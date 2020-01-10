@@ -1,0 +1,60 @@
+//遮罩消失淡出
+.canorder-leave-active {
+    animation: order-close .6s linear;
+  }
+  @keyframes order-close {
+    0% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+}
+
+//上下弹出
+.updown-enter-active {
+  animation: updown-in .3s linear;
+}
+.updown-leave-active {
+  animation: updown-in2 .3s linear;
+}
+@keyframes updown-in {
+  0% {
+    transform: translateY(100%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+@keyframes updown-in2 {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+//左右弹出
+.rightinleft-enter-active {
+  animation: rightinleft-in .3s linear;
+}
+.rightinleft-leave-active {
+  animation: rightinleft-in2 .3s linear;
+}
+@keyframes rightinleft-in {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+@keyframes rightinleft-in2 {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
+}

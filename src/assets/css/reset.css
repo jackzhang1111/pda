@@ -1,0 +1,187 @@
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
+  display: block;
+}
+
+html,
+body,
+#app {
+  width: 100%;
+  height: 100%;
+  /* min-width: 1366px; */
+  font-size: 14px;
+}
+
+body {
+  line-height: 1;
+  background: #F8F8FA;
+  font-family: PingFangSC-Medium, PingFang SC;
+  color: #333333;
+}
+
+ol,
+ul {
+  list-style: none;
+}
+
+blockquote,
+q {
+  quotes: none;
+}
+
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {
+  content: '';
+  content: none;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/*修改 elm-ui*/
+.el-table__header {
+  border-radius: 4px 4px 0px 0px;
+}
+
+.el-table__header tr th {
+  background: #FAFAFA !important;
+  font-size: 14px;
+  font-family: PingFangSC-Medium, PingFang SC;
+  color: #000;
+  font-weight: 550;
+}
+
+.el-button--primary {
+  background-color: #4F89F1;
+}
+
+.el-dialog__header {
+  padding: 12px 20px;
+  border-bottom: 1px solid #EEEEEE;
+}
+
+.el-dialog__headerbtn {
+  top: 16px;
+}
+
+.el-dialog__footer {
+  padding: 10px 20px;
+  border-top: 1px solid #EEEEEE;
+}
+
+.aside-nav-popper {
+  border: none !important;
+  color: #467BDC;
+  padding: 12px;
+  box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.15);
+}
+
+.aside-nav-popper.el-tooltip__popper .popper__arrow {
+  border-width: 0;
+}
+
+.el-button .iconfont {
+  margin-right: 4px;
+}

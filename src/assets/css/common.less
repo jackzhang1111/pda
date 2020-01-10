@@ -1,0 +1,116 @@
+html,body{ width: 100%; height: 100%; overflow: scroll;}
+html::-webkit-scrollbar, body::-webkit-scrollbar{width:0px;height:0px;}
+body{margin:0;}
+*{
+    -webkit-user-select: auto;
+}
+
+.c-b-gray{
+    background-color: #F2F3F5;
+}
+.through{//下划线
+    text-decoration:line-through
+}
+.c-orange{
+    color: #FA5300;
+}
+.czjz{ //垂直居中
+    position: absolute;
+    top:50%;
+    transform: translateY(-50%);
+}
+.spjz{ //水平居中
+    position: absolute;
+    left:50%;
+    transform: translateX(-50%);
+}
+.clamp-2{
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+}
+
+.fl-left{
+    float: left;
+}
+.fl-right{
+    float: right;
+}
+.c-999{
+    color: #999;
+}
+.c-666{
+    color: #666;
+}
+.c-333{
+    color: #333;
+}
+.pd-30{
+    padding: 0 30px;
+}
+.bgc-moren{ //默认底色
+    background-color: #F8F8FA;
+}
+.place{
+    height: 88px;
+}
+// 清除浮动
+.clearfix:after {
+    visibility: hidden;
+    display: block;
+    font-size: 0;
+    content: "";
+    clear: both;
+    height: 0;
+}
+
+.bscroll-wrapper{
+    .bscroll-container{
+        .top-tip{
+            position: absolute;  
+            top: -80px;  
+            left: 0;
+            z-index: 1;  
+            width: 100%;  
+            height:80px;  
+            line-height:80px;  
+            text-align:center;
+            color: #555;
+        } 
+        .bottom-tip{
+            width: 100%;
+            height: 35px;
+            line-height: 35px;
+            text-align: center;
+            color: #777;
+            position: relative;
+            padding-bottom: 30px;
+            font-size: 20px;
+            &::after{
+                content: " ";
+                width: 40%;
+                height: 2px;
+                background-color: #999;
+                position: absolute;
+                top:25%;
+                right:0;
+            }
+            &::before{
+                content: " ";
+                width: 40%;
+                height: 2px;
+                background-color: #999;
+                position: absolute;
+                top:25%;
+                left:0;
+            }
+        }
+    }
+}
+
+
+
+
+
+

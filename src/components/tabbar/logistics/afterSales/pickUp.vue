@@ -1,23 +1,23 @@
 <template>
 <!-- 取件 -->
     <div class="pick-up">
-        <nosaomiao-header></nosaomiao-header>
-        <div class="pick-up-order">退货单号：FGS14964616516</div>
+        <nosaomiao-header title="取件"></nosaomiao-header>
+        <div class="pick-up-order">物流单号：{{detailData.expressNo}}</div>
         <div class="order-detail">
             <div class="detail-header">
-                <van-icon name="play" class="play-left" color="#DCDCDC"/>
+                <van-icon name="play" class="play-left" :color="playLeft ? '#DCDCDC':'#333'" @click="cliPlayLeft"/>
                 <div class="num-input">
                     <input type="number" v-model="current">
                 </div>
                 <span class="ma-35 header-font">/</span>
-                <span class="header-font">5</span>
-                <van-icon name="play" class="play-right"/>
+                <span class="header-font">{{listLength}}</span>
+                <van-icon name="play" class="play-right" :color="playRight ? '#DCDCDC':'#333'" @click="cliPlayRight"/>
             </div>
             <div class="order-product">
-                <img src="../../../../assets/img/product@2x.png">
+                <img :src="$webUrl+currentProduct.skuImg">
                 <div class="product">
-                    <p>百思图冬季商场同款舒适帅气休闲靴系带牛皮马丁靴女皮靴DD989DZ8</p>
-                    <p class="guige">TSIN：5616</p>
+                    <p>{{currentProduct.skuName}}</p>
+                    <p class="guige">TSIN：{{currentProduct.tsinCode}}</p>
                 </div>
             </div>
             <div class="detailed">
@@ -25,64 +25,56 @@
                     <span class="guige-name">{{detailedGuige.name}}</span>
                     <span class="guige-value">{{detailedGuige.value}}</span>
                 </div>
-                <div class="volume">
-                    <div class="volume-item">
-                        <span class="c-999">单位体积 长×宽×高(cm³)</span>
-                        <div class="fl-right volume-value">
-                            <span>61.5</span>
-                            <span>x</span>
-                            <span>500.5</span>
-                            <span>x</span>
-                            <span>61.5</span>
-                        </div>
-                    </div>
-                    <div class="volume-item">
-                        <div class="fl-right">
-                            <span class="c-999">体积:</span>
-                            <span class="fs-22 c-333">1.86520008</span>
-                            <span class="c-999">m³</span>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
-        <div class="btn-wcqj" @click="finishPicking">完成取件</div>
+        <div class="btn-wcqj" @click="finishPicking" v-if="detailData.orderCourierStatusBack == 1">完成取件</div>
     </div>
 </template>
 
 <script>
 import nosaomiaoHeader from '@/multiplexing/nosaomiaoHeader.vue'
-import { Dialog } from 'vant';
+import { Dialog ,Toast } from 'vant';
+import {backlogisticsorderinfoApi,pickupbacklogisticsorderApi} from '@/api/logistics/afterSales/index.js'
 export default {
     props: {
 
     },
     data() {
         return {
+            listLength:0,
             current:1,
             detailedGuigeList:[
-                {name:'规格属性',value:'白色/S'},
-                {name:'供应商',value:'深圳市卜鸣科技'},
-                {name:'批次号',value:'54616DDGV6'},
+                {name:'规格属性',value:this.aaa},
                 {name:'销售退货数量',value:'100'},
                 {name:'FNSKU',value:'6461654'},
-                {name:'供应商',value:'100'},
+                {name:'本次取件数量',value:'100'},
                 {name:'国际码',value:'FSN46166'},
-                {name:'供应商',value:'26'}
-            ]
+            ],
+            detailData:{},
+            currentProduct:{},
         };
     },
     computed: {
-
+        playLeft() {
+            return  this.current == 1
+        },
+        playRight() {
+            
+            return  this.current == this.listLength
+        }
     },
     created() {
 
     },
     mounted() {
-
+        this.backlogisticsorderinfo(this.$route.query.orderid)
     },
     watch: {
-
+        currentProduct:{
+            handler:function(newVal){
+                this.setCurrentProduct()
+            }
+        }
     },
     methods: {
         //完成取件
@@ -91,10 +83,49 @@ export default {
                 title: '温馨提示',
                 message: '您确认商品完成取件了吗？'
             }).then(() => {
-                // on confirm
-            }).catch(() => {
-            // on cancel
-            });
+               this.pickupbacklogisticsorder(this.$route.query.orderid)
+            }).catch(() => {});
+        },
+        //售后详情
+        backlogisticsorderinfo(id){
+            backlogisticsorderinfoApi({order_id:id}).then(res => {
+                if(res.code == 0){
+                    this.detailData = res.Data
+                    this.currentProduct = res.Data.detailList[this.current-1]
+                    this.listLength = res.Data.detailList.length
+                    this.setCurrentProduct()
+                }
+            })
+        },
+        //当前商品基本属性
+        setCurrentProduct(){
+            this.detailedGuigeList[0].value = this.currentProduct.skuValuesTitle
+            this.detailedGuigeList[1].value = this.currentProduct.detailNum
+            this.detailedGuigeList[2].value = this.currentProduct.fnskuCode
+            this.detailedGuigeList[3].value = this.currentProduct.detailNum
+            this.detailedGuigeList[4].value = this.currentProduct.intCode
+        },
+        //上一个
+        cliPlayLeft(){
+            if(this.current <=1) return
+            this.current--
+            this.currentProduct = this.detailData.detailList[this.current-1]
+        },
+        //下一个
+        cliPlayRight(){
+            if(this.current >= this.listLength) return
+            this.current++
+            this.currentProduct = this.detailData.detailList[this.current-1]
+        },
+        //取件
+        pickupbacklogisticsorder(id){
+            pickupbacklogisticsorderApi({orderId:id}).then(res => {
+                if(res.code == 0){
+                    
+                    Toast('成功取件')
+                    setTimeout(()=>{this.backlogisticsorderinfo(this.$route.query.orderid)},1000)
+                }
+            })
         }
     },
     components: {
@@ -157,10 +188,11 @@ export default {
                 width: 140px;
                 height: 140px;
                 vertical-align: top;
+                margin-right:21px;
             }
             .product{
                 display: inline-block;
-                width: 518px;
+                width: 500px;
                 font-size:26px;
                 line-height:39px;
                 color: #333333;
@@ -183,18 +215,6 @@ export default {
                     display: inline-block;
                     width: 200px;
                     color: #999;
-                }
-            }
-            .volume{
-                padding: 14px 30px 20px;
-                .volume-item{
-                    height: 40px;
-                    line-height: 40px;
-                    .volume-value{
-                        span{
-                            margin-left:30px;
-                        }
-                    }
                 }
             }
         }

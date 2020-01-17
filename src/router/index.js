@@ -13,11 +13,14 @@ import distributionList from '@/components/tabbar/logistics/delivery/distributio
 import distributionDetail from '@/components/tabbar/logistics/delivery/distributionDetail.vue'
 import packagePieces from '@/components/tabbar/logistics/delivery/packagePieces.vue'
 import logisticsSearchOrder from '@/components/tabbar/logistics/itemComponents/searchOrder.vue'
+import searchDist from '@/components/tabbar/logistics/delivery/searchDist.vue'
+
 //物流-售后
 import afterSales from '@/components/tabbar/logistics/afterSales/afterSales.vue'
 import afterSalesList from '@/components/tabbar/logistics/afterSales/afterSalesList.vue'
 import afterSalesDetail from '@/components/tabbar/logistics/afterSales/afterSalesDetail.vue'
 import afterSalesPickUp from '@/components/tabbar/logistics/afterSales/pickUp.vue'
+import searchAfter from '@/components/tabbar/logistics/afterSales/searchAfter.vue'
 //我的-个人信息
 import information from '@/components/tabbar/account/information/information.vue'
 import informationList from '@/components/tabbar/account/information/informationList.vue'
@@ -88,6 +91,11 @@ export default new Router({
           path:'distributionList/logisticsSearchOrder',
           name:'logisticsSearchOrder',
           component:logisticsSearchOrder,
+        },
+        {
+          path:'distributionList/searchDist',
+          name:'searchDist',
+          component:searchDist,
         }
       ]
     },
@@ -111,6 +119,11 @@ export default new Router({
           path:'afterSalesList/afterSalesPickUp',
           name:'afterSalesPickUp',
           component:afterSalesPickUp,
+        },
+        {
+          path:'afterSalesList/searchAfter',
+          name:'searchAfter',
+          component:searchAfter,
         }
       ]
     },

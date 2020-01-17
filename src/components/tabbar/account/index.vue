@@ -6,8 +6,8 @@
         </div>
         <div class="pd-30">
             <div class="business-card" @click="$router.push({name:'informationList'})">
-                <p class="card-name">{{userinfo.username}}</p>
-                <p>账号：{{userinfo.mobile}}</p>
+                <p class="card-name">{{userinfoPda.username}}</p>
+                <p>账号：{{userinfoPda.mobile}}</p>
                 <van-icon name="arrow" size="20" class="arrow" color="#A3A3A3" />
             </div>
             <div class="option-list">
@@ -52,7 +52,7 @@ export default {
     },
     data() {
         return {
-            userinfo:{}
+            userinfoPda:{}
         };
     },
     computed: {
@@ -62,7 +62,7 @@ export default {
 
     },
     mounted() {
-        this.userinfo = JSON.parse(localStorage.userinfo)
+        this.userinfoPda = JSON.parse(localStorage.userinfoPda)
     },
     watch: {
 

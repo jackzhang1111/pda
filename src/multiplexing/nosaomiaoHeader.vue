@@ -2,7 +2,7 @@
     <div>
         <div class="nosaomiao-header">
             <van-icon name="arrow-left" size="20" class="arrow-left" @click="$router.go(-1)"/>
-            <span>待接单</span>
+            <span>{{title}}</span>
         </div>
         <div class="place"></div>
     </div>
@@ -11,7 +11,10 @@
 <script>
 export default {
     props: {
-
+        title:{
+            type:String,
+            default:''
+        }
     },
     data() {
         return {

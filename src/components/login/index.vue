@@ -34,6 +34,7 @@
 
 <script>
 import {loginApi} from '@/api/login/index.js'
+import {Toast} from 'vant'
 export default {
     props: {
 
@@ -70,14 +71,18 @@ export default {
     methods: {
         //登录
         denglu(){
+            if(this.formData.username == '' || this.formData.password == ''){
+                Toast('用户名或者密码不能为空')
+                return
+            }
             this.login(this.formData)
-            
         },
+        //登录接口
         login(data){
            loginApi(data).then(res => {
                if(res. code == 0){
                     localStorage.token = res.token
-                    localStorage.userinfo = JSON.stringify(res.user) 
+                    localStorage.userinfoPda = JSON.stringify(res.user) 
                     this.$router.push({name:'logistics'})
                }
            })

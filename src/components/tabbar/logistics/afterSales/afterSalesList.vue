@@ -1,46 +1,49 @@
 <template>
     <div class="distribution-list">
-        <saomiao-header></saomiao-header>
-        <div>
-            <van-tabs type="card" color="#666666" title-active-color="#333333">
+        <saomiao-header @search="search"></saomiao-header>
+        <div class="commodity-tab">
+            <van-tabs type="card" color="#666666" title-active-color="#333333" @change="onClick">
                 <van-tab :title="tab.name" v-for='(tab,index) in tabList' :key="index" >
-                    <div class="bscroll-con">
-                        <div class="order" v-for="(i,index) in 6" :key="index" >
-                            <div class="order-header">
-                                <span>退货单号:GHOJ2019111164615</span>
-                                <div class="fl-right">
-                                    <span>待接单</span>
-                                </div>
-                            </div>
-                            <div class="order-con" @click="toDetail">
-                                <img src="@/assets/img/wodezichan.png" class="touxiang fl-left">
-                                <div class="fl-left xinxi">
-                                    <div class="p1">
-                                        <span>李四</span>
-                                        <span>16163264611</span>
-                                    </div>
-                                    <div class="p2">
-                                        <span>加纳 大阿克拉省 艾博罗阿也伊 顺有顺月 光博客 可顺月沉吟</span>
+                    <scroll class="bscroll-wrapper" ref="wrapper" :data="recordGroup" :pulldown="pulldown" :pullup="pullup" @pulldown="_pulldown" @pullup="_pullup">
+                        <div class="bscroll-con">
+                            <div class="order" v-for="(data,index) in dataList" :key="index" >
+                                <div class="order-header">
+                                    <span>物流单号:{{data.expressNo}}</span>
+                                    <div class="fl-right">
+                                        <span>{{orderStatus(data.orderCourierStatusBack,'statusList')}}</span>
                                     </div>
                                 </div>
-                                <div class="btn fl-right" @click.stop="pickUp">取件</div>
-                            </div>
-                            <div class="order-footer">
-                                <div class="footer-item">
-                                    <img src="@/assets/img/phone@2x.png">
-                                    <span>拨打电话</span> 
+                                <div class="order-con" @click="toDetail(data.orderId)">
+                                    <img :src="$webUrl+data.headImg" class="touxiang fl-left">
+                                    <div class="fl-left xinxi">
+                                        <div class="p1">
+                                            <span>{{data.consignee}}</span>
+                                            <span>{{data.mobile}}</span>
+                                        </div>
+                                        <div class="p2">
+                                            <span>{{data.addressDetail}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="btn fl-right" @click.stop="receipt(data.orderId)" v-if="data.orderCourierStatusBack == 0">接单</div>
+                                    <div class="btn fl-right" @click.stop="pieces(data.orderId)" v-if="data.orderCourierStatusBack == 1">取件</div>
                                 </div>
-                                <div class="footer-item">
-                                    <img src="@/assets/img/navigation@2x.png">
-                                    <span>导航</span> 
-                                </div>
-                                <div class="footer-item">
-                                    <img src="@/assets/img/abnormal@2x.png">
-                                    <span>异常</span> 
+                                <div class="order-footer">
+                                    <div class="footer-item">
+                                        <img src="@/assets/img/phone@2x.png">
+                                        <span>拨打电话</span> 
+                                    </div>
+                                    <div class="footer-item">
+                                        <img src="@/assets/img/navigation@2x.png">
+                                        <span>导航</span> 
+                                    </div>
+                                    <div class="footer-item">
+                                        <img src="@/assets/img/abnormal@2x.png">
+                                        <span>异常</span> 
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </scroll>
                 </van-tab>
             </van-tabs>
         </div>
@@ -50,6 +53,7 @@
 <script>
 import saomiaoHeader from '@/multiplexing/saomiaoHeader.vue'
 import { Dialog } from 'vant';
+import {getbacklogisticsorderApi,receivebacklogisticsorderApi} from '@/api/logistics/afterSales/index.js'
 export default {
     props: {
 
@@ -62,6 +66,24 @@ export default {
                 {name:'待取件',value:2},
                 {name:'待入库',value:3},
                 {name:'已入库',value:4},
+            ],
+            dataList:[],
+            recordGroup:[],
+            pulldown:true,
+            pullup:true,
+            guanmengou:true,
+            totalCount:0,
+            formData:{
+                expressNo:'',
+                orderCourierStatusBack:null,
+                page:1,
+                limit:10
+            },
+            statusList:[
+                {name:'待接单',type:0},
+                {name:'待取件',type:1},
+                {name:'待入库',type:2},
+                {name:'已入库',type:3},
             ]
         };
     },
@@ -72,27 +94,106 @@ export default {
 
     },
     mounted() {
-
-    },
+        this.refreshOrder()
+    },  
     watch: {
 
     },
     methods: {
-        toDetail(){
-            this.$router.push({name:'afterSalesDetail'})
+        toDetail(orderid){
+            this.$router.push({name:'afterSalesDetail',query:{orderid}})
+        },
+        //切换tab
+        onClick(index) {
+            if(index == 0){
+                this.formData.orderCourierStatusBack = null
+            }else{
+                this.formData.orderCourierStatusBack = index - 1
+            }  
+            this.refreshOrder()
+        },
+        search(value){
+            this.$router.push({name:'searchAfter',query:{expressNo:value}})
+        },
+        //售后列表
+        getbacklogisticsorder(data,flag){
+            getbacklogisticsorderApi(data).then(res => {
+                if(res.code == 0){
+                    if(flag){
+                        this.dataList = res.Data.list
+                    }else{
+                        this.dataList = this.dataList.concat(res.Data.list);
+                    }
+                    this.totalCount = res.Data.totalCount
+                    if(this.dataList.length > 0){
+                        if(this.dataList.length >= this.totalCount){
+                            this.pullup = false
+                        }
+                    }else{
+                        this.pulldown = false
+                        this.pullup = false
+                    }
+                }
+            })
         },
         //接单
-        pickUp(){
-           Dialog.confirm({
+        receivebacklogisticsorder(id){
+            receivebacklogisticsorderApi({orderId:id}).then(res => {
+                if(res.code == 0){
+                    this.refreshOrder()
+                }
+            })
+        },
+
+         //下拉刷新
+        _pulldown(){
+            setTimeout(()=>{
+                this.refreshOrder()
+            },500)
+        },
+        //上拉加载
+        _pullup() {
+            if(!this.pullup) return
+            //不知道为什么触发两次,使用关门狗拦截
+            if(this.guanmengou){
+                this.formData.page++
+                this.getbacklogisticsorder(this.formData,false)
+                this.guanmengou = false
+            }
+            setTimeout(()=>{
+                this.guanmengou = true
+            },500)
+        },
+        //刷新页面
+        refreshOrder(){
+            this.formData.page = 1
+            this.formData.limit = 10
+            this.getbacklogisticsorder(this.formData,true)
+            this.pullup = true
+        },
+        //编译状态
+        orderStatus(type,list){
+            let name = ''
+            this[list].forEach(statu => {
+                if(statu.type == type){
+                    name = statu.name
+                }
+            })
+            return name
+        },
+        //接单
+        receipt(id){
+            Dialog.confirm({
                 title: '温馨提示',
-                message: '您确定要取件吗？'
-                }).then(() => {
-                    // on confirm
-                    this.$router.push({name:'afterSalesPickUp'})
-                }).catch(() => {
-                    // on cancel
-                });
-        }
+                message: '您确定要接单吗？'
+            }).then(() => {
+                this.receivebacklogisticsorder(id)
+            }).catch(() => {});
+        },
+        //取件
+        pieces(orderid){
+            this.$router.push({name:'afterSalesPickUp',query:{orderid}})
+        },
     },
     components: {
         saomiaoHeader
@@ -101,6 +202,9 @@ export default {
 </script>
 
 <style scoped lang="less">
+.bscroll-wrapper{
+    height: calc(100vh - 230px);
+}
 .distribution-list{
     /deep/ .van-tabs--card{
         padding: 0 30px;
@@ -176,5 +280,12 @@ export default {
             }
         }
     }
+    .commodity-tab{
+        /deep/ .van-tabs__content{
+            position: relative;
+            overflow: hidden;
+        }
+    }
 }
+
 </style>

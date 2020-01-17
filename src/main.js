@@ -12,11 +12,24 @@ import '@/assets/css/animation.less'
 import {isDisabled,formValidate,strTrim,objTrim,priceReg,objDeepCopy,deepnull} from '@/common/utils'
 import store from './store/index'
 import * as mycomponents from '@/common/mycomponents.js'
+import {gethttpimgurlApi} from '@/api/login/index'
 
 Vue.config.productionTip = false
 
 
 Vue.use(Vant);
+
+
+Vue.prototype.jn = '₵'
+Vue.prototype.$webUrl = 'http://47.52.210.251:8091/tospino/test/'
+
+gethttpimgurlApi().then(res => {
+  if(res.code == 0){
+    Vue.prototype.jn = res.currency
+    Vue.prototype.$webUrl = res.webUrl
+  }
+})
+
 
 Vue.prototype.$fn = {
   copy:objDeepCopy,
@@ -27,8 +40,7 @@ Vue.prototype.$fn = {
   priceReg,
   deepnull,
 }
-Vue.prototype.jn = '₵'
-Vue.prototype.$webUrl = 'http://192.168.1.9:8080/shangzhan168/dev/'
+
 
 //注册全局组件
 Object.keys(mycomponents).forEach(key => {

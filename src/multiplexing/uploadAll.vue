@@ -5,7 +5,7 @@
 </template>
 
 <script>
-// import {uploadImgApi} from '@/api/register/index'
+import {uploadImgApi} from '@/api/upload/index'
 export default {
     props: {
         maxCount:{
@@ -33,18 +33,18 @@ export default {
     },
     methods: {
         afterRead(file) {
-            // this.fileList.pop()
-            // //new 一个FormData格式的参数
-            // let params = new FormData()
-            // params.append('file', file.file)
-            // // 此时可以自行将文件上传至服务器
-            // uploadImgApi(params,14).then(res => {
-            //     if(res.code == 0){
-            //         this.filePathList.push(res.filePath)
-            //         this.fileList.push(file)
-            //         this.success(this.filePath)
-            //     }
-            // })
+            this.fileList.pop()
+            //new 一个FormData格式的参数
+            let params = new FormData()
+            params.append('file', file.file)
+            // 此时可以自行将文件上传至服务器
+            uploadImgApi(params,14).then(res => {
+                if(res.code == 0){
+                    this.filePathList.push(res.filePath)
+                    this.fileList.push(file)
+                    this.success(this.filePath)
+                }
+            })
         },
         //成功后将数据传回
         success(){

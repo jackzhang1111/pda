@@ -1,21 +1,21 @@
 <template>
     <div class="distribution-detail">
-        <nosaomiao-header></nosaomiao-header>
+        <nosaomiao-header :title="orderStatus(detailData.orderCourierStatusBack,'statusList')"></nosaomiao-header>
         <div class="detail-con">
             <div class="shxx">
                 <div class="shxx-header">
                     <p class="p1">取件信息</p> 
-                    <p>退货单号:GHOJ2019111164615</p>
+                    <p>物流单号:{{detailData.expressNo}}</p>
                 </div>
                 <div class="shxx-con">
-                    <img src="@/assets/img/wodezichan.png" class="touxiang fl-left">
+                    <img :src="$webUrl+detailData.headImg" class="touxiang fl-left">
                     <div class="fl-left xinxi">
                         <div class="p1">
-                            <span>李四</span>
-                            <span>16163264611</span>
+                            <span>{{detailData.consignee}}</span>
+                            <span>{{detailData.mobile}}</span>
                         </div>
                         <div class="p2">
-                            <span>加纳 大阿克拉省 艾博罗阿也伊 顺有顺月 光博客 可顺月沉吟</span>
+                            <span>{{detailData.addressDetail}}</span>
                         </div>
                     </div>
                 </div>
@@ -32,45 +32,44 @@
             </div>
             <div class="spqd">
                 <div class="spqd-header">商品清单</div>
-                <div class="spqd-list" v-for="(i,index) in 3" :key="index">
-                    <img src="@/assets/img/wodezichan.png" class="shangpin-img fl-left">
+                <div class="spqd-list" v-for="(detail,index) in detailData.detailList" :key="index">
+                    <img :src="$webUrl+detail.skuImg" class="shangpin-img fl-left">
                     <div class="fl-left good-name">
-                        <p class="p1 clamp-2 c-333">华为HONOR荣耀20pro直降全面屏网通手机官方旗舰店正品v20s官网新品麒品v20s官网新品麒品v20s官网新品麒品v20s官网新品麒</p>
-                        <p class="p2 c-666">TSIN：5616</p>
+                        <p class="p1 clamp-2 c-333">{{detail.skuName}}</p>
+                        <p class="p2 c-666">TSIN：{{detail.tsinCode}}</p>
                         <p class="p3 c-666">
-                            <span>白色/S码</span>
-                            <span class="fl-right">x20</span>
+                            <span>{{detail.skuValuesTitle}}</span>
+                            <span class="fl-right">x{{detail.detailNum}}</span>
                         </p>
                     </div>
                 </div>
                 <div class="spqd-footer">
                     <span>总计:</span>
-                    <span>40</span>
+                    <span>{{detailData.totalNum}}</span>
                 </div>
             </div>
             <div class="order-time">
-                <div class="time-item">
+                <div class="time-item" v-if="detailData.acceptTime">
                     <span class="c-333">接单时间</span>
-                    <div class="fl-right fs-22 c-666">2019-11-11 16:07:59</div>
+                    <div class="fl-right fs-22 c-666">{{detailData.acceptTime}}</div>
                 </div>
-                <div class="time-item">
-                    <span class="c-333">揽件时间</span>
-                    <div class="fl-right fs-22 c-666">2019-11-11 16:07:59</div>
+                <div class="time-item" v-if="detailData.pickupTime">
+                    <span class="c-333">取件时间</span>
+                    <div class="fl-right fs-22 c-666">{{detailData.pickupTime}}</div>
                 </div>
-                <div class="time-item">
-                    <span class="c-333">签收时间</span>
-                    <div class="fl-right fs-22 c-666">2019-11-11 16:07:59</div>
+                <div class="time-item" v-if="detailData.stockinTime">
+                    <span class="c-333">入库时间</span>
+                    <div class="fl-right fs-22 c-666">{{detailData.stockinTime}}</div>
                 </div>  
             </div>
+            <div class="place"></div>
         </div>
-
-        
-
     </div>
 </template>
 
 <script>
 import nosaomiaoHeader from '@/multiplexing/nosaomiaoHeader.vue'
+import {backlogisticsorderinfoApi} from '@/api/logistics/afterSales/index.js'
 export default {
     props: {
 
@@ -84,8 +83,15 @@ export default {
                 { name: '客户签收',value:2 },
                 { name: '取消',value:0}
             ],
+            statusList:[
+                {name:'待接单',type:0},
+                {name:'待取件',type:1},
+                {name:'待入库',type:2},
+                {name:'已入库',type:3},
+            ],
             uploadList:[],
-            zhezhaoStatus:false
+            zhezhaoStatus:false,
+            detailData:{}
         };
     },
     computed: {
@@ -95,13 +101,30 @@ export default {
 
     },
     mounted() {
-
+        this.backlogisticsorderinfo(this.$route.query.orderid)
     },
     watch: {
 
     },
     methods: {
-        
+        //售后详情
+        backlogisticsorderinfo(id){
+            backlogisticsorderinfoApi({order_id:id}).then(res => {
+                if(res.code == 0){
+                    this.detailData = res.Data
+                }
+            })
+        },
+        //编译状态
+        orderStatus(type,list){
+            let name = ''
+            this[list].forEach(statu => {
+                if(statu.type == type){
+                    name = statu.name
+                }
+            })
+            return name
+        },
     },
     components: {
         nosaomiaoHeader,

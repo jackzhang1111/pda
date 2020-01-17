@@ -1,53 +1,47 @@
 <template>
     <div class="distribution-list">
-        <saomiao-header @search="search"></saomiao-header>
+        <saomiao-header @search="search" :value="$route.query.expressNo"></saomiao-header>
         <div class="commodity-tab">
-            <van-tabs type="card" color="#666666" title-active-color="#333333" @change="onClick">
-                <van-tab :title="tab.name" v-for='(tab,index) in tabList' :key="index">
-                    <scroll class="bscroll-wrapper" ref="wrapper" :data="recordGroup" :pulldown="pulldown" :pullup="pullup" @pulldown="_pulldown" @pullup="_pullup">
-                        <div class="bscroll-con">
-                            <div class="order" v-for="(data,index) in dataList" :key="index" >
-                                <div class="order-header">
-                                    <span>物流单号:{{data.expressNo}}</span>
-                                    <div class="fl-right">
-                                        <span>{{orderStatus(data.orderCourierStatus,'statusList')}}</span>
-                                    </div>
-                                </div>
-                                <div class="order-con" @click="toDetail(data.orderId)">
-                                    <img :src="$webUrl+data.headImg" class="touxiang fl-left">
-                                    <div class="fl-left xinxi">
-                                        <div class="p1">
-                                            <span>{{data.consignee}}</span>
-                                            <span>{{data.mobile}}</span>
-                                        </div>
-                                        <div class="p2">
-                                            <span>{{data.addressDetail}}</span>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="btn fl-right" @click.stop="receipt(data.orderId)" v-if="data.orderCourierStatus==0">接单</div>
-                                    <div class="btn fl-right" @click.stop="pieces(data.orderId)" v-if="data.canPickup == 1">揽件</div>
-                                    <div class="sqtk fl-right" v-if="data.applyRefund == 1">申请退款</div>
-                                </div>
-                                <div class="order-footer">
-                                    <div class="footer-item">
-                                        <img src="@/assets/img/phone@2x.png">
-                                        <span>拨打电话</span> 
-                                    </div>
-                                    <div class="footer-item">
-                                        <img src="@/assets/img/navigation@2x.png">
-                                        <span>导航</span> 
-                                    </div>
-                                    <div class="footer-item">
-                                        <img src="@/assets/img/abnormal@2x.png">
-                                        <span>异常</span> 
-                                    </div>
-                                </div>
+            <scroll class="bscroll-wrapper" ref="wrapper" :data="recordGroup" :pulldown="pulldown" :pullup="pullup" @pulldown="_pulldown" @pullup="_pullup">
+                <div class="bscroll-con">
+                    <div class="order" v-for="(data,index) in dataList" :key="index" >
+                        <div class="order-header">
+                            <span>物流单号:{{data.expressNo}}</span>
+                            <div class="fl-right">
+                                <span>{{orderStatus(data.orderCourierStatus,'statusList')}}</span>
                             </div>
                         </div>
-                    </scroll>
-                </van-tab>
-            </van-tabs>
+                        <div class="order-con" @click="toDetail">
+                            <img src="@/assets/img/wodezichan.png" class="touxiang fl-left">
+                            <div class="fl-left xinxi">
+                                <div class="p1">
+                                    <span>李四</span>
+                                    <span>16163264611</span>
+                                </div>
+                                <div class="p2">
+                                    <span>{{data.addressDetail}}</span>
+                                </div>
+                            </div>
+                            <div class="btn fl-right" @click.stop="receipt" v-if="data.orderCourierStatus==0">接单</div>
+                            <div class="btn fl-right" @click.stop="pieces" v-if="data.canPickup == 1">揽件</div>
+                        </div>
+                        <div class="order-footer">
+                            <div class="footer-item">
+                                <img src="@/assets/img/phone@2x.png">
+                                <span>拨打电话</span> 
+                            </div>
+                            <div class="footer-item">
+                                <img src="@/assets/img/navigation@2x.png">
+                                <span>导航</span> 
+                            </div>
+                            <div class="footer-item">
+                                <img src="@/assets/img/abnormal@2x.png">
+                                <span>异常</span> 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </scroll>
         </div>
     </div>
 </template>
@@ -55,21 +49,13 @@
 <script>
 import saomiaoHeader from '@/multiplexing/saomiaoHeader.vue'
 import { Dialog } from 'vant';
-import {getlogisticsorderApi,receivelogisticsorderApi} from '@/api/logistics/delivery/index.js'
+import {getlogisticsorderApi} from '@/api/logistics/delivery/index.js'
 export default {
     props: {
 
     },
     data() {
         return {
-            tabList:[
-                {name:'全部',value:0},
-                {name:'待接单',value:1},
-                {name:'待揽件',value:2},
-                {name:'配送中',value:3},
-                {name:'已签收',value:4},
-                {name:'已拒签',value:5},
-            ],
             dataList:[],
             recordGroup:[],
             pulldown:true,
@@ -99,27 +85,40 @@ export default {
     },
     mounted() {
         this.refreshOrder()
+        this.formData.expressNo = this.$route.query.expressNo
     },
     watch: {
 
     },
     methods: {
-        toDetail(orderid){
-            this.$router.push({name:'distributionDetail',query:{orderid}})
+        toDetail(){
+            this.$router.push({name:'distributionDetail'})
         },
         //接单
-        receipt(id){
+        receipt(){
            Dialog.confirm({
                 title: '温馨提示',
                 message: '您确定要接单吗？'
                 }).then(() => {
                     // on confirm
-                    this.receivelogisticsorder(id)
-                }).catch(() => {});
+                    console.log(123);
+                }).catch(() => {
+                    // on cancel
+                    console.log(456);
+            });
         },
         //揽件
-        pieces(orderid){
-            this.$router.push({name:'packagePieces',query:{orderid}})
+        pieces(){
+            Dialog.confirm({
+                title: '温馨提示',
+                message: '您确认揽件并配送吗？'
+                }).then(() => {
+                    // on confirm
+                    console.log(123);
+                }).catch(() => {
+                    // on cancel
+                    console.log(456);
+            });
         },
         //配送列表
         getlogisticsorder(data,flag){
@@ -139,6 +138,8 @@ export default {
                         this.pulldown = false
                         this.pullup = false
                     }
+                }else{
+                    this.pullup = false
                 }
             })
         },
@@ -178,25 +179,9 @@ export default {
             })
             return name
         },
-        //切换tab
-        onClick(index) {
-            if(index == 0){
-                this.formData.orderCourierStatus = null
-            }else{
-                this.formData.orderCourierStatus = index - 1
-            }  
-            this.refreshOrder()
-        },
         search(value){
-            this.$router.push({name:'searchDist',query:{expressNo:value}})
-        },
-        //接单
-        receivelogisticsorder(id){
-            receivelogisticsorderApi({orderId:id}).then(res => {
-                if(res.code == 0){
-                    this.refreshOrder()
-                }
-            })
+            this.formData.expressNo = value
+            this.refreshOrder()
         }
     },
     components: {
@@ -207,7 +192,7 @@ export default {
 
 <style scoped lang="less">
 .bscroll-wrapper{
-    height: calc(100vh - 230px);
+    height: calc(100vh - 150px);
 }
 .distribution-list{
     
@@ -272,13 +257,6 @@ export default {
                 border-radius:6px;
                 line-height: 48px;
                 text-align: center;
-                margin-left:20px;
-            }
-            .sqtk{
-                height:48px;
-                line-height: 48px;
-                text-align: right;
-                
             }
         }
         .order-footer{
@@ -299,10 +277,9 @@ export default {
         }
     }
     .commodity-tab{
-        /deep/ .van-tabs__content{
-            position: relative;
-            overflow: hidden;
-        }
+        overflow: hidden;
+        margin-top:30px;
+        padding: 0 30px;
     }
 }
 </style>

@@ -1,21 +1,21 @@
 <template>
     <div class="distribution-detail">
-        <nosaomiao-header></nosaomiao-header>
+        <nosaomiao-header :title="orderStatus(detailData.orderCourierStatus,'statusList')"></nosaomiao-header>
         <div class="detail-con">
             <div class="shxx">
                 <div class="shxx-header">
                     <p class="p1">收货信息</p> 
-                    <p>订单号:GHOJ2019111164615</p>
+                    <p>订单号:{{detailData.expressNo}}</p>
                 </div>
                 <div class="shxx-con">
-                    <img src="@/assets/img/wodezichan.png" class="touxiang fl-left">
+                    <img :src="$webUrl+detailData.headImg" class="touxiang fl-left">
                     <div class="fl-left xinxi">
                         <div class="p1">
-                            <span>李四</span>
-                            <span>16163264611</span>
+                            <span>{{detailData.consignee}}</span>
+                            <span>{{detailData.mobile}}</span>
                         </div>
                         <div class="p2">
-                            <span>加纳 大阿克拉省 艾博罗阿也伊 顺有顺月 光博客 可顺月沉吟</span>
+                            <span>{{detailData.addressDetail}}</span>
                         </div>
                     </div>
                 </div>
@@ -32,49 +32,51 @@
             </div>
             <div class="spqd">
                 <div class="spqd-header">商品清单</div>
-                <div class="spqd-list" v-for="(i,index) in 3" :key="index">
-                    <img src="@/assets/img/wodezichan.png" class="shangpin-img fl-left">
+                <div class="spqd-list" v-for="(detail,index) in detailData.detailList" :key="index">
+                    <img :src="$webUrl+detail.skuImg" class="shangpin-img fl-left">
                     <div class="fl-left good-name">
-                        <p class="p1 clamp-2 c-333">华为HONOR荣耀20pro直降全面屏网通手机官方旗舰店正品v20s官网新品麒品v20s官网新品麒品v20s官网新品麒品v20s官网新品麒</p>
-                        <p class="p2 c-666">TSIN：5616</p>
+                        <p class="p1 clamp-2 c-333">{{detail.supplyName}}</p>
+                        <p class="p2 c-666">TSIN：{{detail.tsinCode}}</p>
                         <p class="p3 c-666">
-                            <span>白色/S码</span>
-                            <span class="fl-right">x20</span>
+                            <span>{{detail.skuValuesTitle}}</span>
+                            <span class="fl-right">x{{detail.detailNum}}</span>
                         </p>
                     </div>
                 </div>
                 <div class="spqd-footer">
                     <span>总计:</span>
-                    <span>40</span>
+                    <span>{{detailData.totalNum}}</span>
                 </div>
             </div>
             <div class="order-time">
-                <div class="time-item">
+                <div class="time-item" v-if="detailData.acceptTime">
                     <span class="c-333">接单时间</span>
-                    <div class="fl-right fs-22 c-666">2019-11-11 16:07:59</div>
+                    <div class="fl-right fs-22 c-666">{{detailData.acceptTime}}</div>
                 </div>
-                <div class="time-item">
+                <div class="time-item" v-if="detailData.pickupTime">
                     <span class="c-333">揽件时间</span>
-                    <div class="fl-right fs-22 c-666">2019-11-11 16:07:59</div>
+                    <div class="fl-right fs-22 c-666">{{detailData.pickupTime}}</div>
                 </div>
-                <div class="time-item">
+                <div class="time-item" v-if="detailData.signTime">
                     <span class="c-333">签收时间</span>
-                    <div class="fl-right fs-22 c-666">2019-11-11 16:07:59</div>
+                    <div class="fl-right fs-22 c-666">{{detailData.signTime}}</div>
                 </div>  
             </div>
-            <div class="qianshou" v-if="true">
+            <div class="qianshou" v-if="detailData.orderCourierStatus == 3">
                 <p>
                    <span>签收凭证：</span>
                    <span>客户签收</span>
                 </p>
-                <div class="pingzheng"></div>
+                <div class="pingzheng">
+                    <img :src="$webUrl+i.imgUrl" v-for="(i,index) in detailData.imgList" :key="index">
+                </div>
             </div>
-            <div class="qianshou" v-if="true">
+            <div class="qianshou" v-if="detailData.orderCourierStatus == 4">
                 <p>拒签原因:</p>
-                <p>货品损坏</p>
+                <p>{{detailData.refuseSignReason}}</p>
             </div>
-            <div class="btns">
-                <div class="btn-jq fl-left" @click="dialogShow =true">客户拒签</div>
+            <div class="btns" v-if="detailData.orderCourierStatus == 2">
+                <div class="btn-jq fl-left" @click="refuseTosign">客户拒签</div>
                 <div class="btn-qs fl-right" @click="qsShow=true">确认签收</div>
             </div>
         </div>
@@ -86,14 +88,14 @@
                 <div>
                     <div class="title">拍照签收</div>
                     <div class="kuang">
-                        <upload-all @getfilePathList="getfilePathList" :maxCount="3" v-if="true"></upload-all>
-                        <div v-if="false">
-                            <textarea class="textarea" placeholder="请填写客户拒签原因"></textarea>
+                        <upload-all @getfilePathList="getfilePathList" :maxCount="3" v-if="qhStatus"></upload-all>
+                        <div v-else>
+                            <textarea class="textarea" placeholder="请填写客户拒签原因" v-model="qianshouData.refuseSignReason"></textarea>
                         </div>
                     </div>
                     <div class="tanchuang-btns">
-                        <div class="fl-left qx-btn">取消</div>
-                        <div class="fl-left qd-btn">确定</div>
+                        <div class="fl-left qx-btn" @click="cancel">取消</div>
+                        <div class="fl-left qd-btn" @click="confirm">确定</div>
                     </div>
                 </div>
                 
@@ -107,6 +109,8 @@
 import nosaomiaoHeader from '@/multiplexing/nosaomiaoHeader.vue'
 import zhezhao from '@/multiplexing/zhezhao.vue'
 import uploadAll from '@/multiplexing/uploadAll'
+import {logisticsorderinfoApi,signlogisticsorderApi} from '@/api/logistics/delivery/index.js'
+import {Toast} from 'vant'
 export default {
     props: {
 
@@ -114,14 +118,28 @@ export default {
     data() {
         return {
             qsShow: false,
-            dialogShow:false,
+            qhStatus:true,
             actions: [
                 { name: '拍照签收',value:1 },
-                { name: '客户签收',value:2 },
+                // { name: '客户签收',value:2 },
                 { name: '取消',value:0}
             ],
             uploadList:[],
-            zhezhaoStatus:false
+            zhezhaoStatus:false,
+            detailData:{},
+            statusList:[
+                {name:'待接单',type:0},
+                {name:'待揽件',type:1},
+                {name:'配送中',type:2},
+                {name:'已签收',type:3},
+                {name:'拒绝签收',type:4},
+            ],
+            qianshouData:{
+                orderId:this.$route.query.orderid,
+                signType:null,
+                refuseSignReason:'',
+                imgList:[]
+            }
         };
     },
     computed: {
@@ -131,7 +149,7 @@ export default {
 
     },
     mounted() {
-
+        this.logisticsorderinfo(this.$route.query.orderid)
     },
     watch: {
 
@@ -141,13 +159,77 @@ export default {
         onSelect(item) {
             // 默认情况下，点击选项时不会自动关闭菜单
             // 可以通过 close-on-click-action 属性开启自动关闭
-            this.show = false;
-            console.log(item);
+            this.qsShow = false;
+            if(item.value == 1){
+                this.zhezhaoStatus = true
+                this.qhStatus = true
+                this.qianshouData.signType = 1
+            }
+        },
+        //拒签按钮
+        refuseTosign(){
+            this.zhezhaoStatus = true
+            this.qhStatus = false
+            this.qianshouData.signType = 2
         },
         //获取上传图片列表
         getfilePathList(list){
             this.uploadList = list
-        }
+        },
+        //配送单详情
+        logisticsorderinfo(id){
+            logisticsorderinfoApi({order_id:id}).then(res => {
+                if(res.code == 0){
+                    this.detailData = res.Data
+                }
+            })
+        },
+        //编译状态
+        orderStatus(type,list){
+            let name = ''
+            this[list].forEach(statu => {
+                if(statu.type == type){
+                    name = statu.name
+                }
+            })
+            return name
+        },
+        //签收/拒签 确定按钮
+        confirm(){
+            let arr = []
+            if(this.qianshouData.signType == 1){
+                this.uploadList.forEach(item => {
+                    let obj = {
+                        imgUrl:item
+                    }
+                    arr.push(obj)
+                    this.qianshouData.imgList = arr
+                })
+                if(this.qianshouData.imgList.length <= 0){
+                    Toast('签收图片不能为空')
+                    return
+                }
+            }else{
+                this.qianshouData.imgList = []
+            }
+
+            this.signlogisticsorder(this.qianshouData)
+
+        },
+        //签收/拒签 取消按钮
+        cancel(){
+            this.zhezhaoStatus = false
+            this.qianshouData.refuseSignReason = ''
+        },
+        //签收/拒签接口
+        signlogisticsorder(data){
+            signlogisticsorderApi(data).then(res => {
+                if(res.code == 0){
+                    this.logisticsorderinfo(this.$route.query.orderid)
+                    this.zhezhaoStatus = false
+                }
+            })
+        },
     },
     components: {
         nosaomiaoHeader,
@@ -185,7 +267,20 @@ export default {
             }
             .xinxi{
                 width: 464px;
-                
+                .p1{
+                    margin-bottom: 30px;
+                    font-size: 26px;
+                    span{
+                        &:nth-child(1){
+                            margin-right: 70px;
+                        }
+                    }
+                }
+                .p2{
+                    font-size: 24px;
+                    line-height:36px;
+                    color: #999;
+                }
             }
             
         }
@@ -277,10 +372,13 @@ export default {
             margin-bottom: 32px;
         }
         .pingzheng{
-            width:357px;
-            height:200px;
-            background:rgba(245,245,245,1);
-            border:1px solid rgba(201,201,201,1);
+            display: flex;
+            align-items: center;
+            img{
+                width: 200px;
+                height:200px;
+                margin-right:20px;
+            }
         }
     }
     .btns{
@@ -347,10 +445,11 @@ export default {
             }
             .textarea{
                 width: 90%;
-                height: 260px;
+                height: 230px;
                 border: 0;
                 font-size: 24px;
                 line-height:30px;
+                margin-top: 20px;
             }
         }
         .tanchuang-btns{

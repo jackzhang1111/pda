@@ -1,45 +1,47 @@
 <template>
 <!-- 揽件详情 -->
     <div class="package-pieces">
-        <nosaomiao-header></nosaomiao-header>
+        <nosaomiao-header title="揽件"></nosaomiao-header>
         <div class="order-con">
             <div class="order-no">
-                <p>订单号：FSG56256461625</p>
+                <p>物流单号: &nbsp;{{detailData.expressNo}}</p>
             </div>
             <div class="spqd">
                 <div class="spqd-header">商品清单</div>
-                <div class="spqd-list" v-for="(i,index) in 6" :key="index">
-                    <img src="@/assets/img/wodezichan.png" class="shangpin-img fl-left">
+                <div class="spqd-list" v-for="(detail,index) in detailData.detailList" :key="index">
+                    <img :src="$webUrl+detail.skuImg" class="shangpin-img fl-left">
                     <div class="fl-left good-name">
-                        <p class="p1 clamp-2 c-333">华为HONOR荣耀20pro直降全面屏网通手机官方旗舰店正品v20s官网新品麒品v20s官网新品麒品v20s官网新品麒品v20s官网新品麒</p>
-                        <p class="p2 c-666">TSIN：5616</p>
+                        <p class="p1 clamp-2 c-333">{{detail.supplyName}}</p>
+                        <p class="p2 c-666">TSIN：{{detail.tsinCode}}</p>
                         <p class="p3 c-666">
-                            <span>白色/S码</span>
-                            <span class="fl-right">x20</span>
+                            <span>{{detail.skuValuesTitle}}</span>
+                            <span class="fl-right">x{{detail.detailNum}}</span>
                         </p>
                     </div>
                 </div>
                 <div class="spqd-footer">
-                    <span>总计:</span>
-                    <span>40</span>
+                    <span>总计:</span> 
+                    <span>{{detailData.totalNum}}</span> 
                 </div>
             </div>
         </div>
         
-        <div class="qrlj-btn" @click="pieces">确认揽件</div>
+        <div class="qrlj-btn" @click="pieces" v-if="detailData.canPickup != 0">确认揽件</div>
+        <div class="btn-place"></div>
     </div>
 </template>
 
 <script>
 import nosaomiaoHeader from '@/multiplexing/nosaomiaoHeader.vue'
-import { Dialog } from 'vant'
+import { Dialog,Toast} from 'vant'
+import {pickuplogisticsorderApi,logisticsorderinfoApi} from '@/api/logistics/delivery/index.js'
 export default {
     props: {
 
     },
     data() {
         return {
-
+            detailData:{}
         };
     },
     computed: {
@@ -49,24 +51,37 @@ export default {
 
     },
     mounted() {
-
+        this.logisticsorderinfo(this.$route.query.orderid)
     },
     watch: {
 
     },
     methods: {
-        //揽件
+        //揽件按钮
         pieces(){
             Dialog.confirm({
                 title: '温馨提示',
                 message: '您确认揽件并配送吗？'
                 }).then(() => {
-                    // on confirm
-                    console.log(123);
-                }).catch(() => {
-                    // on cancel
-                    console.log(456);
-            });
+                    this.pickuplogisticsorder(this.$route.query.orderid)
+                }).catch(() => {});
+        },
+        //配送单详情
+        logisticsorderinfo(id){
+            logisticsorderinfoApi({order_id:id}).then(res => {
+                if(res.code == 0){
+                    this.detailData = res.Data
+                }
+            })
+        },
+        //揽件接口
+        pickuplogisticsorder(orderId){
+            pickuplogisticsorderApi({orderId}).then(res => {
+                if(res.code == 0){
+                    Toast('成功揽件')
+                    this.logisticsorderinfo(this.$route.query.orderid)
+                }
+            })
         }
     },
     components: {
@@ -77,6 +92,8 @@ export default {
 
 <style scoped lang="less">
 .package-pieces{
+    position: relative;
+    min-height: 100vh;
     .order-con{
         padding: 20px 30px 0;
         .order-no{
@@ -142,7 +159,7 @@ export default {
         
     }
     .qrlj-btn{
-        position: relative;
+        position: absolute;
         width: 100%;
         height: 110px;
         background-color: #333;
@@ -152,6 +169,8 @@ export default {
         color: #fff;
         bottom: 0;
     }
-    
+    .btn-place{
+        height: 110px;;
+    }
 }
 </style>

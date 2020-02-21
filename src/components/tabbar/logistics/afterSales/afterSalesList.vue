@@ -141,6 +141,14 @@ export default {
             receivebacklogisticsorderApi({orderId:id}).then(res => {
                 if(res.code == 0){
                     this.refreshOrder()
+                }else if(res.code == 1){
+                    Toast('参数requestModel不能为空')
+                }else if(res.code == 2){
+                    Toast('物流单Id必须大于0')
+                }else if(res.code == 21){
+                    Toast('该物流单不存在')
+                }else if(res.code == 22){
+                    Toast('该物流单不是待接单状态，不能接单')
                 }
             })
         },

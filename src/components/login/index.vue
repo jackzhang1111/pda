@@ -58,8 +58,12 @@ export default {
 
     },
     mounted() {
-
+        window.addEventListener("keyup",this.keyupEnter,false);
     },
+    beforeDestroy() {
+        //生命周期 - 销毁之前
+        window.removeEventListener("keyup",this.keyupEnter,false);
+    }, 
     watch: {
         iconStatus:{
             handler:function(newVal){
@@ -86,7 +90,15 @@ export default {
                     this.$router.push({name:'logistics'})
                }
            })
-        }
+        },
+         //回车键
+        keyupEnter(){
+            const that = this;
+            if( window.event.keyCode == 13 ){
+                //执行登录方法
+                this.denglu()
+            }
+        },
     },
     components: {
 

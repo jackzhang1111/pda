@@ -86,7 +86,7 @@
         <zhezhao v-if="zhezhaoStatus">
             <div class="tanchuang">
                 <div>
-                    <div class="title">拍照签收</div>
+                    <div class="title">{{qhStatus?'拍照签收':'填写拒签原因'}}</div>
                     <div class="kuang">
                         <upload-all @getfilePathList="getfilePathList" :maxCount="3" v-if="qhStatus"></upload-all>
                         <div v-else>
@@ -181,6 +181,12 @@ export default {
             logisticsorderinfoApi({order_id:id}).then(res => {
                 if(res.code == 0){
                     this.detailData = res.Data
+                }else if(res.code == 1){
+                    Toast(res.orderSn+'不属于您的配送单，请联系客服')
+                    this.$router.go(-1)
+                }else if(res.code == 2){
+                    Toast('不存在此单号，请重新扫描')
+                    this.$router.go(-1)
                 }
             })
         },
@@ -227,6 +233,22 @@ export default {
                 if(res.code == 0){
                     this.logisticsorderinfo(this.$route.query.orderid)
                     this.zhezhaoStatus = false
+                }else if(res.code == 1){
+                    Toast('参数requestModel不能为空')
+                }else if(res.code == 2){
+                    Toast('物流单Id必须大于0')
+                }else if(res.code == 3){
+                    Toast('参数签收类型signType不正确')
+                }else if(res.code == 4){
+                    Toast('请填写拒签原因')
+                }else if(res.code == 5){
+                    Toast('请上传签收凭证')
+                }else if(res.code == 21){
+                    Toast('该物流单不存在')
+                }else if(res.code == 22){
+                    Toast('该物流单不是待接单状态，不能接单')
+                }else if(res.code == 31){
+                    Toast('该物流单不属于当前配送人员，不能进行此操作')
                 }
             })
         },

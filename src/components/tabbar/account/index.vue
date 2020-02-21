@@ -40,12 +40,13 @@
                     </div>
                 </div>
             </div>
-            <div class="login-out" @click="$router.push({name:'login'})">退出登录</div>
+            <div class="login-out" @click="logout">退出登录</div>
         </div>
     </div>
 </template>
 
 <script>
+import {logoutApi} from '@/api/login/index.js'
 export default {
     props: {
 
@@ -53,6 +54,7 @@ export default {
     data() {
         return {
             userinfoPda:{}
+            
         };
     },
     computed: {
@@ -68,7 +70,13 @@ export default {
 
     },
     methods: {
-
+        logout(){
+            logoutApi().then(res => {
+               if(res.code == 0){
+                   this.$router.push({name:'login'})
+               } 
+            })
+        }
     },
     components: {
 

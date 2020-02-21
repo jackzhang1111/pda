@@ -16,3 +16,11 @@ export function gethttpimgurlApi(params) {
         data:params
     })
 }
+
+//用户退出登录
+export function logoutApi() {
+    return park({
+        url:`/PDAlogin/logout`,
+        method: 'POST',
+    })
+}

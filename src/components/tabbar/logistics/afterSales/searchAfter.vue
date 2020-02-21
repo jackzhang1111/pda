@@ -11,19 +11,19 @@
                                 <span>{{orderStatus(data.orderCourierStatus,'statusList')}}</span>
                             </div>
                         </div>
-                        <div class="order-con" @click="toDetail">
+                        <div class="order-con" @click="toDetail(data.orderId)">
                             <img src="@/assets/img/wodezichan.png" class="touxiang fl-left">
                             <div class="fl-left xinxi">
                                 <div class="p1">
-                                    <span>李四</span>
-                                    <span>16163264611</span>
+                                    <span>{{data.consignee}}</span>
+                                    <span>{{data.mobile}}</span>
                                 </div>
                                 <div class="p2">
                                     <span>{{data.addressDetail}}</span>
                                 </div>
                             </div>
-                            <div class="btn fl-right" @click.stop="receipt" v-if="data.orderCourierStatus==0">接单</div>
-                            <div class="btn fl-right" @click.stop="pieces" v-if="data.canPickup == 1">揽件</div>
+                            <div class="btn fl-right" @click.stop="receipt(data.orderId)" v-if="data.orderCourierStatusBack == 0">接单</div>
+                            <div class="btn fl-right" @click.stop="pieces(data.orderId)" v-if="data.orderCourierStatusBack == 1">取件</div>
                         </div>
                         <div class="order-footer">
                             <div class="footer-item">
@@ -92,34 +92,21 @@ export default {
 
     },
     methods: {
-        toDetail(){
-            this.$router.push({name:'distributionDetail'})
+        toDetail(orderid){
+            this.$router.push({name:'afterSalesDetail',query:{orderid}})
         },
         //接单
-        receipt(){
-           Dialog.confirm({
-                title: '温馨提示',
-                message: '您确定要接单吗？'
-                }).then(() => {
-                    // on confirm
-                    console.log(123);
-                }).catch(() => {
-                    // on cancel
-                    console.log(456);
-            });
-        },
-        //揽件
-        pieces(){
+        receipt(id){
             Dialog.confirm({
                 title: '温馨提示',
-                message: '您确认揽件并配送吗？'
-                }).then(() => {
-                    // on confirm
-                    console.log(123);
-                }).catch(() => {
-                    // on cancel
-                    console.log(456);
-            });
+                message: '您确定要接单吗？'
+            }).then(() => {
+                this.receivebacklogisticsorder(id)
+            }).catch(() => {});
+        },
+        //取件
+        pieces(orderid){
+            this.$router.push({name:'afterSalesPickUp',query:{orderid}})
         },
         //配送列表
         getbacklogisticsorder(data,flag){

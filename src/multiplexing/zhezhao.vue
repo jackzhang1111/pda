@@ -1,5 +1,5 @@
 <template>
-    <div class="zhezhao">
+    <div class="zhezhao" @click="clizhezhao">
         <slot></slot>   
     </div>
 </template>
@@ -27,7 +27,9 @@ export default {
 
     },
     methods: {
-
+        clizhezhao(){
+            this.$emit('cancalZhezhao',false)
+        }
     },
     components: {
 

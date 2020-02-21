@@ -4,29 +4,29 @@
         <div class="option-list">
             <div class="option-item">
                 <span>姓名</span>
-                <div class="fl-right">司庭轩</div>
+                <div class="fl-right">{{userinfoPda.username}}</div>
             </div>
             <div class="option-item">
                 <span>性别</span>
-                <div class="fl-right">男</div>
+                <div class="fl-right">{{userinfoPda.sextxt}}</div>
             </div>
             <div class="option-item" @click="$router.push({name:'currentPhone'})">
                 <span>手机</span>
                 <div class="fl-right">
-                    <span>16648415555</span>
+                    <span>{{userinfoPda.mobile}}</span>
                     <van-icon name="arrow" size="15" class="arrow" color="#A3A3A3"/>
                 </div>
             </div>
             <div class="option-item" @click="$router.push({name:'eMail'})">
                 <span>邮箱</span>
                 <div class="fl-right">
-                    <span>info@tospino.com</span>
+                    <span>{{userinfoPda.email}}</span>
                     <van-icon name="arrow" size="15" class="arrow" color="#A3A3A3"/>
                 </div>
             </div>
             <div class="option-item">
                 <span>证件号</span>
-                <div class="fl-right">465666164965461</div>
+                <div class="fl-right">{{userinfoPda.idnumber}}</div>
             </div>
             <div class="option-item" @click="$router.push({name:'where'})">
                 <span>居住地址</span>
@@ -40,7 +40,7 @@
             </div>
             <div class="option-item">
                 <span>所属承运商</span>
-                <div class="fl-right">中通速运</div>
+                <div class="fl-right">{{userinfoPda.carrierBusinessName}}</div>
             </div>
             
         </div>
@@ -55,7 +55,7 @@ export default {
     },
     data() {
         return {
-
+            userinfoPda:{}
         };
     },
     computed: {
@@ -65,7 +65,7 @@ export default {
 
     },
     mounted() {
-
+        this.userinfoPda = JSON.parse(localStorage.userinfoPda)
     },
     watch: {
 

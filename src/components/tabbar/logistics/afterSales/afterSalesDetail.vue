@@ -70,6 +70,7 @@
 <script>
 import nosaomiaoHeader from '@/multiplexing/nosaomiaoHeader.vue'
 import {backlogisticsorderinfoApi} from '@/api/logistics/afterSales/index.js'
+import {Toast} from 'vant'
 export default {
     props: {
 
@@ -112,6 +113,12 @@ export default {
             backlogisticsorderinfoApi({order_id:id}).then(res => {
                 if(res.code == 0){
                     this.detailData = res.Data
+                }else if(res.code == 1){
+                    Toast(res.orderSn+'不属于您的配送单，请联系客服')
+                    this.$router.go(-1)
+                }else if(res.code == 2){
+                    Toast('不存在此单号，请重新扫描')
+                    this.$router.go(-1)
                 }
             })
         },
@@ -121,6 +128,7 @@ export default {
             this[list].forEach(statu => {
                 if(statu.type == type){
                     name = statu.name
+                    
                 }
             })
             return name

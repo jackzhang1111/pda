@@ -11,19 +11,19 @@
                                 <span>{{orderStatus(data.orderCourierStatus,'statusList')}}</span>
                             </div>
                         </div>
-                        <div class="order-con" @click="toDetail">
+                        <div class="order-con" @click="toDetail(data.orderId)">
                             <img src="@/assets/img/wodezichan.png" class="touxiang fl-left">
                             <div class="fl-left xinxi">
                                 <div class="p1">
-                                    <span>李四</span>
-                                    <span>16163264611</span>
+                                    <span>{{data.consignee}}</span>
+                                    <span>{{data.mobile}}</span>
                                 </div>
                                 <div class="p2">
                                     <span>{{data.addressDetail}}</span>
                                 </div>
                             </div>
-                            <div class="btn fl-right" @click.stop="receipt" v-if="data.orderCourierStatus==0">接单</div>
-                            <div class="btn fl-right" @click.stop="pieces" v-if="data.canPickup == 1">揽件</div>
+                            <div class="btn fl-right" @click.stop="receipt(data.orderId)" v-if="data.orderCourierStatus==0">接单</div>
+                            <div class="btn fl-right" @click.stop="pieces(data.orderId)" v-if="data.canPickup == 1">揽件</div>
                         </div>
                         <div class="order-footer">
                             <div class="footer-item">
@@ -48,8 +48,8 @@
 
 <script>
 import saomiaoHeader from '@/multiplexing/saomiaoHeader.vue'
-import { Dialog } from 'vant';
-import {getlogisticsorderApi} from '@/api/logistics/delivery/index.js'
+import { Dialog,Toast } from 'vant';
+import {getlogisticsorderApi,receivelogisticsorderApi} from '@/api/logistics/delivery/index.js'
 export default {
     props: {
 
@@ -91,34 +91,22 @@ export default {
 
     },
     methods: {
-        toDetail(){
-            this.$router.push({name:'distributionDetail'})
+        toDetail(orderid){
+            this.$router.push({name:'distributionDetail',query:{orderid}})
         },
         //接单
-        receipt(){
+        receipt(id){
            Dialog.confirm({
                 title: '温馨提示',
                 message: '您确定要接单吗？'
                 }).then(() => {
                     // on confirm
-                    console.log(123);
-                }).catch(() => {
-                    // on cancel
-                    console.log(456);
-            });
+                    this.receivelogisticsorder(id)
+                }).catch(() => {});
         },
         //揽件
-        pieces(){
-            Dialog.confirm({
-                title: '温馨提示',
-                message: '您确认揽件并配送吗？'
-                }).then(() => {
-                    // on confirm
-                    console.log(123);
-                }).catch(() => {
-                    // on cancel
-                    console.log(456);
-            });
+        pieces(orderid){
+            this.$router.push({name:'packagePieces',query:{orderid}})
         },
         //配送列表
         getlogisticsorder(data,flag){
@@ -182,6 +170,24 @@ export default {
         search(value){
             this.formData.expressNo = value
             this.refreshOrder()
+        },
+        //接单
+        receivelogisticsorder(id){
+            receivelogisticsorderApi({orderId:id}).then(res => {
+                if(res.code == 0){
+                    this.refreshOrder()
+                }else if(res.code == 1){
+                    Toast('参数requestModel不能为空')
+                }else if(res.code == 2){
+                    Toast('物流单Id必须大于0')
+                }else if(res.code == 21){
+                    Toast('该物流单不存在')
+                }else if(res.code == 22){
+                    Toast('该物流单不是待接单状态，不能接单')
+                }else if(res.code == 23){
+                    Toast('该物流单已配送，不能接单')
+                }
+            })
         }
     },
     components: {

@@ -71,6 +71,12 @@ export default {
             logisticsorderinfoApi({order_id:id}).then(res => {
                 if(res.code == 0){
                     this.detailData = res.Data
+                }else if(res.code == 1){
+                    Toast(res.orderSn+'不属于您的配送单，请联系客服')
+                    this.$router.go(-1)
+                }else if(res.code == 2){
+                    Toast('不存在此单号，请重新扫描')
+                    this.$router.go(-1)
                 }
             })
         },
@@ -80,6 +86,20 @@ export default {
                 if(res.code == 0){
                     Toast('成功揽件')
                     this.logisticsorderinfo(this.$route.query.orderid)
+                }else if(res.code == 1){
+                    Toast('参数requestModel不能为空')
+                }else if(res.code == 2){
+                    Toast('物流单Id必须大于0')
+                }else if(res.code == 21){
+                    Toast('该物流单不存在')
+                }else if(res.code == 22){
+                    Toast('该物流单不是待接单状态，不能接单')
+                }else if(res.code == 23){
+                    Toast('该物流单已配送，不能接单')
+                }else if(res.code == 24){
+                    Toast('该物流单未出库完成，不能揽件')
+                }else if(res.code == 31){
+                    Toast('该物流单不属于当前配送人员，不能进行此操作')
                 }
             })
         }

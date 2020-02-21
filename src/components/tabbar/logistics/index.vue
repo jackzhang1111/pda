@@ -17,10 +17,17 @@
                 <div class="c-666">{{icon.name}}</div>
             </div>
         </div>
-        <div class="saomiao-btn">
+    
+        <div class="saomiao-btn" @click="saomiaoBtn">
             <img src="@/assets/img/saomiao.svg">
             <span>扫描条码</span>
         </div>
+
+        <zhezhao v-if="zhezhaoStatus" @cancalZhezhao="cancalZhezhao">
+            <div class="smxz">
+                <div class="tiaoshu" v-for="saomiaoItme in saomiaoList" :key="saomiaoItme.value" @click.stop="toSweepCode(saomiaoItme.value)">{{saomiaoItme.name}}</div>
+            </div>
+        </zhezhao>
     </div>
 </template>
 
@@ -31,6 +38,7 @@ import cheliang from '@/assets/img/cheliang.png'
 import shouhou from '@/assets/img/shouhou.png'
 import yichangchuli from '@/assets/img/yichangchuli.png'
 import wodezichan from '@/assets/img/wodezichan.png'
+import zhezhao from '@/multiplexing/zhezhao.vue'
 export default {
     props: {
 
@@ -63,7 +71,13 @@ export default {
                     name:'我的资产',
                     routerName:''
                 },
-            ]
+            ],
+            saomiaoList:[
+                {name:'扫描揽件',value:1},
+                {name:'扫描签收',value:2},
+                {name:'扫描取件',value:3}
+            ],
+            zhezhaoStatus:false
             
         };
     },
@@ -80,27 +94,39 @@ export default {
 
     },
     methods: {
+        cancalZhezhao(flag){
+            this.zhezhaoStatus = flag
+        },
+        //点击物流类型
         iconItem(routerName){
             if(routerName == '') return
             this.$router.push({name:routerName})
+        },
+        //扫码
+        toSweepCode(value){
+            this.$router.push({name:'sweepCode',query:{code:value}})
+        },
+        saomiaoBtn(){
+            this.zhezhaoStatus = true;
         }
     },
     components: {
-        tabbarHeader
+        tabbarHeader,
+        zhezhao
     },
 };
 </script>
 
 <style scoped lang="less">
 .logistics{
-    padding: 0 30px;
     font-size: 24px;
     .logistics-top{
+        // padding: 0 30px;
         height: 230px;
         background-color: #fff;
         box-shadow:0px 10px 10px 0px rgba(59,59,59,0.12);
         border-radius:20px;
-        margin:50px 0 60px;
+        margin:50px 30px 60px;
         .tongji{
             width: 50%;
             height: 100%;
@@ -124,6 +150,7 @@ export default {
         }
     }
     .saomiao-btn{
+        margin:0 30px;
         height: 88px;
         line-height: 88px;
         font-size: 36px;
@@ -133,6 +160,21 @@ export default {
         border-radius:44px;
         img{
             vertical-align: middle;
+        }
+    }
+    .smxz{
+        position: absolute;
+        top:50%;
+        left:50%;
+        transform: translate(-50%,-50%);
+        .tiaoshu{
+            padding-left:30px;
+            width: 470px;
+            height: 100px;
+            background-color: #fff;
+            line-height: 100px;
+            font-size: 30px;
+            border-bottom: 1px solid #999;
         }
     }
 }

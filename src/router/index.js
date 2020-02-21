@@ -28,11 +28,14 @@ import replacementPhone from '@/components/tabbar/account/information/replacemen
 import currentPhone from '@/components/tabbar/account/information/currentPhone.vue'
 import eMail from '@/components/tabbar/account/information/eMail.vue'
 import where from '@/components/tabbar/account/information/where.vue'
+
+//扫码
+import sweepCode from '@/multiplexing/sweepCode'
 Vue.use(Router)
 
 export default new Router({
   routes: [
-    {path:'/',redirect:{name:"login"}},  // 重定向到主页
+    {path:'/',redirect:{name:"logistics"}},  // 重定向到主页
     {
       path: '/login',
       name: 'login',
@@ -160,6 +163,11 @@ export default new Router({
           component:where,
         },
       ]
+    },
+    {
+      path: '/sweepCode',
+      name: 'sweepCode',
+      component: sweepCode
     },
   ]
 })

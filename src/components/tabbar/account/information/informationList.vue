@@ -36,7 +36,7 @@
             </div>
             <div class="option-item">
                 <span>岗位</span>
-                <div class="fl-right">司机</div>
+                <div class="fl-right">{{userinfoPda.position}}</div>
             </div>
             <div class="option-item">
                 <span>所属承运商</span>

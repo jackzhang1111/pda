@@ -115,10 +115,13 @@ export default {
                     this.detailData = res.Data
                 }else if(res.code == 1){
                     Toast(res.orderSn+'不属于您的配送单，请联系客服')
-                    this.$router.go(-1)
+                    setTimeout(()=>{this.$router.go(-1)},1000)
                 }else if(res.code == 2){
                     Toast('不存在此单号，请重新扫描')
-                    this.$router.go(-1)
+                    setTimeout(()=>{this.$router.go(-1)},1000)
+                }else if(res.code == 3){
+                    Toast(res.orderSn+'未接单，请先接单')
+                    setTimeout(()=>{this.$router.go(-1)},1000)
                 }
             })
         },

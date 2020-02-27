@@ -30,6 +30,7 @@ export default {
     mounted() {
         this.startRecognize()
         this.code = this.$route.query.code
+        this.plusReady()
         // this.aaa()
     },
     beforeDestroy(){
@@ -140,13 +141,41 @@ export default {
                         this.$router.replace({name:'packagePieces',query:{orderid:res.orderId}})
                     }else if(this.code == 2){
                         //跳到签收详情页面
-                        this.$router.replace({name:'distributionDetail',query:{orderid:res.orderId}})
+                        this.$router.replace({name:'distributionDetail',query:{orderid:res.orderId,type:0}})
                     }else if(this.code == 3){
                         //跳到取件页面
                         this.$router.replace({name:'afterSalesPickUp',query:{orderid:res.orderId}})
                     }
                 }
             })
+        },
+        //调用pda本地扫描
+        plusReady() {   
+            var that = this
+            var main = plus.android.runtimeMainActivity();//获取activity  
+            var context = plus.android.importClass('android.content.Context'); //上下文  
+            var receiver = plus.android.implements('io.dcloud.feature.internal.reflect.BroadcastReceiver',{  
+            onReceive : doReceive });  
+            var IntentFilter = plus.android.importClass('android.content.IntentFilter');  
+            var Intent = plus.android.importClass('android.content.Intent');  
+            var filter = new IntentFilter();  
+            filter.addAction("com.zkc.scancode");//监听扫描  
+            main.registerReceiver(receiver,filter);//注册监听  
+
+            function doReceive(context, intent) {   
+                plus.android.importClass(intent);//通过intent实例引入intent类，方便以后的‘.’操作  
+                let orderSnindex = null
+                var orderSn = intent.getStringExtra("code");   
+                if(orderSn.indexOf("{") != -1){
+                    orderSnindex = orderSn.indexOf("{")
+                    orderSn = orderSn.substring(0,orderSnindex)
+                }
+                let obj = {
+                    orderSn
+                }
+                that.getlogisticsorderbyordersn(obj)
+                main.unregisterReceiver(receiver);//取消监听  
+            }  
         }
     },
     components: {

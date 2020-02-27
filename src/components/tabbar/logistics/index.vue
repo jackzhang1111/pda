@@ -3,11 +3,11 @@
         <tabbar-header></tabbar-header>
         <div class="logistics-top">
             <div class="fl-left tongji">
-                <div class="fs-40 tongji-top">0</div>
+                <div class="fs-40 tongji-top">{{waitOrderCount}}</div>
                 <div class="c-999">待接单</div>
             </div>
             <div class="fl-left tongji">
-                <div class="fs-40 tongji-top">1266</div>
+                <div class="fs-40 tongji-top">{{todaySignOrderCount}}</div>
                 <div class="c-999">今日签收</div>
             </div>
         </div>
@@ -39,6 +39,7 @@ import shouhou from '@/assets/img/shouhou.png'
 import yichangchuli from '@/assets/img/yichangchuli.png'
 import wodezichan from '@/assets/img/wodezichan.png'
 import zhezhao from '@/multiplexing/zhezhao.vue'
+import {getlogisticscenterdataApi} from '@/api/logistics/index'
 export default {
     props: {
 
@@ -51,34 +52,35 @@ export default {
                     name:'配送',
                     routerName:'distributionList'
                 },
-                {
-                    icon:cheliang,
-                    name:'车辆',
-                    routerName:''
-                },
+                // {
+                //     icon:cheliang,
+                //     name:'车辆',
+                //     routerName:''
+                // },
                 {
                     icon:shouhou,
                     name:'售后',
                     routerName:'afterSalesList'
                 },
-                {
-                    icon:yichangchuli,
-                    name:'异常处理',
-                    routerName:''
-                },
-                {
-                    icon:wodezichan,
-                    name:'我的资产',
-                    routerName:''
-                },
+                // {
+                //     icon:yichangchuli,
+                //     name:'异常处理',
+                //     routerName:''
+                // },
+                // {
+                //     icon:wodezichan,
+                //     name:'我的资产',
+                //     routerName:''
+                // },
             ],
             saomiaoList:[
                 {name:'扫描揽件',value:1},
                 {name:'扫描签收',value:2},
                 {name:'扫描取件',value:3}
             ],
-            zhezhaoStatus:false
-            
+            zhezhaoStatus:false,
+            waitOrderCount:0,
+            todaySignOrderCount:0,
         };
     },
     computed: {
@@ -88,7 +90,7 @@ export default {
 
     },
     mounted() {
-        
+        this.getlogisticscenterdata({})
     },
     watch: {
 
@@ -108,6 +110,15 @@ export default {
         },
         saomiaoBtn(){
             this.zhezhaoStatus = true;
+        },
+        //获取物流模块主页数据
+        getlogisticscenterdata(data){
+            getlogisticscenterdataApi(data).then(res => {
+                if(res.code == 0){
+                    this.todaySignOrderCount = res.Data.todaySignOrderCount
+                    this.waitOrderCount = res.Data.waitOrderCount
+                }
+            })
         }
     },
     components: {
@@ -139,13 +150,15 @@ export default {
     .logistics-con{
         display: flex;
         flex-wrap: wrap;
-        margin-bottom: 344px;
+        margin-bottom: 100px;
         .con-item{
             width: 230px;
             height: 158px;
             text-align: center;
             img{
-                transform: scale(0.5);
+                // transform: scale(0.5);
+                height: 50px;
+                margin-bottom: 15px;
             }
         }
     }

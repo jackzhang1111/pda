@@ -52,7 +52,7 @@
 
 <script>
 import saomiaoHeader from '@/multiplexing/saomiaoHeader.vue'
-import { Dialog } from 'vant';
+import { Dialog ,Toast} from 'vant';
 import {getbacklogisticsorderApi,receivebacklogisticsorderApi} from '@/api/logistics/afterSales/index.js'
 export default {
     props: {

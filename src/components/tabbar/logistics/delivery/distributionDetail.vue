@@ -178,7 +178,8 @@ export default {
         },
         //配送单详情
         logisticsorderinfo(id){
-            logisticsorderinfoApi({order_id:id}).then(res => {
+            let get_type = this.$route.query.type
+            logisticsorderinfoApi({order_id:id,get_type}).then(res => {
                 if(res.code == 0){
                     this.detailData = res.Data
                 }else if(res.code == 1){

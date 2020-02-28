@@ -88,7 +88,8 @@ export default {
         },
         //售后详情
         backlogisticsorderinfo(id){
-            backlogisticsorderinfoApi({order_id:id}).then(res => {
+            let get_type = this.$route.query.type
+            backlogisticsorderinfoApi({order_id:id,get_type}).then(res => {
                 if(res.code == 0){
                     this.detailData = res.Data
                     this.currentProduct = res.Data.detailList[this.current-1]

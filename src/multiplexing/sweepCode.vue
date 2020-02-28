@@ -138,13 +138,13 @@ export default {
                     //根据类型判断跳转到哪
                     if(this.code == 1){
                         //跳到揽件页面
-                        this.$router.replace({name:'packagePieces',query:{orderid:res.orderId}})
+                        this.$router.replace({name:'packagePieces',query:{orderid:res.orderId,type:0}})
                     }else if(this.code == 2){
                         //跳到签收详情页面
                         this.$router.replace({name:'distributionDetail',query:{orderid:res.orderId,type:0}})
                     }else if(this.code == 3){
                         //跳到取件页面
-                        this.$router.replace({name:'afterSalesPickUp',query:{orderid:res.orderId}})
+                        this.$router.replace({name:'afterSalesPickUp',query:{orderid:res.orderId,type:0}})
                     }
                 }
             })

@@ -2,7 +2,7 @@
     <div class="distribution-list">
         <saomiao-header @search="search"></saomiao-header>
         <div class="commodity-tab">
-            <van-tabs type="card" color="#666666" title-active-color="#333333" @change="onClick">
+            <van-tabs type="card" color="#666666" title-active-color="#333333" @change="onClick" v-model="active">
                 <van-tab :title="tab.name" v-for='(tab,index) in tabList' :key="index">
                     <scroll class="bscroll-wrapper" ref="wrapper" :data="recordGroup" :pulldown="pulldown" :pullup="pullup" @pulldown="_pulldown" @pullup="_pullup">
                         <div class="bscroll-con">
@@ -11,6 +11,9 @@
                                     <span>物流单号:{{data.expressNo}}</span>
                                     <div class="fl-right">
                                         <span>{{orderStatus(data.orderCourierStatus,'statusList')}}</span>
+                                    </div>
+                                    <div>
+                                        <span>关联单号:{{data.saleOrderSn}}</span>
                                     </div>
                                 </div>
                                 <div class="order-con" @click="toDetail(data.orderId)">
@@ -22,6 +25,7 @@
                                         </div>
                                         <div class="p2">
                                             <span>{{data.addressDetail}}</span>
+                                            <div class="money">{{jn}}{{data.orderAmountWebsite}}</div>
                                         </div>
                                     </div>
                                     
@@ -88,7 +92,8 @@ export default {
                 {name:'配送中',type:2},
                 {name:'已签收',type:3},
                 {name:'拒绝签收',type:4},
-            ]
+            ],
+            active:0
         };
     },
     computed: {
@@ -99,6 +104,12 @@ export default {
     },
     mounted() {
         this.refreshOrder()
+        this.active = Number(sessionStorage.getItem("activeIndex"))
+        if(this.active == 0){
+            this.formData.orderCourierStatus = null
+        }else{
+            this.formData.orderCourierStatus = this.active - 1
+        }
     },
     watch: {
 
@@ -185,6 +196,7 @@ export default {
             }else{
                 this.formData.orderCourierStatus = index - 1
             }  
+            sessionStorage.setItem("activeIndex", index);
             this.refreshOrder()
         },
         search(value){
@@ -250,10 +262,10 @@ export default {
         border-bottom: 1px solid #F2F3F5;
         margin-bottom: 20px;
         .order-header{
-            height: 79px;
-            line-height: 79px;
+            line-height: 40px;
             border-bottom: 1px solid #F2F3F5;
-            padding: 0 30px;
+            padding:20px 30px;
+            overflow: hidden;
         }
         .order-con{
             padding: 30px 30px 19px;
@@ -273,6 +285,11 @@ export default {
                 .p2{
                     color: #999;
                     margin:30px 0 60px;
+                    .money{
+                        margin-top: 30px;
+                        float: right;
+                        color: #FA5300;
+                    }
                 }
             }
             .btn{

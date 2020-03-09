@@ -102,6 +102,7 @@ export default {
         //点击物流类型
         iconItem(routerName){
             if(routerName == '') return
+            sessionStorage.setItem("activeIndex", 0);
             this.$router.push({name:routerName})
         },
         //扫码

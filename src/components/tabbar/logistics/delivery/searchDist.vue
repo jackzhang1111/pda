@@ -10,6 +10,9 @@
                             <div class="fl-right">
                                 <span>{{orderStatus(data.orderCourierStatus,'statusList')}}</span>
                             </div>
+                            <div>
+                                <span>关联单号:{{data.saleOrderSn}}</span>
+                            </div>
                         </div>
                         <div class="order-con" @click="toDetail(data.orderId)">
                             <img src="@/assets/img/wodezichan.png" class="touxiang fl-left">
@@ -20,6 +23,7 @@
                                 </div>
                                 <div class="p2">
                                     <span>{{data.addressDetail}}</span>
+                                    <div class="money">{{jn}}{{data.orderAmountWebsite}}</div>
                                 </div>
                             </div>
                             <div class="btn fl-right" @click.stop="receipt(data.orderId)" v-if="data.orderCourierStatus==0">接单</div>
@@ -231,10 +235,9 @@ export default {
         border-bottom: 1px solid #F2F3F5;
         margin-bottom: 20px;
         .order-header{
-            height: 79px;
-            line-height: 79px;
+            line-height: 40px;
             border-bottom: 1px solid #F2F3F5;
-            padding: 0 30px;
+            padding:20px 30px;
         }
         .order-con{
             padding: 30px 30px 19px;
@@ -254,6 +257,11 @@ export default {
                 .p2{
                     color: #999;
                     margin:30px 0 60px;
+                    .money{
+                        margin-top: 30px;
+                        float: right;
+                        color: #FA5300;
+                    }
                 }
             }
             .btn{

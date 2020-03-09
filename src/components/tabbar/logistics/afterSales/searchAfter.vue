@@ -49,8 +49,7 @@
 <script>
 import saomiaoHeader from '@/multiplexing/saomiaoHeader.vue'
 import { Dialog } from 'vant';
-// import {getlogisticsorderApi} from '@/api/logistics/delivery/index.js'
-import {getbacklogisticsorderApi} from '@/api/logistics/afterSales/index.js'
+import {getbacklogisticsorderApi,receivebacklogisticsorderApi} from '@/api/logistics/afterSales/index.js'
 export default {
     props: {
 
@@ -128,6 +127,14 @@ export default {
                     }
                 }else{
                     this.pullup = false
+                }
+            })
+        },
+        //接单
+        receivebacklogisticsorder(id){
+            receivebacklogisticsorderApi({orderId:id}).then(res => {
+                if(res.code == 0){
+                    this.refreshOrder()
                 }
             })
         },

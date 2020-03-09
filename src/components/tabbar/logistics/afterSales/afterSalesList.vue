@@ -2,7 +2,7 @@
     <div class="distribution-list">
         <saomiao-header @search="search"></saomiao-header>
         <div class="commodity-tab">
-            <van-tabs type="card" color="#666666" title-active-color="#333333" @change="onClick">
+            <van-tabs type="card" color="#666666" title-active-color="#333333" @change="onClick" v-model="active">
                 <van-tab :title="tab.name" v-for='(tab,index) in tabList' :key="index" >
                     <scroll class="bscroll-wrapper" ref="wrapper" :data="recordGroup" :pulldown="pulldown" :pullup="pullup" @pulldown="_pulldown" @pullup="_pullup">
                         <div class="bscroll-con">
@@ -84,7 +84,8 @@ export default {
                 {name:'待取件',type:1},
                 {name:'待入库',type:2},
                 {name:'已入库',type:3},
-            ]
+            ],
+            active:0
         };
     },
     computed: {
@@ -95,6 +96,12 @@ export default {
     },
     mounted() {
         this.refreshOrder()
+        this.active = Number(sessionStorage.getItem("activeIndex"))
+        if(this.active == 0){
+            this.formData.orderCourierStatusBack = null
+        }else{
+            this.formData.orderCourierStatusBack = this.active - 1
+        } 
     },  
     watch: {
 
@@ -110,6 +117,7 @@ export default {
             }else{
                 this.formData.orderCourierStatusBack = index - 1
             }  
+            sessionStorage.setItem("activeIndex", index);
             this.refreshOrder()
         },
         search(value){

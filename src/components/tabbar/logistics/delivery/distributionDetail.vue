@@ -4,8 +4,12 @@
         <div class="detail-con">
             <div class="shxx">
                 <div class="shxx-header">
-                    <p class="p1">收货信息</p> 
-                    <p>订单号:{{detailData.expressNo}}</p>
+                    <div>
+                        <span class="fl-right c-orange">{{jn}}{{detailData.orderAmountWebsite}}</span>
+                        <p class="p1">收货信息</p> 
+                    </div>
+                    <p>物流单号:{{detailData.expressNo}}</p>
+                    <p>关联单号:{{detailData.saleOrderSn}}</p>
                 </div>
                 <div class="shxx-con">
                     <img :src="$webUrl+detailData.headImg" class="touxiang fl-left">
@@ -278,6 +282,7 @@ export default {
         .shxx-header{
             padding: 30px;
             border-bottom: 1px solid #F2F3F5;
+            line-height: 30px;
             .p1{
                 font-size: 32px;
                 margin-bottom: 56px;

@@ -5,7 +5,7 @@
         <div class="order-con">
             <div class="order-no">
                 <p>物流单号: &nbsp;{{detailData.expressNo}}</p>
-                <p>关联单号: {{detailData.expressNo}}</p>
+                <p>关联单号: {{detailData.saleOrderSn}}</p>
             </div>
             <div class="spqd">
                 <div class="spqd-header">商品清单</div>

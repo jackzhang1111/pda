@@ -4,7 +4,7 @@ import { Toast } from 'vant';
 import Qs from 'qs'
 //form Data格式
 const mainAxios = axios.create({
-    timeout: 30000,
+    timeout: 180000,
     headers: {
         'Content-Type': 'multipart/form-data'
     },
@@ -12,7 +12,7 @@ const mainAxios = axios.create({
 });
 
 const parkAxios = axios.create({
-    timeout: 10000,
+    timeout: 30000,
     headers: {
         'Content-Type':'application/json;charset=utf-8'
     },
@@ -27,7 +27,7 @@ mainAxios.interceptors.request.use(function (config) {
         message: 'loading',
         forbidClick: true,
         loadingType: 'spinner',
-        duration:30000
+        duration:180000
       });
     
     return config;
@@ -49,7 +49,7 @@ parkAxios.interceptors.request.use(function (config) {
         message: 'loading',
         forbidClick: true,
         loadingType: 'spinner',
-        duration:10000
+        duration:30000
       });
     config.transformRequest = [function (data) {
         // 在请求之前对data传参进行格式转换

@@ -4,10 +4,10 @@
         <van-tabbar class="icons" v-model="active" active-color="#000" inactive-color="#010101" route>
             <!-- <span>自定义</span> -->
             <!-- <img slot="icon" slot-scope="props" :src="props.active ? icon.active : icon.inactive"> -->
-            <!-- <van-tabbar-item route to="/control/warehousing">
+            <van-tabbar-item route to="/control/warehousing">
                 <span>仓储</span>
                 <img slot="icon" slot-scope="props" :src="props.active ? icon.cangchu1 : icon.cangchu" class="icon-style">
-            </van-tabbar-item> -->
+            </van-tabbar-item>
              <van-tabbar-item route to="/control/logistics">
                 <span>物流</span>
                 <img slot="icon" slot-scope="props" :src="props.active ? icon.wuliu1 : icon.wuliu" class="icon-style">

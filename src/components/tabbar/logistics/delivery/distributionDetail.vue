@@ -387,10 +387,11 @@ export default {
         padding: 0 30px;
         margin-bottom: 20px;
         .time-item{
-            height: 88px;
             line-height: 88px;
             font-size: 26px;
             border-bottom: 1px solid #F2F3F5;
+            padding: 0 30px;
+            overflow: hidden;
         }
     }
     .qianshou{

@@ -106,6 +106,13 @@ export default {
         iconItem(routerName){
             if(routerName == '') return
             this.$router.push({name:routerName})
+            try{
+                sessionStorage.removeItem('activeIndex')
+                sessionStorage.removeItem('activeOne')
+            }
+            catch(error){
+                console.log(err.message);
+            }
         },
         //扫码
         toSweepCode(value){

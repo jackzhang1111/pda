@@ -63,25 +63,28 @@
         </div>
         <div class="goods-shelves">
             <div class="set-shelves">
-                <span>设置上架货位</span>
+                <span @click="showPicker = true">设置上架货位</span>
+                <van-popup v-model="showPicker" position="bottom">
+                    <van-picker show-toolbar :columns="currentProduct.columns" @cancel="showPicker = false" @confirm="onConfirm"/>
+                </van-popup>
                 <van-icon name="play"/>
             </div>
-            <div class="shelves-item" v-for="(warehouse,index) in detailData.warehouselist" :key="index">
+            <div class="shelves-item" v-for="(warehouse,index) in currentProduct.warehouselist" :key="index">
                 <div class="item-title">
                     <span>{{warehouse.regionName}}</span>
                     <img src="@/assets/img/lajitong.svg">
                 </div>
                 <div class="item-number">
                     <div>{{warehouse.volume}}/{{warehouse.volume-warehouse.takeVolume}}m³</div>
-                    <div>{{warehouse.downItemNum*currentProduct.unitSize ? accMul(warehouse.downItemNum,currentProduct.unitSize) : 0}}m³</div>
+                    <div>{{warehouse.upItemNum*currentProduct.unitSize ? accMul(warehouse.upItemNum,currentProduct.unitSize) : 0}}m³</div>
                     <div class="item-input">
-                        <input type="number" v-model="warehouse.downItemNum">
+                        <input type="number" v-model="warehouse.upItemNum">
                     </div>
                 </div>
             </div>
         </div>
         <div class="btns">
-            <div class="btn-qbrk" @click="allShelves">确认全部上架</div>
+            <div class="btn-qbrk" @click="finishPicking">确认全部上架</div>
         </div>
         <div class="shelves-place"></div>
     </div>
@@ -92,6 +95,7 @@ import saomiaoHeader from '@/multiplexing/saomiaoHeader.vue'
 import { Dialog ,Toast } from 'vant';
 import {returngoodsstockdowmAllApi} from '@/api/warehousing/cancellation/index.js'
 import {transferinstockdowmproshelvesApi} from '@/api/warehousing/allocation/index.js'
+import {stockInToShelvesAllApi} from '@/api/warehousing/warehousSupplied/index.js'
 export default {
     props: {
 
@@ -121,11 +125,19 @@ export default {
                 shelfDownOrderId:'',
                 sourceType:2
             },
+            shelvesData:{
+                shelvesOrderId:0,
+                sourceType:2,
+                productlist:[]
+            },
             paraObj:{
                 typeId:1,
                 paramId:''
             },
-            productArray:[]
+            productArray:[],
+            value: '',
+            showPicker: false,
+            columns: []
         };
     },
     computed: {
@@ -177,8 +189,14 @@ export default {
                     this.productArray = res.Data.productList
                     
                     this.removeData.shelfDownOrderId = this.detailData.shelfDownOrderId
-                    this.detailData.warehouselist.forEach(item => {
-                        item.computedNum = 0
+                    this.shelvesData.shelvesOrderId = res.Data.shelvesOrderId
+                    this.detailData.warehouselist.forEach(element => {
+                        element.text = element.regionName
+                        this.columns.push(element)
+                    });
+                    this.productArray.forEach(ele => {
+                        ele.warehouselist = new Array()
+                        ele.columns = this.columns.map(o => Object.assign({}, o));
                     })
                     this.setCurrentProduct()
                 }
@@ -189,23 +207,72 @@ export default {
             this.detailedGuigeList[0].value = this.currentProduct.skuValuesTitle
             this.detailedGuigeList[1].value = this.currentProduct.businessName
             this.detailedGuigeList[2].value = this.currentProduct.batchNo
-            this.detailedGuigeList[3].value = this.currentProduct.hasInDetailNum
+            this.detailedGuigeList[3].value = this.currentProduct.detailNum
             this.detailedGuigeList[4].value = this.currentProduct.fnskuCode
             this.detailedGuigeList[5].value = this.currentProduct.goodnumPerBox
             this.detailedGuigeList[6].value = this.currentProduct.intCode
-            this.detailedGuigeList[7].value = this.currentProduct.inDetailNum
+            this.detailedGuigeList[7].value = this.currentProduct.hasInDetailNum
             this.detailedGuigeList[8].value = this.currentProduct.stockIntype
             this.detailedGuigeList[9].value = this.currentProduct.unitWeight
             this.detailedGuigeList[10].value = this.currentProduct.stockInWarehouse
             this.detailedGuigeList[11].value = this.currentProduct.boxWeight
         },
         //全部上架
-        allShelves(){
+        finishPicking(){
+            let arr = []
+            this.productArray.forEach(ele => {
+                let obj = {
+                    batchNo:ele.batchNo,
+                    skuId:ele.skuId,
+                    stockInOrderType:2,
+                    orderDetailId:ele.orderDetailId,
+                    unitSize:ele.unitSize,
+                    proRegion:[]
+                }
+                ele.warehouselist.forEach(item => {
+                    if(Number(item.upItemNum)>0){
+                        let proRegionObj = {
+                            regionId:item.regionId,
+                            orderDetailId:ele.orderDetailId,
+                            stockInOrderType:2,
+                            upItemNum:Number(item.upItemNum),
+                        }
+                        obj.proRegion.push(proRegionObj)
+                    }
+                })
+                if(obj.proRegion.length > 0){
+                    arr.push(obj)
+                }
+                this.shelvesData.productlist = arr
+            });
             Dialog.confirm({
                 title: '温馨提示',
                 message: '您确定要“确认全部上架”操作吗?'
             }).then(() => {
-                
+                let productIndex, proRegionIndex,flag = true
+                if(this.productArray.length != this.shelvesData.productlist.length){
+                    flag = false
+                }
+                if(flag){
+                    for (productIndex = 0; productIndex < this.shelvesData.productlist.length; productIndex++) { 
+                        let num = 0,allNum = 0
+                        for(proRegionIndex = 0; proRegionIndex < this.shelvesData.productlist[productIndex].proRegion.length; proRegionIndex++){
+                            num += this.shelvesData.productlist[productIndex].proRegion[proRegionIndex].upItemNum
+                        }
+                        if(this.productArray[productIndex].hasInDetailNum != num){
+                            flag = false
+                        }
+                    }
+                }
+                if(!flag){
+                    Toast('全部上架数量不正确')
+                    return
+                }
+                if(this.shelvesData.productlist.length == 0){
+                    Toast('请选择库区上架')
+                    return
+                }
+                this.stockInToShelvesAll(this.shelvesData)
             }).catch(() => {});
         },
         //小数点计算
@@ -214,6 +281,22 @@ export default {
             try{m+=s1.split(".")[1].length}catch(e){}
             try{m+=s2.split(".")[1].length}catch(e){}
             return Number(s1.replace(".",""))*Number(s2.replace(".",""))/Math.pow(10,m)
+        },
+        onConfirm(value) {
+            this.currentProduct.warehouselist.push(value)
+            this.value = value;
+            this.showPicker = false;
+        },
+        //全部上架
+        stockInToShelvesAll(data){
+            stockInToShelvesAllApi(data).then(res => {
+                if(res.code == 0){
+                    Toast('下架成功')
+                    setTimeout(()=>{
+                        this.$router.go(-1)
+                    },1500)
+                }
+            })
         }
     },
     components: {
@@ -314,7 +397,7 @@ export default {
                     width: 80px;
                     height: 40px;
                     line-height: 40px;
-                    border: 2px solid #dcdcdc;
+                    // border: 2px solid #dcdcdc;
                     border-radius:6px;
                     vertical-align: middle;
                     text-align: center;

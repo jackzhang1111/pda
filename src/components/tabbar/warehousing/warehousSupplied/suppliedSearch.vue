@@ -1,36 +1,32 @@
 <template>
-<!-- 采购出库列表 -->
+<!-- 供货入库列表 -->
     <div class="supplied-list">
-        <saomiao-header @search="search"></saomiao-header>
+        <saomiao-header @search="search" :value="$route.query.expressNo"></saomiao-header>
         <div class="commodity-tab">
-            <van-tabs type="card" color="#666666" title-active-color="#333333" @change="onClick" v-model="active">
-                <van-tab :title="tab.name" v-for='(tab,index) in tabList' :key="index">
-                    <scroll class="bscroll-wrapper" ref="wrapper" :data="recordGroup" :pulldown="pulldown" :pullup="pullup" @pulldown="_pulldown" @pullup="_pullup">
-                         <div class="bscroll-con">
-                                <div class="order" v-for="(data,index) in dataList" :key="index" >
-                                    <div class="order-header">
-                                        <span>{{data.orderSn}}</span>
-                                        <div class="fl-right">
-                                            <span>{{orderStatus(data.orderStatus,'statusList')}}</span>
-                                        </div>
-                                    </div>
-                                    <div class="order-con" @click="toDetail(data.orderId,data.orderStatus)">
-                                        <p>关联供货单:{{data.supplyOrderSn}}</p>
-                                        <p>供应商：{{data.businessName}}</p>
-                                        <p>出库仓库：{{data.warehouseName}}</p>
-                                        <p>退货出库数量：{{data.totalNum}}</p>
-                                    </div>
-                                    <div class="order-footer">
-                                        <div class="btn fl-right" v-if="data.orderStatus == 0">打印出库单</div>
-                                        <div class="btn fl-right" v-if="data.orderStatus == 0" @click="toRemove(data.orderId)">下架</div>
-                                        <div class="btn fl-right" v-if="data.orderStatus == 1" @click="toOutstock(data.orderId)">出库</div>
-                                        <div class="btn fl-right" v-if="data.orderStatus == 2">打印下架单</div>
-                                    </div>
+            <scroll class="bscroll-wrapper" ref="wrapper" :data="recordGroup" :pulldown="pulldown" :pullup="pullup" @pulldown="_pulldown" @pullup="_pullup">
+                    <div class="bscroll-con">
+                        <div class="order" v-for="(data,index) in dataList" :key="index" >
+                            <div class="order-header">
+                                <span>单号:{{data.orderSn}}</span>
+                                <div class="fl-right">
+                                    <span>{{orderStatus(data.wmsOrderStatus,'statusList')}}</span>
                                 </div>
-                         </div>
-                    </scroll>
-                </van-tab>
-            </van-tabs>
+                            </div>
+                            <div class="order-con" @click="toDetail(data.orderId,data.wmsOrderStatus)">
+                                <p>供应商：{{data.businessName}}</p>
+                                <p>入库仓库：{{data.warehouseName}}</p>
+                                <p>供货数量：{{data.totalNum}}</p>
+                            </div>
+                            <div class="order-footer" v-show="data.wmsOrderStatus != 1">
+                                <div class="btn fl-right" v-if="data.wmsOrderStatus == 2">打印供货单</div>
+                                <div class="btn fl-right" v-if="data.wmsOrderStatus == 2" @click="toPickUp(data.orderId,data.wmsOrderStatus)">入库</div>
+                                <div class="btn fl-right" v-if="data.wmsOrderStatus == 3">打印入库单</div>
+                                <div class="btn fl-right" v-if="data.wmsOrderStatus == 3" @click="toshelves(data.orderId)">上架</div>
+                                <div class="btn fl-right" v-if="data.wmsOrderStatus == 4">打印上架单</div>
+                            </div>
+                        </div>
+                    </div>
+            </scroll>
         </div>
     </div>
 </template>
@@ -38,26 +34,20 @@
 <script>
 import saomiaoHeader from '@/multiplexing/saomiaoHeader.vue'
 import { Dialog ,Toast} from 'vant';
-import {returngoodsstockorderlistApi} from '@/api/warehousing/cancellation/index.js'
+import {supplyorderlistApi} from '@/api/warehousing/warehousSupplied/index.js'
 export default {
     props: {
 
     },
     data() {
         return {
-            tabList:[
-                {name:'全部',value:-1},
-                {name:'待下架',value:0},
-                {name:'待出库',value:1},
-                {name:'已出库',value:2},
-            ],
             statusList:[
-                {name:'全部',type:-1},
-                {name:'待下架',type:0},
-                {name:'待出库',type:1},
-                {name:'已出库',type:2},
+                {name:'待审核',type:0},
+                {name:'待发货',type:1},
+                {name:'待入库',type:2},
+                {name:'待上架',type:3},
+                {name:'已上架',type:4},
             ],
-            active:0,
             recordGroup:[],
             pulldown:true,
             pullup:true,
@@ -66,7 +56,7 @@ export default {
             dataList:[],
             formData:{
                 orderSn:'',
-                pdaorderStatus:-1,
+                wmsOrderStatus:0,
                 page:1,
                 limit:10
             },
@@ -79,10 +69,7 @@ export default {
 
     },
     mounted() {
-        if(sessionStorage.getItem("activeIndex")){
-            this.active = Number(sessionStorage.getItem("activeIndex"))+1
-            this.formData.pdaorderStatus = Number(sessionStorage.getItem("activeIndex"))
-        }
+        this.formData.orderSn = this.$route.query.expressNo
         this.refreshOrder()
     },
     watch: {
@@ -91,12 +78,7 @@ export default {
     methods: { 
         //搜索框 
         search(value){
-            this.$router.push({name:'cancellationSearch',query:{expressNo:value}})
-        },
-        //切换tab
-        onClick(index) {
-            this.formData.pdaorderStatus = index-1
-            sessionStorage.setItem("activeIndex", index-1);
+            this.formData.orderSn = value
             this.refreshOrder()
         },
         //下拉刷新
@@ -111,7 +93,7 @@ export default {
             //不知道为什么触发两次,使用关门狗拦截
             if(this.guanmengou){
                 this.formData.page++
-                this.returngoodsstockorderlist(this.formData,false)
+                this.supplyorderlist(this.formData,false)
                 this.guanmengou = false
             }
             setTimeout(()=>{
@@ -122,12 +104,12 @@ export default {
         refreshOrder(){
             this.formData.page = 1
             this.formData.limit = 10
-            this.returngoodsstockorderlist(this.formData,true)
+            this.supplyorderlist(this.formData,true)
             this.pullup = true
         },
         //供货入库列表
-        returngoodsstockorderlist(data,flag){
-            returngoodsstockorderlistApi(data).then(res => {
+        supplyorderlist(data,flag){
+            supplyorderlistApi(data).then(res => {
                 if(res.code == 0){
                     if(flag){
                         this.dataList = res.Data.list
@@ -157,16 +139,16 @@ export default {
             return name
         },
         //去到详情
-        toDetail(orderid,orderStatus){
-            this.$router.push({name:'cancellationDetail',query:{orderid,type:orderStatus}})
+        toDetail(orderid,wmsOrderStatus){
+            this.$router.push({name:'suppliedDetail',query:{orderid,type:wmsOrderStatus}})
         },
-        //去到下架
-        toRemove(orderid){
-            this.$router.push({name:'cancellationRemove',query:{orderid}})
+        //去入库页面
+        toPickUp(orderid){
+            this.$router.push({name:'suppliedPickUp',query:{orderid}})
         },
-        //去出库
-        toOutstock(orderid){
-            this.$router.push({name:'cancellationOutstock',query:{orderid}})
+        //去上架页面
+        toshelves(paramId){
+            this.$router.push({name:'suppliedShelves',query:{paramId,typeId:1}})
         }
     },
     components: {
@@ -206,7 +188,8 @@ export default {
         font-size: 24px;
         overflow: hidden;
         border-bottom: 1px solid #F2F3F5;
-        margin-bottom: 20px;
+        margin:0 30px 20px;
+
         .order-header{
             line-height: 40px;
             border-bottom: 1px solid #F2F3F5;

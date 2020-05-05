@@ -147,8 +147,10 @@ export default {
         this.typeSatus = this.$route.query.type
         if(this.$route.query.status == 0){
             this.transferouttockdowmprodetail(this.$route.query.orderid)
+            this.statusList = [{name:'待下架',type:0},{name:'待出库',type:1},{name:'已出库',type:2}]
         }else{
             this.transferinstockdowmprodetail(this.$route.query.orderid)
+            this.statusList = [{name:'待入库',type:0},{name:'待上架',type:1},{name:'已入库',type:2}]
         }
     },
     watch: {

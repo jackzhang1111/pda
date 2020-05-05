@@ -28,9 +28,14 @@
                     <span class="c-333">出库数量</span>
                     <div class="fl-right fs-22 c-666">{{detailData.totalNum}}</div>
                 </div>
-                <div class="time-item" v-if="typeSatus != 0">
-                    <span class="c-333">下架货位</span>
-                    <div class="fl-right fs-22 c-666">{{detailData.warehouseName}}</div>
+                <div class="time-item" v-if="typeSatus == 2 || typeSatus == 1">
+                    <span class="c-333">下架货架</span>
+                    <div class="fl-right fs-22 c-666">
+                        <div v-for="(warehouse,index) in detailData.warehouselist" :key="index">
+                            <span>{{warehouse.regionName}}</span>&nbsp;&nbsp;&nbsp;
+                            <span>{{warehouse.downItemNum}}</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -69,7 +74,7 @@
 
 <script>
 import nosaomiaoHeader from '@/multiplexing/nosaomiaoHeader.vue'
-import {saleoutstockdowmdetailApi,saleoutorderstockdowmprobatchNoApi,saleoutorderstockdowmprobatchRegionApi} from '@/api/warehousing/sold/index.js'
+import {saleoutstockdowmdetailApi} from '@/api/warehousing/sold/index.js'
 export default {
     props: {
 
@@ -119,19 +124,6 @@ export default {
                 }
             })
         },
-        //销售下架获取所有商品入库批次列表信息
-        saleoutorderstockdowmprobatchNo(data){
-            saleoutorderstockdowmprobatchNoApi(data).then(res => {
-
-            })
-        },
-
-        //销售下架获取所有商品入库批次对应的库位列表信息
-        saleoutorderstockdowmprobatchRegion(data){
-            saleoutorderstockdowmprobatchRegionApi(data).then(res => {
-
-            })
-        }
     },
     components: {
         nosaomiaoHeader

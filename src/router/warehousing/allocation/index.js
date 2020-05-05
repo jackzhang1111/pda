@@ -5,6 +5,7 @@ import allocationOutstock from '@/components/tabbar/warehousing/allocation/alloc
 import allocationRemove from '@/components/tabbar/warehousing/allocation/allocationRemove'
 import allocationInstorage from '@/components/tabbar/warehousing/allocation/allocationInstorage'
 import allocationUppershelf from '@/components/tabbar/warehousing/allocation/allocationUppershelf'
+import allocationSearch from '@/components/tabbar/warehousing/allocation/allocationSearch'
 let routes = [
     {
         path: 'allocationList',
@@ -35,6 +36,11 @@ let routes = [
         path: 'allocationList/allocationUppershelf',
         name: 'allocationUppershelf',
         component: allocationUppershelf,
+    },
+    {
+        path: 'allocationList/allocationSearch',
+        name: 'allocationSearch',
+        component: allocationSearch,
     }
 ];
 

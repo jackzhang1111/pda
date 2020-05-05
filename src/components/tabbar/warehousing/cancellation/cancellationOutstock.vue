@@ -263,7 +263,7 @@ export default {
                     width: 80px;
                     height: 40px;
                     line-height: 40px;
-                    border: 2px solid #dcdcdc;
+                    // border: 2px solid #dcdcdc;
                     border-radius:6px;
                     vertical-align: middle;
                     text-align: center;

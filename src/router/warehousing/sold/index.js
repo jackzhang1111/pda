@@ -3,6 +3,7 @@ import soldList from '@/components/tabbar/warehousing/sold/soldList'
 import soldDetail from '@/components/tabbar/warehousing/sold/soldDetail'
 import soldRemove from '@/components/tabbar/warehousing/sold/soldRemove'
 import soldOutstock from '@/components/tabbar/warehousing/sold/soldOutstock'
+import soldSearch from '@/components/tabbar/warehousing/sold/soldSearch'
 let routes = [
     {
         path:'soldList',
@@ -23,6 +24,11 @@ let routes = [
         path:'soldList/soldOutstock',
         name:'soldOutstock',
         component:soldOutstock
+    },
+    {
+        path:'soldList/soldSearch',
+        name:'soldSearch',
+        component:soldSearch
     }
 ];
 

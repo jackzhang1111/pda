@@ -2,7 +2,7 @@
 <!-- 出库 -->
     <div class="pick-up">
         <saomiao-header @search="search"></saomiao-header>
-        <div class="pick-up-order">采购退货出库单号：{{detailData.shelfDownorderSn}}</div>
+        <div class="pick-up-order">销售出库单号：{{detailData.shelfDownorderSn}}</div>
         <div class="order-detail">
             <div class="detail-header">
                 <van-icon name="play" class="play-left" :color="playLeft ? '#DCDCDC':'#333'" @click="cliPlayLeft"/>
@@ -264,7 +264,7 @@ export default {
                     width: 80px;
                     height: 40px;
                     line-height: 40px;
-                    border: 2px solid #dcdcdc;
+                    // border: 2px solid #dcdcdc;
                     border-radius:6px;
                     vertical-align: middle;
                     text-align: center;

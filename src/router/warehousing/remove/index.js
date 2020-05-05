@@ -5,7 +5,7 @@ let routes = [
         path:'removeList',
         name:'removeList',
         component:removeList
-    }
+    },
 ];
 
 export default routes;

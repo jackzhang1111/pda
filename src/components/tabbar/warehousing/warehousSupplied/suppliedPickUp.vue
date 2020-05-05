@@ -2,15 +2,18 @@
 <!-- 入库 -->
     <div class="pick-up">
         <saomiao-header @search="search"></saomiao-header>
-        <div class="pick-up-order">供货单号：{{detailData.orderSn}}</div>
-        <div class="order-detail">
+        <div class="pick-up-order">
+           <span>供货单号：{{detailData.orderSn}}</span>
+           <span class="fl-right">{{listLength}}</span>
+        </div>
+        <div class="order-detail" v-if="currentArray.length > 0">
             <div class="detail-header">
                 <van-icon name="play" class="play-left" :color="playLeft ? '#DCDCDC':'#333'" @click="cliPlayLeft"/>
                 <div class="num-input">
                     <input type="number" v-model="current">
                 </div>
                 <span class="ma-35 header-font">/</span>
-                <span class="header-font">{{listLength}}</span>
+                <span class="header-font">{{currentArray.length}}</span>
                 <van-icon name="play" class="play-right" :color="playRight ? '#DCDCDC':'#333'" @click="cliPlayRight"/>
             </div>
             <div class="order-product">
@@ -25,20 +28,52 @@
                     <span class="c-999">{{detailedGuige.name}}</span>&nbsp;&nbsp;&nbsp;
                     <span class="c-666">{{detailedGuige.value}}</span>
                 </div>
+                <div class="detailed-item">
+                    <span class="c-999">本次入库数量</span>&nbsp;&nbsp;&nbsp;
+                    <div class="item-input">
+                        <input type="number" v-model="currentProduct.inDetailNum">
+                    </div>
+                </div>
+                <div class="detailed-item">
+                    <span class="c-999">入库类型</span>&nbsp;&nbsp;&nbsp;
+                    <span class="c-666">{{currentProduct.stockIntype}}</span>
+                </div>
+                <div class="detailed-item">
+                    <span class="c-999">单位重量(kg)</span>&nbsp;&nbsp;&nbsp;
+                    <div class="item-input">
+                        <input type="number" v-model="currentProduct.unitWeight">
+                    </div>
+                </div>
+                <div class="detailed-item">
+                    <span class="c-999">入库仓库</span>&nbsp;&nbsp;&nbsp;
+                    <span class="c-666">{{currentProduct.stockInWarehouse}}</span>
+                </div>
+                <div class="detailed-item">
+                    <span class="c-999">装箱重量(kg)</span>&nbsp;&nbsp;&nbsp;
+                    <div class="item-input">
+                        <input type="number" v-model="currentProduct.boxWeight">
+                    </div>
+                </div>
                 <div class="tiji">
                     <div class="clearfix">
                         <span class="pl-30">单位体积 长×宽×高(cm)</span>
                         <div class="fl-right">
-                            <span class="kuang">{{currentProduct.unitLength}}</span>
+                            <div class="kuang">
+                                <input type="number" v-model="currentProduct.unitLength">
+                            </div>
                             <span>X</span>
-                            <span class="kuang">{{currentProduct.unitWidth}}</span>
+                            <div class="kuang">
+                                <input type="number" v-model="currentProduct.unitWidth">
+                            </div>
                             <span>X</span>
-                            <span class="kuang">{{currentProduct.unitHeight}}</span>
+                            <div class="kuang">
+                                <input type="number" v-model="currentProduct.unitHeight">
+                            </div>
                         </div>
                     </div>
                     <div class="total">
                         <span>体积:</span>
-                        <span class="tijitotal">{{currentProduct.unitSize}}</span>
+                        <span class="tijitotal">{{computVolume(currentProduct.unitLength,currentProduct.unitWidth,currentProduct.unitHeight)}}</span>
                         <span>m³</span>
                     </div>
                 </div>
@@ -46,16 +81,22 @@
                     <div class="clearfix">
                         <span class="pl-30">装箱体积 长×宽×高(cm)</span>
                         <div class="fl-right">
-                            <span class="kuang">{{currentProduct.boxLength}}</span>
+                            <div class="kuang">
+                                <input type="number" v-model="currentProduct.boxLength">
+                            </div>
                             <span>X</span>
-                            <span class="kuang">{{currentProduct.boxWidth}}</span>
+                            <div class="kuang">
+                                <input type="number" v-model="currentProduct.boxWidth">
+                            </div>
                             <span>X</span>
-                            <span class="kuang">{{currentProduct.boxHeight}}</span>
+                            <div class="kuang">
+                                <input type="number" v-model="currentProduct.boxHeight">
+                            </div>
                         </div>
                     </div>
                     <div class="total">
                         <span>体积:</span>
-                        <span class="tijitotal">{{currentProduct.boxSize}}</span>
+                        <span class="tijitotal">{{computVolume(currentProduct.boxLength,currentProduct.boxWidth,currentProduct.boxHeight)}}</span>
                         <span>m³</span>
                     </div>
                 </div>
@@ -63,7 +104,7 @@
         </div>
         <div class="btns">
             <div class="btn-smtm">扫描条码</div>
-            <div class="btn-qbrk">确认全部入库</div>
+            <div class="btn-qbrk" @click="outStock">确认全部入库</div>
         </div>
         
     </div>
@@ -72,7 +113,7 @@
 <script>
 import saomiaoHeader from '@/multiplexing/saomiaoHeader.vue'
 import { Dialog ,Toast } from 'vant';
-import {confirmationStockInApi} from '@/api/warehousing/warehousSupplied/index.js'
+import {confirmationStockInApi,scanproductbarcodeApi} from '@/api/warehousing/warehousSupplied/index.js'
 export default {
     props: {
 
@@ -84,21 +125,24 @@ export default {
             detailData:{},
             currentProduct:{},
             detailedGuigeList:[
-                {name:'规格属性',value:'100'},
-                {name:'供货数量',value:'100'},
-                {name:'供应商',value:'6461654'},
-                {name:'供货箱数',value:'100'},
-                {name:'批次号',value:'FSN46166'},
-                {name:'装箱数量',value:'FSN46166'},
-                {name:'FNSKU',value:'FSN46166'},
-                {name:'已入库数量',value:'FSN46166'},
-                {name:'国际码',value:'FSN46166'},
-                {name:'本次入库数量',value:'FSN46166'},
-                {name:'入库类型',value:'FSN46166'},
-                {name:'单位重量(kg)',value:'FSN46166'},
-                {name:'入库仓库',value:'FSN46166'},
-                {name:'装箱重量(kg)',value:'FSN46166'},
+                {name:'规格属性',value:''},
+                {name:'供货数量',value:''},
+                {name:'供应商',value:''},
+                {name:'供货箱数',value:''},
+                {name:'批次号',value:''},
+                {name:'装箱数量',value:''},
+                {name:'FNSKU',value:''},
+                {name:'已入库数量',value:''},
+                {name:'国际码',value:''},
             ],
+            currentArray:[],
+            productlist:[],
+            outStockObj:{   
+                productList:[],
+                remark:'',
+                sourceType:2,
+                stockInOrderId:null
+            }
         };
     },
     computed: {
@@ -106,11 +150,8 @@ export default {
             return  this.current == 1
         },
         playRight() {
-            return  this.current == this.listLength
-        }
-    },
-    created() {
-
+            return  this.current == this.currentArray.length
+        },
     },
     mounted() {
         this.confirmationStockIn(this.$route.query.orderid)
@@ -120,53 +161,118 @@ export default {
             handler:function(newVal){
                 this.setCurrentProduct()
             }
+        },
+        productlist:{
+            handler:function(newVal){
+                this.productlist.forEach(item => {
+                    if(item.display == 1){
+                        this.currentArray.push(item)
+                    }
+                });
+            }
         }
     },
     methods: {
         //搜索框 
-        search(){
-
+        search(val){
+            this.productlist.forEach(item => {
+                if(item.fnskuCode == val && item.display == 0){
+                    item.display = 1
+                    this.currentArray.push(item)
+                    this.currentProduct = this.currentArray[this.currentArray.length-1]
+                    this.current = this.currentArray.length
+                }
+            });
         },
         //上一个
         cliPlayLeft(){
             if(this.current <=1) return
             this.current--
-            this.currentProduct = this.detailData.productlist[this.current-1]
+            this.currentProduct = this.currentArray[this.current-1]
         },
         //下一个
         cliPlayRight(){
-            if(this.current >= this.listLength) return
+            if(this.current >= this.currentArray.length) return
             this.current++
-            this.currentProduct = this.detailData.productlist[this.current-1]
+            this.currentProduct = this.currentArray[this.current-1]
         },
         //入库信息
         confirmationStockIn(orderId){
             confirmationStockInApi({orderId}).then(res => {
                 if(res.code == 0){
                     this.detailData = res.Data
-                    this.currentProduct = res.Data.productlist[this.current-1]
+                    this.productlist = res.Data.productlist.map(o => Object.assign({}, o));
+                    setTimeout(()=>{this.currentProduct = this.currentArray[this.current-1]},0)
                     this.listLength = res.Data.productlist.length
-                    this.setCurrentProduct()
+                    this.outStockObj.stockInOrderId = res.Data.stockInOrderId
+                    
                 }
             })
         },
         //当前商品基本属性
         setCurrentProduct(){
-            this.detailedGuigeList[0].value = this.currentProduct.skuValuesTitle
-            this.detailedGuigeList[1].value = this.currentProduct.detailNum
-            this.detailedGuigeList[2].value = this.currentProduct.businessName
-            this.detailedGuigeList[3].value = this.currentProduct.inDetailBoxNum
-            this.detailedGuigeList[4].value = this.currentProduct.batchNo
-            this.detailedGuigeList[5].value = this.currentProduct.goodnumPerBox
-            this.detailedGuigeList[6].value = this.currentProduct.fnskuCode
-            this.detailedGuigeList[7].value = this.currentProduct.hasInDetailNum
-            this.detailedGuigeList[8].value = this.currentProduct.intCode
-            this.detailedGuigeList[9].value = this.currentProduct.inDetailNum
-            this.detailedGuigeList[10].value = this.currentProduct.stockIntype
-            this.detailedGuigeList[11].value = this.currentProduct.unitWeight
-            this.detailedGuigeList[12].value = this.currentProduct.stockInWarehouse
-            this.detailedGuigeList[13].value = this.currentProduct.boxWeight
+            try{
+                this.detailedGuigeList[0].value = this.currentProduct.skuValuesTitle
+                this.detailedGuigeList[1].value = this.currentProduct.detailNum
+                this.detailedGuigeList[2].value = this.currentProduct.businessName
+                this.detailedGuigeList[3].value = this.currentProduct.inDetailBoxNum
+                this.detailedGuigeList[4].value = this.currentProduct.batchNo
+                this.detailedGuigeList[5].value = this.currentProduct.goodnumPerBox
+                this.detailedGuigeList[6].value = this.currentProduct.fnskuCode
+                this.detailedGuigeList[7].value = this.currentProduct.hasInDetailNum
+                this.detailedGuigeList[8].value = this.currentProduct.intCode
+            }catch(err){console.log(err)}
+            
         },
+        //计算体积
+        computVolume(length,width,height){
+            return (length*100)*(width*100)*(height*100)/Math.pow(10,12)
+        },
+        outStock(){
+            Dialog.confirm({
+                title: '温馨提示',
+                message: '您确定要“确认全部入库”操作吗??'
+            }).then(() => {
+                let arr = []
+                this.currentArray.forEach(good => {
+                    let obj = {
+                        inBoxHeight:good.boxHeight,//装箱高度
+                        inBoxLength:good.boxLength, //装箱长度
+                        inBoxWeight:good.boxWeight, //装箱重量
+                        inBoxWidth: good.boxWidth,  //装箱长度
+                        inDetailNum: good.inDetailNum, //数量
+                        inUnitHeight: good.unitHeight, //单位高度
+                        inUnitLength: good.unitLength, //单位长度
+                        inUnitWeight: good.unitWeight, //单位重量
+                        inUnitWidth: good.unitWidth,  //单位宽度
+                        orderDetailId: good.orderDetailId //供货单明细表id
+                    }
+                    arr.push(obj)
+                })
+                this.outStockObj.productList = arr
+                if(this.currentArray.length < this.listLength){
+                    Dialog.confirm({
+                        title: '温馨提示',
+                        message: '商品数量不足,是否继续入库?'
+                    }).then(()=>{
+                        this.scanproductbarcode(this.outStockObj)
+                    }).catch(()=>{})
+                }else{
+                    this.scanproductbarcode(this.outStockObj)
+                }
+            }).catch(() => {});
+        },
+        //扫描供货单再扫描商品编码后的确定全部入库操作
+        scanproductbarcode(data){
+            scanproductbarcodeApi(data).then(res => {
+                if(res.code == 0){
+                    Toast('入库成功')
+                    setTimeout(()=>{
+                        this.$router.go(-1)
+                    },1500)
+                }
+            })
+        }
     },
     components: {
         saomiaoHeader
@@ -251,6 +357,21 @@ export default {
                 width: 46%;
                 padding: 20px 0px 20px 30px;
                 border-bottom: 1px solid #999;
+                .item-input{
+                    display: inline-block;
+                    width: 100px;
+                    height: 40px;
+                    line-height: 40px;
+                    text-align: center;
+                    border: 1px #dcdcdc solid;
+                    padding-top: 2px;
+                    input{
+                        width: 90%;
+                        height: 85%;
+                        border:0;
+                        text-align: center;
+                    }
+                }
             }
             .tiji{
                 width: 100%;
@@ -270,6 +391,13 @@ export default {
                     border-radius:6px;
                     vertical-align: middle;
                     text-align: center;
+                    font-size: 18px;
+                    input{
+                        width: 85%;
+                        height: 70%;
+                        border:0;
+                        text-align: center;
+                    }
                 }
                 .total{
                     width: 100%;

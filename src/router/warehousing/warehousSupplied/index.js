@@ -3,6 +3,7 @@ import suppliedList from '@/components/tabbar/warehousing/warehousSupplied/suppl
 import suppliedDetail from '@/components/tabbar/warehousing/warehousSupplied/suppliedDetail'
 import suppliedPickUp from '@/components/tabbar/warehousing/warehousSupplied/suppliedPickUp'
 import suppliedShelves from '@/components/tabbar/warehousing/warehousSupplied/suppliedShelves'
+import suppliedSearch from '@/components/tabbar/warehousing/warehousSupplied/suppliedSearch'
 let routes = [
     {
         path: 'suppliedList',
@@ -23,6 +24,11 @@ let routes = [
         path: 'suppliedList/suppliedShelves',
         name: 'suppliedShelves',
         component: suppliedShelves,
+    },
+    {
+        path: 'suppliedList/suppliedSearch',
+        name: 'suppliedSearch',
+        component: suppliedSearch,
     }
 ];
 

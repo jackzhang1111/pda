@@ -1,26 +1,8 @@
 <template>
-<!-- 下架 -->
+<!-- 售后上架 -->
     <div class="pick-up">
         <saomiao-header @search="search"></saomiao-header>
-        <div class="pick-up-order" v-if="!$route.query.type">调拨出库单号：{{detailData.shelfDownorderSn}}</div>
-
-        <van-collapse v-model="activeNames" class="collapse" v-if="$route.query.type == 'xiajia'">
-            <van-collapse-item>
-                <template #title>
-                    <div>
-                        <span>调拨出库单号：</span>
-                        <span class="fl-right fs-20">{{detailData.shelfDownorderSn}}</span>
-                    </div>
-                </template>
-                <div v-for="(data,index) in dataList" :key="index" class="order-list" @click="toPickUp(data)">
-                    <span>{{data.orderSn}}</span> 
-                    <div class="fl-right">
-                        <van-checkbox v-model="data.checked"></van-checkbox>
-                    </div>
-                </div>
-            </van-collapse-item>
-        </van-collapse>
-
+        <div class="pick-up-order">销售退货入库单号：{{detailData.stockInOrderSn}}</div>
         <div class="order-detail">
             <div class="detail-header">
                 <van-icon name="play" class="play-left" :color="playLeft ? '#DCDCDC':'#333'" @click="cliPlayLeft"/>
@@ -60,46 +42,32 @@
                         <span>m³</span>
                     </div>
                 </div>
-                <div class="tiji">
-                    <div class="clearfix">
-                        <span class="pl-30">装箱体积 长×宽×高(cm)</span>
-                        <div class="fl-right">
-                            <span class="kuang">{{currentProduct.boxLength}}</span>
-                            <span>X</span>
-                            <span class="kuang">{{currentProduct.boxWidth}}</span>
-                            <span>X</span>
-                            <span class="kuang">{{currentProduct.boxHeight}}</span>
-                        </div>
-                    </div>
-                    <div class="total">
-                        <span>体积:</span>
-                        <span class="tijitotal">{{currentProduct.boxSize}}</span>
-                        <span>m³</span>
-                    </div>
-                </div>
             </div>
         </div>
         <div class="goods-shelves">
             <div class="set-shelves">
-                <span>下架货位</span>
+                <span @click="showPicker = true">设置上架货位</span>
+                <van-popup v-model="showPicker" position="bottom">
+                    <van-picker show-toolbar :columns="currentProduct.columns" @cancel="showPicker = false" @confirm="onConfirm"/>
+                </van-popup>
                 <van-icon name="play"/>
             </div>
             <div class="shelves-item" v-for="(warehouse,index) in currentProduct.warehouselist" :key="index">
                 <div class="item-title">
                     <span>{{warehouse.regionName}}</span>
-                    <span class="fs-18">(库存:{{warehouse.canUseNum}})</span>
+                    <img src="@/assets/img/lajitong.svg">
                 </div>
                 <div class="item-number">
-                    <div>{{warehouse.volume}}m³</div>
-                    <div>{{warehouse.takeVolume}}m³</div>
+                    <div>{{warehouse.volume}}/{{warehouse.volume-warehouse.takeVolume}}m³</div>
+                    <div>{{warehouse.upItemNum*currentProduct.unitSize ? accMul(warehouse.upItemNum,currentProduct.unitSize) : 0}}m³</div>
                     <div class="item-input">
-                        <input type="number" v-model="warehouse.downItemNum">
+                        <input type="number" v-model="warehouse.upItemNum">
                     </div>
                 </div>
             </div>
         </div>
         <div class="btns">
-            <div class="btn-qbrk" @click="allShelves">确认全部下架</div>
+            <div class="btn-qbrk" @click="finishPicking">确认全部上架</div>
         </div>
         <div class="shelves-place"></div>
     </div>
@@ -108,9 +76,8 @@
 <script>
 import saomiaoHeader from '@/multiplexing/saomiaoHeader.vue'
 import { Dialog ,Toast } from 'vant';
-import {returngoodsstockdowmAllApi} from '@/api/warehousing/cancellation/index.js'
-import {transferouttockdowmprolistApi} from '@/api/warehousing/allocation/index.js'
-import {waitingfordismountingorderlistApi} from '@/api/warehousing/shelve/index.js'
+import {customerservicebackordershelvesApi} from '@/api/warehousing/warehouAfterSales/index.js'
+import {stockInToShelvesAllApi} from '@/api/warehousing/warehousSupplied/index.js'
 export default {
     props: {
 
@@ -125,25 +92,32 @@ export default {
                 {name:'规格属性',value:''},
                 {name:'供应商',value:''},
                 {name:'批次号',value:''},
-                {name:'调拨出库数量',value:''},
+                {name:'入库仓库',value:''},
                 {name:'FNSKU',value:''},
-                {name:'装箱数量',value:''},
+                {name:'退货入库数量',value:''},
                 {name:'国际码',value:''},
-                {name:'下架数量',value:''},
-                {name:'出库类型',value:''},
+                {name:'上架数量',value:''},
+                {name:'入库类型',value:''},
                 {name:'单位重量(kg)',value:''},
-                {name:'出库仓库',value:''},
-                {name:'装箱重量(kg)',value:''},
             ],
             removeData:{
                 productlist:[],
                 shelfDownOrderId:'',
                 sourceType:2
             },
+            shelvesData:{
+                shelvesOrderId:0,
+                sourceType:2,
+                productlist:[]
+            },
+            paraObj:{
+                typeId:1,
+                paramId:''
+            },
             productArray:[],
-
-            activeNames:[],
-            dataList:[]
+            value: '',
+            showPicker: false,
+            columns: []
         };
     },
     computed: {
@@ -158,10 +132,9 @@ export default {
 
     },
     mounted() {
-        this.transferouttockdowmprolist(this.$route.query.orderid)
-        if(this.$route.query.type == 'xiajia'){
-            this.waitingfordismountingorderlist()
-        }
+        this.paraObj.paramId = Number(this.$route.query.paramId)
+        this.paraObj.typeId = Number(this.$route.query.typeId)
+        this.customerservicebackordershelves(this.paraObj)
     },
     watch: {
         currentProduct:{
@@ -187,9 +160,9 @@ export default {
             this.current++
             this.currentProduct = this.detailData.productList[this.current-1]
         },
-        //下架详情
-        transferouttockdowmprolist(orderId){
-            transferouttockdowmprolistApi({orderId}).then(res => {
+        //上架详情
+        customerservicebackordershelves(data){
+            customerservicebackordershelvesApi(data).then(res => {
                 if(res.code == 0){
                     this.detailData = res.Data
                     this.currentProduct = res.Data.productList[this.current-1]
@@ -197,6 +170,15 @@ export default {
                     this.productArray = res.Data.productList
                     
                     this.removeData.shelfDownOrderId = this.detailData.shelfDownOrderId
+                    this.shelvesData.shelvesOrderId = res.Data.shelvesOrderId
+                    this.detailData.warehouselist.forEach(element => {
+                        element.text = element.regionName
+                        this.columns.push(element)
+                    });
+                    this.productArray.forEach(ele => {
+                        ele.warehouselist = new Array()
+                        ele.columns = this.columns.map(o => Object.assign({}, o));
+                    })
                     this.setCurrentProduct()
                 }
             })
@@ -206,34 +188,33 @@ export default {
             this.detailedGuigeList[0].value = this.currentProduct.skuValuesTitle
             this.detailedGuigeList[1].value = this.currentProduct.businessName
             this.detailedGuigeList[2].value = this.currentProduct.batchNo
-            this.detailedGuigeList[3].value = this.currentProduct.downDetailNum
+            this.detailedGuigeList[3].value = this.currentProduct.stockInWarehouse
             this.detailedGuigeList[4].value = this.currentProduct.fnskuCode
-            this.detailedGuigeList[5].value = this.currentProduct.goodnumPerBox
+            this.detailedGuigeList[5].value = this.currentProduct.hasInDetailNum
             this.detailedGuigeList[6].value = this.currentProduct.intCode
-            this.detailedGuigeList[7].value = this.currentProduct.detailNum
-            this.detailedGuigeList[8].value = this.currentProduct.stockOuttype
+            this.detailedGuigeList[7].value = this.currentProduct.inDetailNum
+            this.detailedGuigeList[8].value = this.currentProduct.stockIntype
             this.detailedGuigeList[9].value = this.currentProduct.unitWeight
-            this.detailedGuigeList[10].value = this.currentProduct.warehouseName
-            this.detailedGuigeList[11].value = this.currentProduct.boxWeight
         },
-        //全部下架
-        allShelves(){
+        //全部上架
+        finishPicking(){
             let arr = []
             this.productArray.forEach(ele => {
                 let obj = {
                     batchNo:ele.batchNo,
                     skuId:ele.skuId,
-                    stockOutOrderDetailId:ele.orderDetailId,
-                    stockOutOrderType:2,
+                    stockInOrderType:3,
+                    orderDetailId:ele.orderDetailId,
+                    unitSize:ele.unitSize,
                     proRegion:[]
                 }
                 ele.warehouselist.forEach(item => {
-                    if(Number(item.downItemNum)>0){
+                    if(Number(item.upItemNum)>0){
                         let proRegionObj = {
-                            downItemNum:Number(item.downItemNum),
                             regionId:item.regionId,
-                            stockOutOrderDetailId:ele.orderDetailId,
-                            stockOutOrderType:2
+                            orderDetailId:ele.orderDetailId,
+                            stockInOrderType:3,
+                            upItemNum:Number(item.upItemNum),
                         }
                         obj.proRegion.push(proRegionObj)
                     }
@@ -241,79 +222,61 @@ export default {
                 if(obj.proRegion.length > 0){
                     arr.push(obj)
                 }
-                this.removeData.productlist = arr
+                this.shelvesData.productlist = arr
             });
             Dialog.confirm({
                 title: '温馨提示',
-                message: '您确定要“确认全部下架”操作吗?'
+                message: '您确定要“确认全部上架”操作吗?'
             }).then(() => {
                 let productIndex, proRegionIndex,flag = true
-                if(this.productArray.length != this.removeData.productlist.length){
+                if(this.productArray.length != this.shelvesData.productlist.length){
                     flag = false
                 }
                 if(flag){
-                    for (productIndex = 0; productIndex < this.removeData.productlist.length; productIndex++) { 
-                        let num = 0
-                        for(proRegionIndex = 0; proRegionIndex < this.removeData.productlist[productIndex].proRegion.length; proRegionIndex++){
-                            num += this.removeData.productlist[productIndex].proRegion[proRegionIndex].downItemNum
+                    for (productIndex = 0; productIndex < this.shelvesData.productlist.length; productIndex++) { 
+                        let num = 0,allNum = 0
+                        for(proRegionIndex = 0; proRegionIndex < this.shelvesData.productlist[productIndex].proRegion.length; proRegionIndex++){
+                            num += this.shelvesData.productlist[productIndex].proRegion[proRegionIndex].upItemNum
                         }
-                        if(this.productArray[productIndex].detailNum != num){
+                        if(this.productArray[productIndex].hasInDetailNum != num){
                             flag = false
                         }
                     }
                 }
                 if(!flag){
-                    Toast('全部下架数量不正确')
+                    Toast('全部上架数量不正确')
                     return
                 }
-                if(this.removeData.productlist.length == 0){
-                    Toast('请选择商品下架')
+                if(this.shelvesData.productlist.length == 0){
+                    Toast('请选择库区上架')
                     return
                 }
-               this.returngoodsstockdowmAll(this.removeData)
+                this.stockInToShelvesAll(this.shelvesData)
             }).catch(() => {});
         },
-        //下架
-        returngoodsstockdowmAll(data){
-            returngoodsstockdowmAllApi(data).then(res => {
+        //小数点计算
+        accMul(arg1,arg2){
+            var m=0,s1=arg1.toString(),s2=arg2.toString();
+            try{m+=s1.split(".")[1].length}catch(e){}
+            try{m+=s2.split(".")[1].length}catch(e){}
+            return Number(s1.replace(".",""))*Number(s2.replace(".",""))/Math.pow(10,m)
+        },
+        onConfirm(value) {
+            this.currentProduct.warehouselist.push(value)
+            this.value = value;
+            this.showPicker = false;
+        },
+        //全部上架
+        stockInToShelvesAll(data){
+            stockInToShelvesAllApi(data).then(res => {
                 if(res.code == 0){
-                    Toast('下架成功')
+                    Toast('上架成功')
                     setTimeout(()=>{
-                        this.$router.go(-1)
+                        this.$router.go(-2)
                     },1500)
                 }
             })
-        },
-        waitingfordismountingorderlist(){
-            waitingfordismountingorderlistApi().then(res => {
-                if(res.code == 0){
-                    this.dataList = res.Data
-                    this.dataList.forEach(item => {
-                        item.checked = false
-                        if(item.orderId == this.$route.query.orderid){
-                            item.checked = true
-                        }
-                    })
-                }
-            })
-        },
-        //选择单号
-        toPickUp(orderData){
-            if(this.$route.query.orderid == orderData.orderId) return
-            this.dataList.forEach(item => {
-                item.checked = false
-            })
-            orderData.checked = true
-            if(orderData.type == 1){
-                this.$router.replace({name:'cancellationRemove',query:{orderid:orderData.orderId,type:'xiajia'}})
-            }else if(orderData.type == 2){
-                this.$router.replace({name:'allocationRemove',query:{orderid:orderData.orderId,type:'xiajia'}})
-                this.transferouttockdowmprolist(orderData.orderId)
-            }else{
-                this.$router.replace({name:'soldRemove',query:{orderid:orderData.orderId,type:'xiajia'}})
-            }
-            this.$forceUpdate()
-        },
+        }
     },
     components: {
         saomiaoHeader
@@ -323,26 +286,6 @@ export default {
 
 <style scoped lang="less">
 .pick-up{
-    .collapse{
-        margin-bottom: 20px;
-    }
-    /deep/ .van-collapse-item__wrapper{
-        .van-collapse-item__content{
-            padding: 0;
-            padding-bottom: 60px;
-        }
-    }
-    .order-list{
-        height: 70px;
-        line-height: 70px;
-        color: #999;
-        font-size: 24px;
-        border-bottom: 1px solid #999;
-        padding: 0 30px;
-        .fl-right{
-            margin-top:14px;
-        }
-    }
     .pick-up-order{
         height: 68px;
         line-height: 68px;
@@ -433,7 +376,7 @@ export default {
                     width: 80px;
                     height: 40px;
                     line-height: 40px;
-                    // border: 2px solid #dcdcdc;
+                    border: 2px solid #dcdcdc;
                     border-radius:6px;
                     vertical-align: middle;
                     text-align: center;
@@ -478,7 +421,7 @@ export default {
             .item-title{
                 font-size:26px;
                 color: #333;
-                text-align: left;
+                text-align: center;
                 overflow: hidden;
                 margin-bottom: 26px;
                 img{

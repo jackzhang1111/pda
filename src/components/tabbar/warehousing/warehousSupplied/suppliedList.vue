@@ -92,8 +92,8 @@ export default {
     },
     methods: { 
         //搜索框 
-        search(){
-
+        search(value){
+            this.$router.push({name:'suppliedSearch',query:{expressNo:value}})
         },
         //切换tab
         onClick(index) {

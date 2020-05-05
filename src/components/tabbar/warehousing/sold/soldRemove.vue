@@ -3,7 +3,25 @@
     <div class="pick-up">
         <div v-show="!batchNoListStatus">
             <saomiao-header @search="search"></saomiao-header>
-            <div class="pick-up-order">出库单号：{{detailData.shelfDownorderSn}}</div>
+            <div class="pick-up-order" v-if="!$route.query.type">销售出库单号：{{detailData.shelfDownorderSn}}</div>
+
+            <van-collapse v-model="activeNames" class="collapse" v-if="$route.query.type == 'xiajia'">
+                <van-collapse-item>
+                    <template #title>
+                        <div>
+                            <span>销售出库单号：</span>
+                            <span class="fl-right fs-20">{{detailData.shelfDownorderSn}}</span>
+                        </div>
+                    </template>
+                    <div v-for="(data,index) in dataList" :key="index" class="order-list" @click="toPickUp(data)">
+                        <span>{{data.orderSn}}</span> 
+                        <div class="fl-right">
+                            <van-checkbox v-model="data.checked"></van-checkbox>
+                        </div>
+                    </div>
+                </van-collapse-item>
+            </van-collapse>
+
             <div class="order-detail">
                 <div class="detail-header">
                     <van-icon name="play" class="play-left" :color="playLeft ? '#DCDCDC':'#333'" @click="cliPlayLeft"/>
@@ -81,6 +99,7 @@ import batchNoList from './batchNoList.vue'
 import { Dialog ,Toast } from 'vant';
 import {saleoutorderstockdowmprolistApi,saleoutorderstockdowmprobatchRegionApi} from '@/api/warehousing/sold/index.js'
 import {returngoodsstockdowmAllApi} from '@/api/warehousing/cancellation/index.js'
+import {waitingfordismountingorderlistApi} from '@/api/warehousing/shelve/index.js'
 export default {
     props: {
 
@@ -113,7 +132,10 @@ export default {
             dataObj:{
                 outWarehouseId:'',
                 skuId:''
-            }
+            },
+
+            activeNames:[],
+            dataList:[]
         };
     },
     computed: {
@@ -129,6 +151,9 @@ export default {
     },
     mounted() {
         this.saleoutorderstockdowmprolist(this.$route.query.orderid)
+        if(this.$route.query.type == 'xiajia'){
+            this.waitingfordismountingorderlist()
+        }
     },
     watch: {
         currentProduct:{
@@ -257,7 +282,7 @@ export default {
                 if(flag){
                     let num = 0,num2 = 0
                     this.productArray.forEach(ele => {
-                        num += ele.detailNum
+                        num += ele.downDetailNum
                     })
                     this.removeData.productlist.forEach(ele => {
                         ele.proRegion.forEach(item => {
@@ -265,6 +290,7 @@ export default {
                         })
                     })
                     if(num != num2){
+                        console.log(num,num2);
                         flag = false
                     }
                 }
@@ -318,7 +344,36 @@ export default {
                 }
             })
         },
-        
+        waitingfordismountingorderlist(){
+            waitingfordismountingorderlistApi().then(res => {
+                if(res.code == 0){
+                    this.dataList = res.Data
+                    this.dataList.forEach(item => {
+                        item.checked = false
+                        if(item.orderId == this.$route.query.orderid){
+                            item.checked = true
+                        }
+                    })
+                }
+            })
+        },
+        //选择单号
+        toPickUp(orderData){
+            if(this.$route.query.orderid == orderData.orderId) return
+            this.dataList.forEach(item => {
+                item.checked = false
+            })
+            orderData.checked = true
+            if(orderData.type == 1){
+                this.$router.replace({name:'cancellationRemove',query:{orderid:orderData.orderId,type:'xiajia'}})
+            }else if(orderData.type == 2){
+                this.$router.replace({name:'allocationRemove',query:{orderid:orderData.orderId,type:'xiajia'}})
+            }else{
+                this.$router.replace({name:'soldRemove',query:{orderid:orderData.orderId,type:'xiajia'}})
+                this.saleoutorderstockdowmprolist(orderData.orderId)
+            }
+            this.$forceUpdate()
+        },
     },
     components: {
         saomiaoHeader,
@@ -329,6 +384,26 @@ export default {
 
 <style scoped lang="less">
 .pick-up{
+    .collapse{
+        margin-bottom: 20px;
+    }
+    /deep/ .van-collapse-item__wrapper{
+        .van-collapse-item__content{
+            padding: 0;
+            padding-bottom: 60px;
+        }
+    }
+    .order-list{
+        height: 70px;
+        line-height: 70px;
+        color: #999;
+        font-size: 24px;
+        border-bottom: 1px solid #999;
+        padding: 0 30px;
+        .fl-right{
+            margin-top:14px;
+        }
+    }
     .pick-up-order{
         height: 68px;
         line-height: 68px;
@@ -427,7 +502,7 @@ export default {
                     width: 80px;
                     height: 40px;
                     line-height: 40px;
-                    border: 2px solid #dcdcdc;
+                    // border: 2px solid #dcdcdc;
                     border-radius:6px;
                     vertical-align: middle;
                     text-align: center;
@@ -524,6 +599,9 @@ export default {
 }
 .fs-18{
     font-size: 18px
+}
+.fs-20{
+    font-size: 20px
 }
 .pl-30{
     padding-left:30px;

@@ -24,6 +24,15 @@
                     <span class="c-333">退货出库数量</span>
                     <div class="fl-right fs-22 c-666">{{detailData.totalNum}}</div>
                 </div>
+                <div class="time-item" v-if="typeSatus == 2 || typeSatus == 1">
+                    <span class="c-333">下架货架</span>
+                    <div class="fl-right fs-22 c-666">
+                        <div v-for="(warehouse,index) in detailData.warehouselist" :key="index">
+                            <span>{{warehouse.regionName}}</span>&nbsp;&nbsp;&nbsp;
+                            <span>{{warehouse.downItemNum}}</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="spqd">
@@ -55,7 +64,7 @@
             </div>
             <div class="time-item" v-if='typeSatus >= 1'>
                 <span class="c-333">下架时间</span>
-                <div class="fl-right fs-22 c-666">{{detailData.shelveDate}}</div>
+                <div class="fl-right fs-22 c-666">{{detailData.finishTime}}</div>
             </div>
             <div class="time-item" v-if='typeSatus == 2'>
                 <span class="c-333">出库完成时间</span>

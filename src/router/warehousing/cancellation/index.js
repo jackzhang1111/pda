@@ -3,6 +3,7 @@ import cancellationList from '@/components/tabbar/warehousing/cancellation/cance
 import cancellationDetail from '@/components/tabbar/warehousing/cancellation/cancellationDetail'
 import cancellationRemove from '@/components/tabbar/warehousing/cancellation/cancellationRemove'
 import cancellationOutstock from '@/components/tabbar/warehousing/cancellation/cancellationOutstock'
+import cancellationSearch from '@/components/tabbar/warehousing/cancellation/cancellationSearch'
 let routes = [
     {
         path:'cancellationList',
@@ -23,6 +24,11 @@ let routes = [
         path:'cancellationList/cancellationOutstock',
         name:'cancellationOutstock',
         component:cancellationOutstock
+    },
+    {
+        path:'cancellationList/cancellationSearch',
+        name:'cancellationSearch',
+        component:cancellationSearch
     }
 ];
 

@@ -8,6 +8,17 @@
                     <span class="c-333">供货单号</span>
                     <div class="fl-right fs-22 c-666">{{detailData.orderSn}}</div>
                 </div>
+
+                <div class="time-item" v-if="typeSatus == 3 || typeSatus == 4">
+                    <span class="c-333">入库单号</span>
+                    <div class="fl-right fs-22 c-666">{{detailData.stockInOrderSn}}</div>
+                </div>
+                <div class="time-item" v-if="typeSatus == 4">
+                    <span class="c-333">上架单号</span>
+                    <div class="fl-right fs-22 c-666">{{detailData.shelveOrderSn}}</div>
+                </div>
+
+
                 <div class="time-item">
                     <span class="c-333">供应商</span>
                     <div class="fl-right fs-22 c-666">{{detailData.businessName}}</div>
@@ -24,7 +35,25 @@
                     <span class="c-333">入库仓库</span>
                     <div class="fl-right fs-22 c-666">{{detailData.warehouseName}}</div>
                 </div>
+
+
+                <div class="time-item" v-if="typeSatus == 3 || typeSatus == 4">
+                    <span class="c-333">入库数量</span>
+                    <div class="fl-right fs-22 c-666">{{detailData.stockInNum}}</div>
+                </div>
+                <div class="time-item" v-if="typeSatus == 4">
+                    <span class="c-333">上架货位</span>
+                    <div class="fl-right fs-22 c-666">
+                        <div v-for="(warehouse,index) in detailData.warehouseList" :key="index">
+                            <span>{{warehouse.regionName}}</span>&nbsp;&nbsp;&nbsp;
+                            <span>{{warehouse.upItemNum}}</span>
+                        </div>
+                    </div>
+                    
+                    
+                </div>
             </div>
+
         </div>
         <div class="spqd">
             <div class="spqd-header">供货商品</div>
@@ -41,7 +70,7 @@
             </div>
             <div class="spqd-footer">
                 <span>总计:</span>
-                <span>9</span>
+                <span>{{detailData.totalProNum?detailData.totalProNum:0}}</span>
             </div>
         </div>
         <div class="order-time" v-if="typeSatus != 1">
@@ -199,6 +228,11 @@ export default {
             border-bottom: 1px solid #F2F3F5;
             padding: 0 30px;
             overflow: hidden;
+            .aaa{
+                display: inline-block;
+                word-wrap:break-word;
+                vertical-align: middle;
+            }
         }
     }
 }

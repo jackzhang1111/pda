@@ -68,7 +68,7 @@ export default {
                 {
                     icon:shouhou,
                     name:'售后',
-                    routerName:'warehouAfterSales'
+                    routerName:'warehouSalesList'
                 },
                 {
                     icon:shangjia,

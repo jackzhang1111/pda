@@ -52,3 +52,12 @@ export function stockInToShelvesAllApi(params) {
         data:params
     })
 }
+
+//扫描供货单再扫描商品编码后的确定全部入库操作
+export function scanproductbarcodeApi(params) {
+    return park({
+        url:`/storage/Scanproductbarcode`,
+        method: 'POST',
+        data:params
+    })
+}

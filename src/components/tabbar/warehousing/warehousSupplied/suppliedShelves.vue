@@ -139,9 +139,6 @@ export default {
             return  this.current == this.listLength
         }
     },
-    created() {
-
-    },
     mounted() {
         this.stockInToShelves(this.$route.query.paramId,this.$route.query.typeId)
     },
@@ -280,7 +277,7 @@ export default {
         stockInToShelvesAll(data){
             stockInToShelvesAllApi(data).then(res => {
                 if(res.code == 0){
-                    Toast('下架成功')
+                    Toast('上架成功')
                     setTimeout(()=>{
                         this.$router.go(-1)
                     },1500)
@@ -386,7 +383,7 @@ export default {
                     width: 80px;
                     height: 40px;
                     line-height: 40px;
-                    border: 2px solid #dcdcdc;
+                    // border: 2px solid #dcdcdc;
                     border-radius:6px;
                     vertical-align: middle;
                     text-align: center;

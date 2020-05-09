@@ -231,6 +231,7 @@ export default {
                     border:0;
                     text-align: center;
                     font-size: 34px;
+                    margin-top:5%;
                 }
             }
             .ma-35{

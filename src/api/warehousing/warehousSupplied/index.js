@@ -61,3 +61,30 @@ export function scanproductbarcodeApi(params) {
         data:params
     })
 }
+
+//PDA首页订单数量统计
+export function pdaselecthomeordertotalApi(params) {
+    return park({
+        url:`/storage/pdaselecthomeordertotal`,
+        method: 'GET',
+        params
+    })
+}
+
+//PDA扫描入库
+export function pdascanningordernoinApi(params) {
+    return park({
+        url:`/storage/pdascanningordernoin`,
+        method: 'GET',
+        params
+    })
+}
+
+//PDA扫描出库
+export function pdascanningordernooutApi(params) {
+    return park({
+        url:`/storage/pdascanningordernoout`,
+        method: 'GET',
+        params
+    })
+}

@@ -121,8 +121,13 @@ export default {
     },
     methods: {
         //搜索框 
-        search(){
-
+        search(val){
+            this.productArray.forEach((item,index) => {
+                if(item.fnskuCode == val){
+                    this.current = index+1
+                    this.currentProduct = this.detailData.productList[index]
+                }
+            });
         },
         //上一个
         cliPlayLeft(){
@@ -136,11 +141,12 @@ export default {
             this.current++
             this.currentProduct = this.detailData.productlist[this.current-1]
         },
-        //出库详情
+        //入库详情
         transferinstockdowmprobtn(orderId){
             transferinstockdowmprobtnApi({orderId}).then(res => {
                 if(res.code == 0){
                     this.detailData = res.Data
+                    this.productArray = res.Data.productlist
                     this.currentProduct = res.Data.productlist[this.current-1]
                     this.listLength = res.Data.productlist.length
                     this.setCurrentProduct()
@@ -149,7 +155,12 @@ export default {
         },
         transferinstockdowmprobtnstock(orderId){
             transferinstockdowmprobtnstockApi({orderId}).then(res => {
-
+                if(res.code == 0){
+                    Toast('入库成功')
+                    setTimeout(()=>{
+                        this.$router.go(-1)
+                    },1500)
+                }
             })
         },
         //当前商品基本属性

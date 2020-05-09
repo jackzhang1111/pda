@@ -222,7 +222,6 @@ export default {
             p{
                 font-size: 22px;
                 color: #333;
-                height: 40px;
                 line-height: 40px;
             }
         }

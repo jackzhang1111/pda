@@ -54,7 +54,7 @@
 <script>
 import saomiaoHeader from '@/multiplexing/saomiaoHeader.vue'
 import { Dialog ,Toast } from 'vant';
-import {returngoodsstockdowmdetailApi,returngoodsstockdowmApi} from '@/api/warehousing/cancellation/index.js'
+import {returngoodsstockdowmprolistApi,returngoodsstockdowmApi} from '@/api/warehousing/cancellation/index.js'
 export default {
     props: {
 
@@ -91,7 +91,7 @@ export default {
 
     },
     mounted() {
-        this.returngoodsstockdowmdetai(this.$route.query.orderid)
+        this.returngoodsstockdowmprolist(this.$route.query.orderid)
     },
     watch: {
         currentProduct:{
@@ -102,8 +102,13 @@ export default {
     },
     methods: {
         //搜索框 
-        search(){
-
+        search(val){
+            this.productArray.forEach((item,index) => {
+                if(item.fnskuCode == val){
+                    this.current = index+1
+                    this.currentProduct = this.detailData.productList[index]
+                }
+            });
         },
         //上一个
         cliPlayLeft(){
@@ -118,10 +123,11 @@ export default {
             this.currentProduct = this.detailData.productList[this.current-1]
         },
         //下架详情
-        returngoodsstockdowmdetai(orderId){
-            returngoodsstockdowmdetailApi({orderId}).then(res => {
+        returngoodsstockdowmprolist(orderId){
+            returngoodsstockdowmprolistApi({orderId}).then(res => {
                 if(res.code == 0){
                     this.detailData = res.Data
+                    this.productArray = res.Data.productList
                     this.currentProduct = res.Data.productList[this.current-1]
                     this.listLength = res.Data.productList.length
                     this.setCurrentProduct()
@@ -209,6 +215,7 @@ export default {
                     border:0;
                     text-align: center;
                     font-size: 34px;
+                    margin-top:5%
                 }
             }
             .ma-35{

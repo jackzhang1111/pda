@@ -1,75 +1,82 @@
 <template>
 <!-- 售后入库 -->
     <div class="pick-up">
-        <div v-show="!batchNoListStatus">
-            <saomiao-header @search="search"></saomiao-header>
-            <div class="pick-up-order">销售退货单号：{{detailData.orderSn}}</div>
-            <div class="order-detail">
-                <div class="detail-header">
-                    <van-icon name="play" class="play-left" :color="playLeft ? '#DCDCDC':'#333'" @click="cliPlayLeft"/>
-                    <div class="num-input">
-                        <input type="number" v-model="current">
+        <div v-show="showPickUp">
+            <div v-show="!batchNoListStatus">
+                <saomiao-header @search="search"></saomiao-header>
+                <div class="pick-up-order">销售退货单号：{{detailData.orderSn}}</div>
+                <div class="order-detail" v-if="currentArray.length > 0">
+                    <div class="detail-header">
+                        <van-icon name="play" class="play-left" :color="playLeft ? '#DCDCDC':'#333'" @click="cliPlayLeft"/>
+                        <div class="num-input">
+                            <input type="number" v-model="current">
+                        </div>
+                        <span class="ma-35 header-font">/</span>
+                        <span class="header-font">{{currentArray.length}}</span>
+                        <van-icon name="play" class="play-right" :color="playRight ? '#DCDCDC':'#333'" @click="cliPlayRight"/>
                     </div>
-                    <span class="ma-35 header-font">/</span>
-                    <span class="header-font">{{listLength}}</span>
-                    <van-icon name="play" class="play-right" :color="playRight ? '#DCDCDC':'#333'" @click="cliPlayRight"/>
-                </div>
-                <div class="order-product">
-                    <img :src="$webUrl+currentProduct.skuImg">
-                    <div class="product">
-                        <p>{{currentProduct.skuName}}</p>
-                        <p class="guige">TSIN：{{currentProduct.tsinCode}}</p>
+                    <div class="order-product">
+                        <img :src="$webUrl+currentProduct.skuImg">
+                        <div class="product">
+                            <p>{{currentProduct.skuName}}</p>
+                            <p class="guige">TSIN：{{currentProduct.tsinCode}}</p>
+                        </div>
                     </div>
-                </div>
-                <div class="detailed">
-                    <div class="detailed-item" v-for="(detailedGuige,index) in detailedGuigeList" :key="index" @click="replaceBatchNo(detailedGuige.name)">
-                        <div class="c-999">{{detailedGuige.name}}</div>&nbsp;&nbsp;&nbsp;
-                        <div class="c-666">{{detailedGuige.value}}</div>
-                    </div>
-                    <div class="tiji">
-                        <div class="clearfix">
-                            <span class="pl-30">单位体积 长×宽×高(cm)</span>
-                            <div class="fl-right">
-                                <span class="kuang">{{currentProduct.unitLength}}</span>
-                                <span>X</span>
-                                <span class="kuang">{{currentProduct.unitWidth}}</span>
-                                <span>X</span>
-                                <span class="kuang">{{currentProduct.unitHeight}}</span>
+                    <div class="detailed">
+                        <div class="detailed-item" v-for="(detailedGuige,index) in detailedGuigeList" :key="index" @click="replaceBatchNo(detailedGuige.name)">
+                            <div class="c-999">{{detailedGuige.name}}</div>&nbsp;&nbsp;&nbsp;
+                            <div class="c-666">{{detailedGuige.value}}</div>
+                        </div>
+                        <div class="tiji">
+                            <div class="clearfix">
+                                <span class="pl-30">单位体积 长×宽×高(cm)</span>
+                                <div class="fl-right">
+                                    <span class="kuang">{{currentProduct.unitLength}}</span>
+                                    <span>X</span>
+                                    <span class="kuang">{{currentProduct.unitWidth}}</span>
+                                    <span>X</span>
+                                    <span class="kuang">{{currentProduct.unitHeight}}</span>
+                                </div>
+                            </div>
+                            <div class="total">
+                                <span>体积:</span>
+                                <span class="tijitotal">{{currentProduct.unitSize}}</span>
+                                <span>m³</span>
                             </div>
                         </div>
-                        <div class="total">
-                            <span>体积:</span>
-                            <span class="tijitotal">{{currentProduct.unitSize}}</span>
-                            <span>m³</span>
+                    </div>
+                    <div class="goods-shelves">
+                        <div class="set-shelves">
+                            <span>入库批次</span>
+                            <van-icon name="play"/>
+                        </div>
+                        <div class="shelves-item" v-for="(batch,index) in currentProduct.batchList" :key="index">
+                            <div class="item-title">
+                                <span class="fs-18">(最大入库数量:{{batch.outProNum ? batch.outProNum : 0}})</span>
+                            </div>
+                            <div class="item-number">
+                                <div>{{batch.batchNo}}</div>
+                                <div class="item-input">
+                                    <input type="number" v-model="batch.inDetailNums">
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="goods-shelves">
-                <div class="set-shelves">
-                    <span>入库批次</span>
-                    <van-icon name="play"/>
+                
+                <div class="btns">
+                    <div class="btn-smtm" @click="showSweepCode(false)">扫码添加商品</div>
+                    <div class="btn-qbrk" @click="outStock">确认全部入库</div>
                 </div>
-                <div class="shelves-item" v-for="(batch,index) in currentProduct.batchList" :key="index">
-                    <div class="item-title">
-                        <span class="fs-18">(最大入库数量:{{batch.outProNum ? batch.outProNum : 0}})</span>
-                    </div>
-                    <div class="item-number">
-                        <div>{{batch.batchNo}}</div>
-                        <div class="item-input">
-                            <input type="number" v-model="batch.inDetailNums">
-                        </div>
-                    </div>
-                </div>
+                <div class="shelves-place"></div>
             </div>
-            <div class="btns">
-                <div class="btn-smtm">扫描条码</div>
-                <div class="btn-qbrk" @click="outStock">确认全部入库</div>
-            </div>
-            <div class="shelves-place"></div>
         </div>
+
         <div v-show="batchNoListStatus">
             <batch-no-list @choiceStatus="choiceStatus" @batchDatas="batchDatas" :dataList="dataList" :typeName="typeName"></batch-no-list>
+        </div>
+        <div v-if="!showPickUp">
+            <sweep-code @search="search" @showSweepCode="showSweepCode"></sweep-code>
         </div>
     </div>
 </template>
@@ -79,6 +86,7 @@ import saomiaoHeader from '@/multiplexing/saomiaoHeader.vue'
 import { Dialog ,Toast } from 'vant';
 import {customerservicebackorderApi,customerservicebackorderinstockAllApi} from '@/api/warehousing/warehouAfterSales/index.js'
 import batchNoList from './batchNoList.vue'
+import sweepCode from '@/components/tabbar/warehousing/warehousSupplied/itemComponents/sweepCode.vue'
 export default {
     props: {
 
@@ -110,7 +118,10 @@ export default {
                 inWarehouseId:'',//入库的仓库ID
                 stockInOrderId:'',//退货单ID
                 outBatchList:[]
-            }
+            },
+            currentArray:[],
+            produclist:[],
+            showPickUp:true
         };
     },
     computed: {
@@ -118,7 +129,7 @@ export default {
             return  this.current == 1
         },
         playRight() {
-            return  this.current == this.listLength
+           return  this.current == this.currentArray.length
         }
     },
     created() {
@@ -132,53 +143,74 @@ export default {
             handler:function(newVal){
                 this.setCurrentProduct()
             }
+        },
+        produclist:{
+            handler:function(newVal){
+                this.produclist.forEach(item => {
+                    if(item.display == 1){
+                        this.currentArray.push(item)
+                    }
+                });
+            }
         }
     },
     methods: {
         //搜索框 
-        search(){
-
+        search(val){
+            this.produclist.forEach((item,index) => {
+                if(item.fnskuCode == val && item.display == 0){
+                    item.display = 1
+                    this.currentArray.push(item)
+                    this.currentProduct = this.currentArray[this.currentArray.length-1]
+                    this.current = this.currentArray.length
+                }else if(item.fnskuCode == val && item.display == 1){
+                    this.current = index + 1
+                    this.currentProduct = this.currentArray[index]
+                    this.currentProduct.inDetailNum++
+                    this.setCurrentProduct()
+                }
+            });
         },
         //上一个
         cliPlayLeft(){
             if(this.current <=1) return
             this.current--
-            this.currentProduct = this.detailData.produclist[this.current-1]
+            this.currentProduct = this.currentArray[this.current-1]
         },
         //下一个
         cliPlayRight(){
-            if(this.current >= this.listLength) return
+            if(this.current >= this.currentArray.length) return
             this.current++
-            this.currentProduct = this.detailData.produclist[this.current-1]
+            this.currentProduct = this.currentArray[this.current-1]
         },
         //入库信息
         customerservicebackorder(backOrderId){
             customerservicebackorderApi({backOrderId}).then(res => {
                 if(res.code == 0){
                     this.detailData = res.Data
-                    this.currentProduct = res.Data.produclist[this.current-1]
+                    this.produclist = res.Data.produclist.map(o => Object.assign({}, o));
+                    setTimeout(()=>{this.currentProduct = this.currentArray[this.current-1]},0)
                     this.listLength = res.Data.produclist.length
-
+                    this.outStockObj.stockInOrderId = res.Data.stockInOrderId
                     this.outStockObj.saleBackOrderId = this.detailData.produclist[0].saleBackOrderId
-                    this.outStockObj.stockInOrderId =  this.detailData.stockInOrderId
-
-
-                    this.setCurrentProduct()
                 }
             })
         },
         //当前商品基本属性
         setCurrentProduct(){
-            this.detailedGuigeList[0].value = this.currentProduct.skuValuesTitle
-            this.detailedGuigeList[1].value = this.currentProduct.businessName
-            this.detailedGuigeList[2].value = this.currentProduct.batchNo
-            // this.detailedGuigeList[3].value = this.currentProduct.inStockType
-            this.detailedGuigeList[4].value = this.currentProduct.fnskuCode
-            this.detailedGuigeList[5].value = this.currentProduct.detailNum
-            this.detailedGuigeList[6].value = this.currentProduct.intCode
-            this.detailedGuigeList[7].value = this.currentProduct.inDetailNum
-            this.detailedGuigeList[8].value = this.currentProduct.inStockType
-            this.detailedGuigeList[9].value = this.currentProduct.unitWeight
+            try{
+                this.detailedGuigeList[0].value = this.currentProduct.skuValuesTitle
+                this.detailedGuigeList[1].value = this.currentProduct.businessName
+                this.detailedGuigeList[2].value = this.currentProduct.batchNo
+                // this.detailedGuigeList[3].value = this.currentProduct.inStockType
+                this.detailedGuigeList[4].value = this.currentProduct.fnskuCode
+                this.detailedGuigeList[5].value = this.currentProduct.detailNum
+                this.detailedGuigeList[6].value = this.currentProduct.intCode
+                this.detailedGuigeList[7].value = this.currentProduct.inDetailNum
+                this.detailedGuigeList[8].value = this.currentProduct.inStockType
+                this.detailedGuigeList[9].value = this.currentProduct.unitWeight
+            }catch(err){console.log(err)}
+            
         },
         //全部入库
         customerservicebackorderinstockAll(data){
@@ -224,24 +256,33 @@ export default {
                         this.currentProduct.saleStockOutOrderDetailId = ele.saleStockOutOrderDetailId
                     }
                 })
-                console.log(batchList,'batchList');
             }
         },
+        //出库
         outStock(){
-            let arr = []
-            this.detailData.produclist.forEach(produc => {
-                produc.batchList.forEach(batchItem => {
-                    let obj = {
-                        inDetailNums:batchItem.inDetailNums,
-                        saleBackOrderDetailIds:produc.saleBackOrderDetailId,
-                        saleStockOutOrderDetailIds:batchItem.saleStockOutOrderDetailId,
-                        maxNumber:batchItem.outProNum
-                    }
-                    arr.push(obj)
+            if(this.currentArray.length == 0){
+                Toast('请选择商品')
+                return
+            }
+            try{
+                let arr = []
+                this.currentArray.forEach(produc => {
+                    produc.batchList.forEach(batchItem => {
+                        let obj = {
+                            inDetailNums:batchItem.inDetailNums,
+                            saleBackOrderDetailIds:produc.saleBackOrderDetailId,
+                            saleStockOutOrderDetailIds:batchItem.saleStockOutOrderDetailId,
+                            maxNumber:batchItem.outProNum
+                        }
+                        arr.push(obj)
+                    })
+                    
                 })
-                
-            })
-            this.outStockObj.outBatchList = arr
+                this.outStockObj.outBatchList = arr
+            }catch(error){
+                Toast('请选择批次号')
+                return
+            }
             Dialog.confirm({
                 title: '温馨提示',
                 message: '您确定要“确认全部入库”操作吗??'
@@ -253,7 +294,7 @@ export default {
                         if(!outBatch.saleStockOutOrderDetailIds){
                             flag = false
                         }
-                        if(outBatch.maxNumber <outBatch.inDetailNums){
+                        if(outBatch.maxNumber < outBatch.inDetailNums){
                             flag = false
                         }
                     })
@@ -266,14 +307,17 @@ export default {
                 }else{
                     Toast('批次号或者入库仓库有误')
                 }
-
-
             }).catch(() => {});
         },
+        //扫描开关
+        showSweepCode(flag){
+            this.showPickUp = flag
+        }
     },
     components: {
         saomiaoHeader,
-        batchNoList
+        batchNoList,
+        sweepCode
     },
 };
 </script>

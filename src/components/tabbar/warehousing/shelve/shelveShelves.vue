@@ -88,7 +88,7 @@
             <div class="shelves-item" v-for="(warehouse,index) in currentProduct.warehouselist" :key="index">
                 <div class="item-title">
                     <span>{{warehouse.regionName}}</span>
-                    <img src="@/assets/img/lajitong.svg">
+                    <img src="@/assets/img/lajitong.svg" @click="detailWarehouse(index)">
                 </div>
                 <div class="item-number">
                     <div>{{warehouse.volume}}/{{warehouse.volume-warehouse.takeVolume}}m³</div>
@@ -195,8 +195,13 @@ export default {
     },
     methods: {
         //搜索框 
-        search(){
-
+        search(val){
+            this.productArray.forEach((item,index) => {
+                if(item.fnskuCode == val){
+                    this.current = index+1
+                    this.currentProduct = this.detailData.productList[index]
+                }
+            });
         },
         //上一个
         cliPlayLeft(){
@@ -447,6 +452,15 @@ export default {
             }
             this.$forceUpdate()
         },
+        //垃圾桶
+        detailWarehouse(index){
+            Dialog.confirm({
+                title: '温馨提示',
+                message: '您确定要删除该货位吗?'
+            }).then(() => {
+                this.currentProduct.warehouselist.splice(index,1)
+            }).catch(() => {});
+        }
     },
     components: {
         saomiaoHeader
@@ -486,6 +500,7 @@ export default {
                     border:0;
                     text-align: center;
                     font-size: 34px;
+                    margin-top:5%;
                 }
             }
             .ma-35{
@@ -583,6 +598,7 @@ export default {
                 border:0
             }
             .item-title{
+                padding-top:10px;
                 font-size:26px;
                 color: #333;
                 text-align: center;
@@ -611,6 +627,7 @@ export default {
                         height: 85%;
                         border:0;
                         text-align: center;
+                        margin-top:5%;
                     }
                 }
             }

@@ -3,15 +3,15 @@
         <tabbar-header></tabbar-header>
         <div class="warehousing-top">
             <div class="fl-left tongji">
-                <div class="fs-40 tongji-top">{{waitOrderCount}}</div>
+                <div class="fs-40 tongji-top">{{inordertotal}}</div>
                 <div class="c-999">今日入库</div>
             </div>
             <div class="fl-left tongji">
-                <div class="fs-40 tongji-top">{{todaySignOrderCount}}</div>
+                <div class="fs-40 tongji-top">{{transordertotal}}</div>
                 <div class="c-999">调拨</div>
             </div>
             <div class="fl-left tongji">
-                <div class="fs-40 tongji-top">{{todaySignOrderCount}}</div>
+                <div class="fs-40 tongji-top">{{outordertotal}}</div>
                 <div class="c-999">今日出库</div>
             </div>
         </div>
@@ -21,11 +21,18 @@
                 <div class="c-666">{{icon.name}}</div>
             </div>
         </div>
-    
+        
         <div class="saomiao-btn" @click="saomiaoBtn">
             <img src="@/assets/img/saomiao.svg">
             <span>扫描条码</span>
         </div>
+
+
+        <zhezhao v-if="zhezhaoStatus" @cancalZhezhao="cancalZhezhao">
+            <div class="smxz">
+                <div class="tiaoshu" v-for="saomiaoItme in saomiaoList" :key="saomiaoItme.value" @click.stop="toSweepCode(saomiaoItme.value)">{{saomiaoItme.name}}</div>
+            </div>
+        </zhezhao>
     </div>
 </template>
 
@@ -38,6 +45,8 @@ import xsck from '@/assets/img/xsck.png'
 import diaobo from '@/assets/img/diaobo.png'
 import shangjia from '@/assets/img/shangjia.png'
 import xiajia from '@/assets/img/xiajia.png'
+import zhezhao from '@/multiplexing/zhezhao.vue'
+import {pdaselecthomeordertotalApi} from '@/api/warehousing/warehousSupplied/index.js'
 export default {
     props: {
 
@@ -82,8 +91,13 @@ export default {
                 },
             ],
             zhezhaoStatus:false,
-            waitOrderCount:0,
-            todaySignOrderCount:0,
+            inordertotal:0,
+            transordertotal:0,
+            outordertotal:0,
+            saomiaoList:[
+                {name:'扫描入库',value:1},
+                {name:'扫描出库',value:2},
+            ],
         };
     },
     computed: {
@@ -93,7 +107,7 @@ export default {
 
     },
     mounted() {
-        
+        this.pdaselecthomeordertotal()
     },
     watch: {
 
@@ -116,14 +130,24 @@ export default {
         },
         //扫码
         toSweepCode(value){
-            this.$router.push({name:'sweepCode',query:{code:value}})
+            this.$router.push({name:'warehousweepCode',query:{code:value}})
         },
         saomiaoBtn(){
             this.zhezhaoStatus = true;
         },
+        pdaselecthomeordertotal(){
+            pdaselecthomeordertotalApi().then(res => {
+                if(res.code == 0){
+                    this.inordertotal = res.Data.inordertotal
+                    this.outordertotal = res.Data.outordertotal
+                    this.transordertotal = res.Data.transordertotal
+                }
+            })
+        }
     },
     components: {
         tabbarHeader,
+        zhezhao
     },
 };
 </script>

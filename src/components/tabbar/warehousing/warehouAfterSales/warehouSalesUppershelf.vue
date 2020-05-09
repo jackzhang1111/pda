@@ -55,7 +55,7 @@
             <div class="shelves-item" v-for="(warehouse,index) in currentProduct.warehouselist" :key="index">
                 <div class="item-title">
                     <span>{{warehouse.regionName}}</span>
-                    <img src="@/assets/img/lajitong.svg">
+                    <!-- <img src="@/assets/img/lajitong.svg"> -->
                 </div>
                 <div class="item-number">
                     <div>{{warehouse.volume}}/{{warehouse.volume-warehouse.takeVolume}}m³</div>

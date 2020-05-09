@@ -65,7 +65,7 @@
             </div>
         </div>
         <div class="spqd">
-            <div class="spqd-header">供货商品</div>
+            <div class="spqd-header">调拨商品</div>
             <div class="spqd-list" v-for="(product,index) in detailData.productList" :key="index">
                 <img :src="$webUrl+product.skuImg" class="shangpin-img fl-left">
                 <div class="fl-left good-name">

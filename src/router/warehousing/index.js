@@ -6,6 +6,8 @@ import remove from './remove/index'
 import shelve from './shelve/index'
 import sold from './sold/index'
 import warehouAfterSales from './warehouAfterSales/index'
+import warehousweepCode from '@/components/tabbar/warehousing/sweepCode.vue'
+import orderInput from '@/components/tabbar/warehousing/orderInput'
 let routes = [
     {
         path: '/warehousing',
@@ -19,8 +21,19 @@ let routes = [
             ...shelve,
             ...sold,
             ...warehouAfterSales,
+            
         ]
-    }
+    },
+    {
+        path: '/warehousing/sweepCode',
+        name: 'warehousweepCode',
+        component: warehousweepCode
+    },
+    {
+        path: '/warehousing/sweepCode/orderInput',
+        name: 'orderInput',
+        component: orderInput
+    },
 ];
 
 export default routes;

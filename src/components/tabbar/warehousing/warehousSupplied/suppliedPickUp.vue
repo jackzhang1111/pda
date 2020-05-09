@@ -1,112 +1,116 @@
 <template>
 <!-- 入库 -->
-    <div class="pick-up">
-        <saomiao-header @search="search"></saomiao-header>
-        <div class="pick-up-order">
-           <span>供货单号：{{detailData.orderSn}}</span>
-           <span class="fl-right">{{listLength}}</span>
-        </div>
-        <div class="order-detail" v-if="currentArray.length > 0">
-            <div class="detail-header">
-                <van-icon name="play" class="play-left" :color="playLeft ? '#DCDCDC':'#333'" @click="cliPlayLeft"/>
-                <div class="num-input">
-                    <input type="number" v-model="current">
-                </div>
-                <span class="ma-35 header-font">/</span>
-                <span class="header-font">{{currentArray.length}}</span>
-                <van-icon name="play" class="play-right" :color="playRight ? '#DCDCDC':'#333'" @click="cliPlayRight"/>
+    <div>
+        <div class="pick-up" v-show="showPickUp">
+            <saomiao-header @search="search"></saomiao-header>
+            <div class="pick-up-order">
+            <span>供货单号：{{detailData.orderSn}}</span>
+            <span class="fl-right">{{listLength}}</span>
             </div>
-            <div class="order-product">
-                <img :src="$webUrl+currentProduct.skuImg">
-                <div class="product">
-                    <p>{{currentProduct.skuName}}</p>
-                    <p class="guige">TSIN：{{currentProduct.tsinCode}}</p>
+            <div class="order-detail" v-if="currentArray.length > 0">
+                <div class="detail-header">
+                    <van-icon name="play" class="play-left" :color="playLeft ? '#DCDCDC':'#333'" @click="cliPlayLeft"/>
+                    <div class="num-input">
+                        <input type="number" v-model="current">
+                    </div>
+                    <span class="ma-35 header-font">/</span>
+                    <span class="header-font">{{currentArray.length}}</span>
+                    <van-icon name="play" class="play-right" :color="playRight ? '#DCDCDC':'#333'" @click="cliPlayRight"/>
                 </div>
-            </div>
-            <div class="detailed">
-                <div class="detailed-item" v-for="(detailedGuige,index) in detailedGuigeList" :key="index">
-                    <span class="c-999">{{detailedGuige.name}}</span>&nbsp;&nbsp;&nbsp;
-                    <span class="c-666">{{detailedGuige.value}}</span>
-                </div>
-                <div class="detailed-item">
-                    <span class="c-999">本次入库数量</span>&nbsp;&nbsp;&nbsp;
-                    <div class="item-input">
-                        <input type="number" v-model="currentProduct.inDetailNum">
+                <div class="order-product">
+                    <img :src="$webUrl+currentProduct.skuImg">
+                    <div class="product">
+                        <p>{{currentProduct.skuName}}</p>
+                        <p class="guige">TSIN：{{currentProduct.tsinCode}}</p>
                     </div>
                 </div>
-                <div class="detailed-item">
-                    <span class="c-999">入库类型</span>&nbsp;&nbsp;&nbsp;
-                    <span class="c-666">{{currentProduct.stockIntype}}</span>
-                </div>
-                <div class="detailed-item">
-                    <span class="c-999">单位重量(kg)</span>&nbsp;&nbsp;&nbsp;
-                    <div class="item-input">
-                        <input type="number" v-model="currentProduct.unitWeight">
+                <div class="detailed">
+                    <div class="detailed-item" v-for="(detailedGuige,index) in detailedGuigeList" :key="index">
+                        <span class="c-999">{{detailedGuige.name}}</span>&nbsp;&nbsp;&nbsp;
+                        <span class="c-666">{{detailedGuige.value}}</span>
                     </div>
-                </div>
-                <div class="detailed-item">
-                    <span class="c-999">入库仓库</span>&nbsp;&nbsp;&nbsp;
-                    <span class="c-666">{{currentProduct.stockInWarehouse}}</span>
-                </div>
-                <div class="detailed-item">
-                    <span class="c-999">装箱重量(kg)</span>&nbsp;&nbsp;&nbsp;
-                    <div class="item-input">
-                        <input type="number" v-model="currentProduct.boxWeight">
-                    </div>
-                </div>
-                <div class="tiji">
-                    <div class="clearfix">
-                        <span class="pl-30">单位体积 长×宽×高(cm)</span>
-                        <div class="fl-right">
-                            <div class="kuang">
-                                <input type="number" v-model="currentProduct.unitLength">
-                            </div>
-                            <span>X</span>
-                            <div class="kuang">
-                                <input type="number" v-model="currentProduct.unitWidth">
-                            </div>
-                            <span>X</span>
-                            <div class="kuang">
-                                <input type="number" v-model="currentProduct.unitHeight">
-                            </div>
+                    <div class="detailed-item">
+                        <span class="c-999">本次入库数量</span>&nbsp;&nbsp;&nbsp;
+                        <div class="item-input">
+                            <input type="number" v-model="currentProduct.inDetailNum">
                         </div>
                     </div>
-                    <div class="total">
-                        <span>体积:</span>
-                        <span class="tijitotal">{{computVolume(currentProduct.unitLength,currentProduct.unitWidth,currentProduct.unitHeight)}}</span>
-                        <span>m³</span>
+                    <div class="detailed-item">
+                        <span class="c-999">入库类型</span>&nbsp;&nbsp;&nbsp;
+                        <span class="c-666">{{currentProduct.stockIntype}}</span>
                     </div>
-                </div>
-                <div class="tiji">
-                    <div class="clearfix">
-                        <span class="pl-30">装箱体积 长×宽×高(cm)</span>
-                        <div class="fl-right">
-                            <div class="kuang">
-                                <input type="number" v-model="currentProduct.boxLength">
-                            </div>
-                            <span>X</span>
-                            <div class="kuang">
-                                <input type="number" v-model="currentProduct.boxWidth">
-                            </div>
-                            <span>X</span>
-                            <div class="kuang">
-                                <input type="number" v-model="currentProduct.boxHeight">
-                            </div>
+                    <div class="detailed-item">
+                        <span class="c-999">单位重量(kg)</span>&nbsp;&nbsp;&nbsp;
+                        <div class="item-input">
+                            <input type="number" v-model="currentProduct.unitWeight">
                         </div>
                     </div>
-                    <div class="total">
-                        <span>体积:</span>
-                        <span class="tijitotal">{{computVolume(currentProduct.boxLength,currentProduct.boxWidth,currentProduct.boxHeight)}}</span>
-                        <span>m³</span>
+                    <div class="detailed-item">
+                        <span class="c-999">入库仓库</span>&nbsp;&nbsp;&nbsp;
+                        <span class="c-666">{{currentProduct.stockInWarehouse}}</span>
+                    </div>
+                    <div class="detailed-item">
+                        <span class="c-999">装箱重量(kg)</span>&nbsp;&nbsp;&nbsp;
+                        <div class="item-input">
+                            <input type="number" v-model="currentProduct.boxWeight">
+                        </div>
+                    </div>
+                    <div class="tiji">
+                        <div class="clearfix">
+                            <span class="pl-30">单位体积 长×宽×高(cm)</span>
+                            <div class="fl-right">
+                                <div class="kuang">
+                                    <input type="number" v-model="currentProduct.unitLength">
+                                </div>
+                                <span>X</span>
+                                <div class="kuang">
+                                    <input type="number" v-model="currentProduct.unitWidth">
+                                </div>
+                                <span>X</span>
+                                <div class="kuang">
+                                    <input type="number" v-model="currentProduct.unitHeight">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="total">
+                            <span>体积:</span>
+                            <span class="tijitotal">{{computVolume(currentProduct.unitLength,currentProduct.unitWidth,currentProduct.unitHeight)}}</span>
+                            <span>m³</span>
+                        </div>
+                    </div>
+                    <div class="tiji">
+                        <div class="clearfix">
+                            <span class="pl-30">装箱体积 长×宽×高(cm)</span>
+                            <div class="fl-right">
+                                <div class="kuang">
+                                    <input type="number" v-model="currentProduct.boxLength">
+                                </div>
+                                <span>X</span>
+                                <div class="kuang">
+                                    <input type="number" v-model="currentProduct.boxWidth">
+                                </div>
+                                <span>X</span>
+                                <div class="kuang">
+                                    <input type="number" v-model="currentProduct.boxHeight">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="total">
+                            <span>体积:</span>
+                            <span class="tijitotal">{{computVolume(currentProduct.boxLength,currentProduct.boxWidth,currentProduct.boxHeight)}}</span>
+                            <span>m³</span>
+                        </div>
                     </div>
                 </div>
             </div>
+            <div class="btns">
+                <div class="btn-smtm" @click="showSweepCode(false)">扫码添加商品</div>
+                <div class="btn-qbrk" @click="outStock">确认全部入库</div>
+            </div>
         </div>
-        <div class="btns">
-            <div class="btn-smtm">扫描条码</div>
-            <div class="btn-qbrk" @click="outStock">确认全部入库</div>
+        <div v-if="!showPickUp">
+            <sweep-code @search="search" @showSweepCode="showSweepCode"></sweep-code>
         </div>
-        
     </div>
 </template>
 
@@ -114,6 +118,7 @@
 import saomiaoHeader from '@/multiplexing/saomiaoHeader.vue'
 import { Dialog ,Toast } from 'vant';
 import {confirmationStockInApi,scanproductbarcodeApi} from '@/api/warehousing/warehousSupplied/index.js'
+import sweepCode from './itemComponents/sweepCode.vue'
 export default {
     props: {
 
@@ -142,7 +147,8 @@ export default {
                 remark:'',
                 sourceType:2,
                 stockInOrderId:null
-            }
+            },
+            showPickUp:true
         };
     },
     computed: {
@@ -175,12 +181,16 @@ export default {
     methods: {
         //搜索框 
         search(val){
-            this.productlist.forEach(item => {
+            this.productlist.forEach((item,index) => {
                 if(item.fnskuCode == val && item.display == 0){
                     item.display = 1
                     this.currentArray.push(item)
                     this.currentProduct = this.currentArray[this.currentArray.length-1]
                     this.current = this.currentArray.length
+                }else if(item.fnskuCode == val && item.display == 1){
+                    this.current = index + 1
+                    this.currentProduct = this.currentArray[index]
+                    this.currentProduct.inDetailNum++
                 }
             });
         },
@@ -272,10 +282,15 @@ export default {
                     },1500)
                 }
             })
+        },
+        //扫描开关
+        showSweepCode(flag){
+            this.showPickUp = flag
         }
     },
     components: {
-        saomiaoHeader
+        saomiaoHeader,
+        sweepCode
     },
 };
 </script>

@@ -172,8 +172,13 @@ export default {
     },
     methods: {
         //搜索框 
-        search(){
-
+        search(val){
+            this.productArray.forEach((item,index) => {
+                if(item.fnskuCode == val){
+                    this.current = index+1
+                    this.currentProduct = this.detailData.productList[index]
+                }
+            });
         },
         //上一个
         cliPlayLeft(){
@@ -379,6 +384,7 @@ export default {
                     border:0;
                     text-align: center;
                     font-size: 34px;
+                    margin-top:5%;
                 }
             }
             .ma-35{
@@ -476,6 +482,7 @@ export default {
                 border:0
             }
             .item-title{
+                padding-top:10px;
                 font-size:26px;
                 color: #333;
                 text-align: left;
@@ -504,6 +511,7 @@ export default {
                         height: 85%;
                         border:0;
                         text-align: center;
+                        margin-top:5%;
                     }
                 }
             }

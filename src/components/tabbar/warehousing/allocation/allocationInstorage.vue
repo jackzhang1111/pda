@@ -7,7 +7,7 @@
             <div class="detail-header">
                 <van-icon name="play" class="play-left" :color="playLeft ? '#DCDCDC':'#333'" @click="cliPlayLeft"/>
                 <div class="num-input">
-                    <input type="number" v-model="current">
+                    <input type="number" v-model="current" @change="changeInput">
                 </div>
                 <span class="ma-35 header-font">/</span>
                 <span class="header-font">{{listLength}}</span>
@@ -168,7 +168,7 @@ export default {
             this.detailedGuigeList[0].value = this.currentProduct.skuValuesTitle
             this.detailedGuigeList[1].value = this.currentProduct.businessName
             this.detailedGuigeList[2].value = this.currentProduct.batchNo
-            this.detailedGuigeList[3].value = this.currentProduct.downDetailNum
+            this.detailedGuigeList[3].value = this.currentProduct.inDetailNum
             this.detailedGuigeList[4].value = this.currentProduct.fnskuCode
             this.detailedGuigeList[5].value = this.currentProduct.goodnumPerBox
             this.detailedGuigeList[6].value = this.currentProduct.intCode
@@ -187,6 +187,15 @@ export default {
                 this.transferinstockdowmprobtnstock(this.detailData.stockInOrderId)
             }).catch(() => {});
         },
+        //更改页数
+        changeInput(){
+            if(this.current > this.listLength){
+                this.current = this.listLength
+            }else if(this.current < 1){
+                this.current = 1
+            }
+            this.currentProduct = this.detailData.productList[this.current-1]
+        }
     },
     components: {
         saomiaoHeader

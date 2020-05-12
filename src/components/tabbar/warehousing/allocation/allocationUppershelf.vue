@@ -7,7 +7,7 @@
             <div class="detail-header">
                 <van-icon name="play" class="play-left" :color="playLeft ? '#DCDCDC':'#333'" @click="cliPlayLeft"/>
                 <div class="num-input">
-                    <input type="number" v-model="current">
+                    <input type="number" v-model="current" @change="changeInput">
                 </div>
                 <span class="ma-35 header-font">/</span>
                 <span class="header-font">{{listLength}}</span>
@@ -93,7 +93,6 @@
 <script>
 import saomiaoHeader from '@/multiplexing/saomiaoHeader.vue'
 import { Dialog ,Toast } from 'vant';
-import {returngoodsstockdowmAllApi} from '@/api/warehousing/cancellation/index.js'
 import {transferinstockdowmproshelvesApi} from '@/api/warehousing/allocation/index.js'
 import {stockInToShelvesAllApi} from '@/api/warehousing/warehousSupplied/index.js'
 export default {
@@ -288,9 +287,19 @@ export default {
             return Number(s1.replace(".",""))*Number(s2.replace(".",""))/Math.pow(10,m)
         },
         onConfirm(value) {
+            if(this.currentProduct.columns.length == 0) return
+            let currIndex = null
             this.currentProduct.warehouselist.push(value)
             this.value = value;
             this.showPicker = false;
+            this.currentProduct.columns.forEach((item,index) => {
+                if(item.regionId == value.regionId){
+                    currIndex = index
+                }
+            })
+            if(currIndex != null){
+                this.currentProduct.columns.splice(currIndex,1)
+            }
         },
         //全部上架
         stockInToShelvesAll(data){
@@ -300,6 +309,8 @@ export default {
                     setTimeout(()=>{
                         this.$router.go(-1)
                     },1500)
+                }else if(res.code == 1){
+                    Toast('本次上架商品数量超过当前最大可上架商品数量（入库单入库商品数量-已创建上架单商品数量）')
                 }
             })
         },
@@ -311,6 +322,15 @@ export default {
             }).then(() => {
                 this.currentProduct.warehouselist.splice(index,1)
             }).catch(() => {});
+        },
+        //更改页数
+        changeInput(){
+            if(this.current > this.listLength){
+                this.current = this.listLength
+            }else if(this.current < 1){
+                this.current = 1
+            }
+            this.currentProduct = this.detailData.productList[this.current-1]
         }
     },
     components: {

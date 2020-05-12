@@ -25,7 +25,7 @@
             <div class="detail-header">
                 <van-icon name="play" class="play-left" :color="playLeft ? '#DCDCDC':'#333'" @click="cliPlayLeft"/>
                 <div class="num-input">
-                    <input type="number" v-model="current">
+                    <input type="number" v-model="current" @change="changeInput">
                 </div>
                 <span class="ma-35 header-font">/</span>
                 <span class="header-font">{{listLength}}</span>
@@ -286,6 +286,18 @@ export default {
                     setTimeout(()=>{
                         this.$router.go(-1)
                     },1500)
+                }else if(res.code == 1){
+                    Toast('本次下架商品数量超过当前最大可下架商品数量（出库单出库商品数量-已创建下架单商品数量）')
+                }else if(res.code == 3){
+                    Toast('出库单出库仓库不一致')
+                }else if(res.code == 4){
+                    Toast('存在状态不为待下架的出库单')
+                }else if(res.code == 6){
+                    Toast('本次下架商品数量超过库区最大可下架商品数量（库区可用库存-已创建下架单待下架商品数量）')
+                }else if(res.code == 7){
+                    Toast('该下架单不是待下架状态，不能修改')
+                }else if(res.code == 8){
+                    Toast('存在已申请退款的销售出库单')
                 }
             })
         },
@@ -319,6 +331,15 @@ export default {
             }
             this.$forceUpdate()
         },
+        //更改页数
+        changeInput(){
+            if(this.current > this.listLength){
+                this.current = this.listLength
+            }else if(this.current < 1){
+                this.current = 1
+            }
+            this.currentProduct = this.detailData.productList[this.current-1]
+        }
     },
     components: {
         saomiaoHeader

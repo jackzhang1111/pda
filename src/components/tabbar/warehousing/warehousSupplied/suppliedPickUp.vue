@@ -11,7 +11,7 @@
                 <div class="detail-header">
                     <van-icon name="play" class="play-left" :color="playLeft ? '#DCDCDC':'#333'" @click="cliPlayLeft"/>
                     <div class="num-input">
-                        <input type="number" v-model="current">
+                        <input type="number" v-model="current" @change="changeInput">
                     </div>
                     <span class="ma-35 header-font">/</span>
                     <span class="header-font">{{currentArray.length}}</span>
@@ -215,7 +215,22 @@ export default {
                     setTimeout(()=>{this.currentProduct = this.currentArray[this.current-1]},0)
                     this.listLength = res.Data.productlist.length
                     this.outStockObj.stockInOrderId = res.Data.stockInOrderId
-                    
+                }else if(res.code == -100){
+                    Toast('该供货条码不存在')
+                }else if(res.code == -110){
+                    Toast('该供货条码为草稿状态不能入库')
+                }else if(res.code == -115){
+                    Toast('该供货条码还在审核中')
+                }else if(res.code == -120){
+                    Toast('该供货条码待发货')
+                }else if(res.code == -130){
+                    Toast('该供货条码已入库请完成待上架请勿重复操作')
+                }else if(res.code == -140){
+                    Toast('该供货条码已完成入库上架请勿重复操作')
+                }else if(res.code == -150){
+                    Toast('该供货条码已作废')
+                }else if(res.code == -160){
+                    Toast('该供货条码的申请已经被驳回')
                 }
             })
         },
@@ -241,7 +256,7 @@ export default {
         outStock(){
             Dialog.confirm({
                 title: '温馨提示',
-                message: '您确定要“确认全部入库”操作吗??'
+                message: '您确定要“确认全部入库”操作吗?'
             }).then(() => {
                 let arr = []
                 this.currentArray.forEach(good => {
@@ -280,12 +295,35 @@ export default {
                     setTimeout(()=>{
                         this.$router.go(-1)
                     },1500)
+                }else if(res.code == 1){
+                    Toast('本次入库商品数量超过当前最大可入库商品数量（供货数量-已创建入库单商品数量）')
+                }else if(res.code == 2){
+                    Toast('存在重复的供货单')
+                }else if(res.code == 3){
+                    Toast('供货单入库仓库不一致')
+                }else if(res.code == 4){
+                    Toast('存在状态不为已发货待入库的供货单')
+                }else if(res.code == 5){
+                    Toast('存在本次入库数总数不大于0的供货单')
+                }else if(res.code == 6){
+                    Toast('该入库单不是待入库状态，不能修改')
+                }else if(res.code == 7){
+                    Toast('一个供货单只能创建一个供货入库单')
                 }
             })
         },
         //扫描开关
         showSweepCode(flag){
             this.showPickUp = flag
+        },
+        //更改页数
+        changeInput(){
+            if(this.current > this.currentArray.length){
+                this.current = this.currentArray.length
+            }else if(this.current < 1){
+                this.current = 1
+            }
+            this.currentProduct = this.currentArray[this.current-1]
         }
     },
     components: {

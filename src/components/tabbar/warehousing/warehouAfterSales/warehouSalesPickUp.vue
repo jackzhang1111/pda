@@ -9,7 +9,7 @@
                     <div class="detail-header">
                         <van-icon name="play" class="play-left" :color="playLeft ? '#DCDCDC':'#333'" @click="cliPlayLeft"/>
                         <div class="num-input">
-                            <input type="number" v-model="current">
+                            <input type="number" v-model="current" @change="changeInput">
                         </div>
                         <span class="ma-35 header-font">/</span>
                         <span class="header-font">{{currentArray.length}}</span>
@@ -147,10 +147,19 @@ export default {
         produclist:{
             handler:function(newVal){
                 this.produclist.forEach(item => {
+                    let arr = []
                     if(item.display == 1){
                         this.currentArray.push(item)
                     }
+                    item.outBatchList.forEach(ele => {
+                        if(ele.isCheck == 1){
+                            arr.push(ele)
+                        }
+                        item.batchList = arr
+                    })
+                    
                 });
+                console.log(this.produclist,'this.produclist');
             }
         }
     },
@@ -193,6 +202,8 @@ export default {
                     this.listLength = res.Data.produclist.length
                     this.outStockObj.stockInOrderId = res.Data.stockInOrderId
                     this.outStockObj.saleBackOrderId = this.detailData.produclist[0].saleBackOrderId
+
+
                 }
             })
         },
@@ -217,6 +228,14 @@ export default {
             customerservicebackorderinstockAllApi(data).then(res => {
                 if(res.code == 0){
                     this.$router.push({name:'warehouSalesUppershelf',query:{paramId:this.$route.query.backOrderId,typeId:1}})
+                }else if(res.code == 1){
+                    Toast('本次上架商品数量超过当前最大可上架商品数量（入库单入库商品数量-已创建上架单商品数量）')
+                }else if(res.code == 6){
+                    Toast('该入库单不是待入库状态，不能修改')
+                }else if(res.code == 7){
+                    Toast('退货单状态不为待入库，不能创建或修改入库单')
+                }else if(res.code == 8){
+                    Toast('该退货单已关联入库单，不能重复使用')
                 }
             })
         },
@@ -285,7 +304,7 @@ export default {
             }
             Dialog.confirm({
                 title: '温馨提示',
-                message: '您确定要“确认全部入库”操作吗??'
+                message: '您确定要“确认全部入库”操作吗?'
             }).then(() => {
                 let flag = true
 
@@ -312,6 +331,15 @@ export default {
         //扫描开关
         showSweepCode(flag){
             this.showPickUp = flag
+        },
+        //更改页数
+        changeInput(){
+            if(this.current > this.currentArray.length){
+                this.current = this.currentArray.length
+            }else if(this.current < 1){
+                this.current = 1
+            }
+            this.currentProduct = this.currentArray[this.current-1]
         }
     },
     components: {

@@ -20,8 +20,8 @@ Vue.config.productionTip = false
 Vue.use(Vant);
 
 
-// Vue.prototype.jn = '₵'
-// Vue.prototype.$webUrl = 'http://47.52.210.251:8091/tospino/test/'
+Vue.prototype.jn = '₵'
+Vue.prototype.$webUrl = ''
 
 gethttpimgurlApi().then(res => {
   if(res.code == 0){

@@ -7,7 +7,7 @@
             <div class="detail-header">
                 <van-icon name="play" class="play-left" :color="playLeft ? '#DCDCDC':'#333'" @click="cliPlayLeft"/>
                 <div class="num-input">
-                    <input type="number" v-model="current">
+                    <input type="number" v-model="current" @change="changeInput">
                 </div>
                 <span class="ma-35 header-font">/</span>
                 <span class="header-font">{{listLength}}</span>
@@ -169,9 +169,22 @@ export default {
                     setTimeout(()=>{
                         this.$router.go(-1)
                     },1500)
+                }else if(res.code == 1){
+                    Toast('该出库单不存在')
+                }else if(res.code == 2){
+                    Toast('该出库单不是待出库状态，不能进行出库')
                 }
             })
         },
+        //更改页数
+        changeInput(){
+            if(this.current > this.listLength){
+                this.current = this.listLength
+            }else if(this.current < 1){
+                this.current = 1
+            }
+            this.currentProduct = this.detailData.productList[this.current-1]
+        }
     },
     components: {
         saomiaoHeader

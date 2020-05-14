@@ -5,10 +5,10 @@
             <span class="header-t2 c-orange" @click="isOk">确定</span>
         </div>
         <div class="place"></div>
-        <div class="batch-list" v-for="(batch,index) in noList" :key="index">
+        <div class="batch-list" v-for="(batch,index) in noList" :key="index" @click="changeCheckbox(batch)">
             <span v-if="typeName=='cangku'">{{batch.warehouseName}}</span>
             <span v-else>{{batch.batchNo}}</span>
-            <van-checkbox v-model="batch.checked" icon-size="24px" class="checkbox fl-right" checked-color="#F83600" @click="changeCheckbox(batch)"></van-checkbox>
+            <van-checkbox v-model="batch.checked" icon-size="24px" class="checkbox fl-right" checked-color="#F83600"></van-checkbox>
         </div>
     </div>
 </template>
@@ -57,6 +57,8 @@ export default {
                     ele.checked = false
                 })
                 item.checked = true
+            }else{
+                item.checked = !item.checked
             }
             this.$forceUpdate()
         },

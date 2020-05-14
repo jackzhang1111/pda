@@ -6,6 +6,7 @@
                 <div class="shxx-header">
                     <p class="p1">取件信息</p> 
                     <p>退货单号:{{detailData.backSn}}</p>
+                    <p>入库单号:{{detailData.backInSn}}</p>
                 </div>
                 <div class="shxx-con">
                     <img :src="$webUrl+detailData.headImg" class="touxiang fl-left">
@@ -56,6 +57,7 @@
                     <img :src="$webUrl+detail.skuImg" class="shangpin-img fl-left">
                     <div class="fl-left good-name">
                         <p class="p1 clamp-2 c-333">{{detail.skuName}}</p>
+                        <p class="p2 c-666">入库批次号:{{detail.batchNo}}</p>
                         <p class="p2 c-666">TSIN：{{detail.tisnCode}}</p>
                         <p class="p3 c-666">
                             <span>{{detail.titleValues}}</span>
@@ -79,11 +81,11 @@
                 </div>
                 <div class="time-item" v-if="$route.query.type == 4">
                     <span class="c-333">上架时间</span>
-                    <div class="fl-right fs-22 c-666">{{detailData.stockinTime}}</div>
+                    <div class="fl-right fs-22 c-666">{{detailData.finishTime}}</div>
                 </div> 
                 <div class="time-item" v-if="$route.query.type == 4">
                     <span class="c-333">入库完成时间</span>
-                    <div class="fl-right fs-22 c-666">{{detailData.stockinTime}}</div>
+                    <div class="fl-right fs-22 c-666">{{detailData.stockInTime}}</div>
                 </div>  
             </div>
             <div class="place"></div>
@@ -162,6 +164,7 @@ export default {
         .shxx-header{
             padding: 30px;
             border-bottom: 1px solid #F2F3F5;
+            line-height: 40px;
             .p1{
                 font-size: 32px;
                 margin-bottom: 56px;

@@ -73,7 +73,7 @@
             <div class="shelves-item" v-for="(warehouse,index) in currentProduct.warehouselist" :key="index">
                 <div class="item-title">
                     <span>{{warehouse.regionName}}</span>
-                    <img src="@/assets/img/lajitong.svg" @click="detailWarehouse(index)">
+                    <img src="@/assets/img/lajitong.svg" @click="detailWarehouse(index,warehouse)">
                 </div>
                 <div class="item-number">
                     <div>{{warehouse.volume}}/{{warehouse.volume-warehouse.takeVolume}}m³</div>
@@ -299,12 +299,13 @@ export default {
             })
         },
         //垃圾桶
-        detailWarehouse(index){
+        detailWarehouse(index,item){
             Dialog.confirm({
                 title: '温馨提示',
                 message: '您确定要删除该货位吗?'
             }).then(() => {
                 this.currentProduct.warehouselist.splice(index,1)
+                this.currentProduct.columns.push(item)
             }).catch(() => {});
         },
         //更改页数

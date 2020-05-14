@@ -66,7 +66,6 @@
             <div class="goods-shelves">
                 <div class="set-shelves">
                     <span>下架货位</span>
-                    <van-icon name="play"/>
                 </div>
                 <div class="shelves-item" v-for="(warehouse,index) in currentProduct.warehouselist" :key="index">
                     <div class="item-title">
@@ -76,8 +75,14 @@
                     <div class="item-number">
                         <div>{{warehouse.volume}}m³</div>
                         <div>{{warehouse.takeVolume}}m³</div>
-                        <div class="item-input">
+                        <!-- <div class="item-input">
                             <input type="number" v-model="warehouse.downItemNum">
+                        </div> -->
+                    </div>
+                    <div class="item-number" v-for="(batchNolist,index) in warehouse.batchNoList" :key="index">
+                        <div>{{batchNolist.inbatchNo}}(库存:{{batchNolist.canUseNum}})</div>
+                        <div class="item-input">
+                            <input type="number" v-model="batchNolist.downItemNum">
                         </div>
                     </div>
                 </div>
@@ -225,54 +230,60 @@ export default {
                     itemBatchNo.forEach(itemBatch => {
                         let obj = {
                             skuId:ele.skuId,
-                            stockOutOrderDetailId:ele.orderDetailId,
                             stockOutOrderType:3,
-                            proRegion:[]
+                            proRegion:[],
+                            stockOutOrderDetailId:''
                         }
                         //库区循环
-                        ele.warehouselist.forEach(item => {
-                            //如果库区里面是有值的
-                            if(Number(item.downItemNum)>0){
-                                //批次号等于该库区的批次号
-                                if(item.batchNo == itemBatch){
-                                    obj.batchNo = itemBatch
-                                    let proRegionObj = {
-                                        downItemNum:Number(item.downItemNum),
-                                        regionId:item.regionId,
-                                        stockOutOrderDetailId:ele.orderDetailId,
-                                        stockOutOrderType:3
+                        ele.warehouselist.forEach(warehouse => {
+                            warehouse.batchNoList.forEach(item => {
+                                //如果库区里面是有值的
+                                if(Number(item.downItemNum)>0){
+                                    //批次号等于该库区的批次号
+                                    if(item.inbatchNo == itemBatch){
+                                        obj.batchNo = itemBatch
+                                        obj.stockOutOrderDetailId = item.stockOutOrderDetailId
+                                        let proRegionObj = {
+                                            downItemNum:Number(item.downItemNum),
+                                            regionId:warehouse.regionId,
+                                            stockOutOrderDetailId:item.stockOutOrderDetailId,
+                                            stockOutOrderType:3
+                                        }
+                                        obj.proRegion.push(proRegionObj)
                                     }
-                                    obj.proRegion.push(proRegionObj)
-                                    
                                 }
+                            })
+                            if(obj.batchNo){
+                                arr.push(obj)
                             }
                         })
-                        if(obj.batchNo){
-                            arr.push(obj)
-                        }
                     })
                 }else{
                     let obj = {
                         batchNo:ele.batchNo,
                         skuId:ele.skuId,
-                        stockOutOrderDetailId:ele.orderDetailId,
                         stockOutOrderType:3,
+                        stockOutOrderDetailId:'',
                         proRegion:[]
                     }
-                    ele.warehouselist.forEach(item => {
-                        if(Number(item.downItemNum)>0){
-                            let proRegionObj = {
-                                downItemNum:Number(item.downItemNum),
-                                regionId:item.regionId,
-                                stockOutOrderDetailId:ele.orderDetailId,
-                                stockOutOrderType:3
+                    ele.warehouselist.forEach(warehouse => {
+                        warehouse.batchNoList.forEach(item => {
+                            if(Number(item.downItemNum)>0){
+                                obj.stockOutOrderDetailId = item.stockOutOrderDetailId
+                                let proRegionObj = {
+                                    downItemNum:Number(item.downItemNum),
+                                    regionId:warehouse.regionId,
+                                    stockOutOrderDetailId:item.stockOutOrderDetailId,
+                                    stockOutOrderType:3
+                                }
+                                obj.proRegion.push(proRegionObj)
                             }
-                            obj.proRegion.push(proRegionObj)
+                        })
+                        if(obj.proRegion.length > 0){
+                            arr.push(obj)
                         }
                     })
-                    if(obj.proRegion.length > 0){
-                        arr.push(obj)
-                    }
+                    
                 }
                 this.removeData.productlist = arr
             });
@@ -282,12 +293,13 @@ export default {
             }).then(() => {
                 let productIndex, proRegionIndex,flag = true
                 if(this.productArray.length > this.removeData.productlist.length){
+                    console.log(this.productArray,'this.productArray',this.removeData);
                     flag = false
                 }
                 if(flag){
                     let num = 0,num2 = 0
                     this.productArray.forEach(ele => {
-                        num += ele.downDetailNum
+                        num += ele.detailNum
                     })
                     this.removeData.productlist.forEach(ele => {
                         ele.proRegion.forEach(item => {
@@ -349,7 +361,8 @@ export default {
             this.currentProduct.batchNo = batchArr.join(',')
             let obj = {
                 outWarehouseId:this.dataObj.outWarehouseId,
-                inbatchNo:batchArr
+                inbatchNo:batchArr,
+                orderId:this.$route.query.orderid
             }
             this.saleoutorderstockdowmprobatchRegion(obj)
         },
@@ -589,6 +602,7 @@ export default {
                 justify-content: space-between;
                 font-size: 20px;
                 color: #333;
+                padding: 20px 0;
                 .item-input{
                     width: 140px;
                     height: 40px;

@@ -4,7 +4,10 @@
         <div v-show="showPickUp">
             <div v-show="!batchNoListStatus">
                 <saomiao-header @search="search"></saomiao-header>
-                <div class="pick-up-order">销售退货单号：{{detailData.orderSn}}</div>
+                <div class="pick-up-order">
+                   <span>销售退货单号：{{detailData.orderSn}}</span>
+                   <span class="fl-right">{{listLength}}</span>
+                </div>
                 <div class="order-detail" v-if="currentArray.length > 0">
                     <div class="detail-header">
                         <van-icon name="play" class="play-left" :color="playLeft ? '#DCDCDC':'#333'" @click="cliPlayLeft"/>
@@ -48,7 +51,6 @@
                     <div class="goods-shelves">
                         <div class="set-shelves">
                             <span>入库批次</span>
-                            <van-icon name="play"/>
                         </div>
                         <div class="shelves-item" v-for="(batch,index) in currentProduct.batchList" :key="index">
                             <div class="item-title">
@@ -57,7 +59,7 @@
                             <div class="item-number">
                                 <div>{{batch.batchNo}}</div>
                                 <div class="item-input">
-                                    <input type="number" v-model="batch.inDetailNums">
+                                    <input type="number" v-model="batch.inProNum">
                                 </div>
                             </div>
                         </div>
@@ -152,6 +154,7 @@ export default {
                         this.currentArray.push(item)
                     }
                     item.outBatchList.forEach(ele => {
+                        ele.checked = ele.isCheck
                         if(ele.isCheck == 1){
                             arr.push(ele)
                         }
@@ -159,7 +162,6 @@ export default {
                     })
                     
                 });
-                console.log(this.produclist,'this.produclist');
             }
         }
     },
@@ -202,8 +204,15 @@ export default {
                     this.listLength = res.Data.produclist.length
                     this.outStockObj.stockInOrderId = res.Data.stockInOrderId
                     this.outStockObj.saleBackOrderId = this.detailData.produclist[0].saleBackOrderId
-
-
+                    this.outStockObj.inWarehouseId = this.detailData.produclist[0].inWarehouseId
+                    if(this.detailData.produclist[0].warehouseName){
+                        this.detailData.warehouselist.forEach(item => {
+                            if(item.warehouseId == this.detailData.produclist[0].inWarehouseId){
+                                item.checked = true
+                            }
+                        })
+                    }
+                   
                 }
             })
         },
@@ -213,7 +222,7 @@ export default {
                 this.detailedGuigeList[0].value = this.currentProduct.skuValuesTitle
                 this.detailedGuigeList[1].value = this.currentProduct.businessName
                 this.detailedGuigeList[2].value = this.currentProduct.batchNo
-                // this.detailedGuigeList[3].value = this.currentProduct.inStockType
+                this.detailedGuigeList[3].value = this.currentProduct.warehouseName
                 this.detailedGuigeList[4].value = this.currentProduct.fnskuCode
                 this.detailedGuigeList[5].value = this.currentProduct.detailNum
                 this.detailedGuigeList[6].value = this.currentProduct.intCode
@@ -264,6 +273,9 @@ export default {
                 this.detailData.produclist.forEach(ele => {
                     ele.inStockType = batchArr[0].warehouseName
                 });
+                this.currentArray.forEach(item => {
+                    item.warehouseName = batchArr[0].warehouseName
+                })
                 this.outStockObj.inWarehouseId = batchArr[0].warehouseId
             }else{
                 this.detailedGuigeList[2].value = batchArr.join(',')
@@ -288,7 +300,7 @@ export default {
                 this.currentArray.forEach(produc => {
                     produc.batchList.forEach(batchItem => {
                         let obj = {
-                            inDetailNums:batchItem.inDetailNums,
+                            inDetailNums:batchItem.inProNum,
                             saleBackOrderDetailIds:produc.saleBackOrderDetailId,
                             saleStockOutOrderDetailIds:batchItem.saleStockOutOrderDetailId,
                             maxNumber:batchItem.outProNum
@@ -307,13 +319,12 @@ export default {
                 message: '您确定要“确认全部入库”操作吗?'
             }).then(() => {
                 let flag = true
-
                 if(this.outStockObj.inWarehouseId){
                     this.outStockObj.outBatchList.forEach(outBatch => {
                         if(!outBatch.saleStockOutOrderDetailIds){
                             flag = false
                         }
-                        if(outBatch.maxNumber < outBatch.inDetailNums){
+                        if(outBatch.maxNumber < outBatch.inProNum){
                             flag = false
                         }
                     })

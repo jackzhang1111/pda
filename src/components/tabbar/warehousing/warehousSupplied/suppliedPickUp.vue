@@ -4,8 +4,8 @@
         <div class="pick-up" v-show="showPickUp">
             <saomiao-header @search="search"></saomiao-header>
             <div class="pick-up-order">
-            <span>供货单号：{{detailData.orderSn}}</span>
-            <span class="fl-right">{{listLength}}</span>
+                <span>供货单号：{{detailData.orderSn}}</span>
+                <span class="fl-right">{{listLength}}</span>
             </div>
             <div class="order-detail" v-if="currentArray.length > 0">
                 <div class="detail-header">

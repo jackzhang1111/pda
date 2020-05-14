@@ -41,6 +41,7 @@
                 <img :src="$webUrl+product.skuImg" class="shangpin-img fl-left">
                 <div class="fl-left good-name">
                     <p class="p1 clamp-2 c-333">{{product.skuName}}</p>
+                    <p class="p2 c-666">入库批次号：{{product.batchNo}}</p>
                     <p class="p2 c-666">TSIN：{{product.tsinCode}}</p>
                     <p class="p3 c-666">
                         <span>{{product.skuValuesTitle}}</span>

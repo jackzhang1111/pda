@@ -82,12 +82,12 @@
         <div class="goods-shelves">
             <div class="set-shelves">
                 <span>下架货位</span>
-                <van-icon name="play"/>
             </div>
             <div class="shelves-item" v-for="(warehouse,index) in currentProduct.warehouselist" :key="index">
                 <div class="item-title">
                     <span>{{warehouse.regionName}}</span>
-                    <span class="fs-18">(库存:{{warehouse.canUseNum}})</span>
+                    <span class="fs-18">(库存:{{warehouse.canUseNum ? warehouse.canUseNum : 0}})</span>
+                    
                 </div>
                 <div class="item-number">
                     <div>{{warehouse.volume}}m³</div>

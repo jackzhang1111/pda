@@ -65,7 +65,6 @@
         <div class="goods-shelves">
             <div class="set-shelves">
                 <span>下架货位</span>
-                <van-icon name="play"/>
             </div>
             <div class="shelves-item" v-for="(warehouse,index) in currentProduct.warehouselist" :key="index">
                 <div class="item-title">

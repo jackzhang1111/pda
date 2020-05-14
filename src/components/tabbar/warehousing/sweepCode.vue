@@ -133,11 +133,11 @@ export default {
             pdascanningordernooutApi({orderSn}).then(res => {
                 if(res.code == 0){
                     if(res.Data.type == 1){
-                        this.$router.push({name:'soldOutstock',query:{orderid:res.Data.orderId}})
+                        this.$router.push({name:'soldRemove',query:{orderid:res.Data.orderId}})
                     }else if(res.Data.type == 2){
-                        this.$router.push({name:'allocationOutstock',query:{orderid:res.Data.orderId}})
+                        this.$router.push({name:'allocationRemove',query:{orderid:res.Data.orderId}})
                     }else if(res.Data.type == 3){
-                        this.$router.push({name:'cancellationOutstock',query:{orderid:res.Data.orderId}})
+                        this.$router.push({name:'cancellationRemove',query:{orderid:res.Data.orderId}})
                     }
                 }
             })

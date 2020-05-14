@@ -9,10 +9,11 @@
                         <div class="bscroll-con">
                             <div class="order" v-for="(data,index) in dataList" :key="index" >
                                 <div class="order-header">
-                                    <span>物流单号:{{data.orderSn}}</span>
+                                    <span class="fl-left">退货单号:{{data.orderSn}}</span>
                                     <div class="fl-right">
                                         <span>{{orderStatus(data.orderState,'statusList')}}</span>
                                     </div>
+                                    <div class="fl-left" v-if="data.logisticsOrderSn">物流单号:{{data.logisticsOrderSn}}</div>
                                 </div>
                                 <div class="order-con" @click="toDetail(data.backOrderId,data.orderState)">
                                     <img :src="$webUrl+data.headImg" class="touxiang fl-left">
@@ -213,10 +214,11 @@ export default {
         border-bottom: 1px solid #F2F3F5;
         margin-bottom: 20px;
         .order-header{
-            height: 79px;
-            line-height: 79px;
+            // height: 79px;
+            line-height: 40px;
             border-bottom: 1px solid #F2F3F5;
-            padding: 0 30px;
+            padding: 20px 30px;
+            overflow: hidden;
         }
         .order-con{
             padding: 30px 30px 19px;

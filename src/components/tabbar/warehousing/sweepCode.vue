@@ -13,6 +13,7 @@ var view = null;
 var scanBarVew = null
 import {getlogisticsorderbyordersnApi} from '@/api/logistics/index.js'
 import {pdascanningordernoinApi,pdascanningordernooutApi} from '@/api/warehousing/warehousSupplied/index.js'
+import { Dialog ,Toast } from 'vant';
 export default {
     props: {
 
@@ -123,8 +124,10 @@ export default {
                     }else if(res.Data.type == 2){
                         this.$router.push({name:'allocationInstorage',query:{orderid:res.Data.orderId}})
                     }else if(res.Data.type == 3){
-                        this.$router.push({name:'warehouSalesPickUp',query:{orderid:res.Data.orderId}})
+                        this.$router.push({name:'warehouSalesPickUp',query:{backOrderId:res.Data.orderId}})
                     }
+                }else if(res.code == -1){
+                    Toast('订单不存在')
                 }
             })
         },
@@ -139,6 +142,8 @@ export default {
                     }else if(res.Data.type == 3){
                         this.$router.push({name:'cancellationRemove',query:{orderid:res.Data.orderId}})
                     }
+                }else if(res.code == -1){
+                    Toast('订单不存在')
                 }
             })
         },

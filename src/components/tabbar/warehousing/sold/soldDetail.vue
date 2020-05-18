@@ -66,7 +66,7 @@
             <div class="time-item" v-if="typeSatus != 1">
                 
                 <span class="c-333">打包/出库完成时间</span>
-                <div class="fl-right fs-22 c-666">{{detailData.stockInTime}}</div>
+                <div class="fl-right fs-22 c-666">{{detailData.stockOutTime}}</div>
             </div>
         </div>
         <div class="place"></div>

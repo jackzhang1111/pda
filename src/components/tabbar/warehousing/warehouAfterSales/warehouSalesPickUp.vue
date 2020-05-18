@@ -28,7 +28,10 @@
                     <div class="detailed">
                         <div class="detailed-item" v-for="(detailedGuige,index) in detailedGuigeList" :key="index" @click="replaceBatchNo(detailedGuige.name)">
                             <div class="c-999">{{detailedGuige.name}}</div>&nbsp;&nbsp;&nbsp;
-                            <div class="c-666">{{detailedGuige.value}}</div>
+                            <div class="c-666">
+                                <span>{{detailedGuige.value}}</span>
+                                <van-icon name="play" v-if="detailedGuige.sanjiao"/>
+                            </div>
                         </div>
                         <div class="tiji">
                             <div class="clearfix">
@@ -59,7 +62,7 @@
                             <div class="item-number">
                                 <div>{{batch.batchNo}}</div>
                                 <div class="item-input">
-                                    <input type="number" v-model="batch.inProNum">
+                                    <input type="number" v-model="batch.inProNum" @change="changNum(batch,'inProNum')">
                                 </div>
                             </div>
                         </div>
@@ -103,7 +106,7 @@ export default {
                 {name:'规格属性',value:''},
                 {name:'供应商',value:''},
                 {name:'批次号',value:''},
-                {name:'入库仓库',value:''},
+                {name:'入库仓库',value:'',sanjiao:true},
                 {name:'FNSKU',value:''},
                 {name:'退货数量',value:''},
                 {name:'国际码',value:''},
@@ -278,7 +281,7 @@ export default {
                 })
                 this.outStockObj.inWarehouseId = batchArr[0].warehouseId
             }else{
-                this.detailedGuigeList[2].value = batchArr.join(',')
+                this.detailedGuigeList[2].value = batchArr.join(', ')
                 this.currentProduct.batchNo = batchArr.join(',')
                 this.currentProduct.outBatchList.forEach(ele => {
                     if(ele.checked){
@@ -345,12 +348,20 @@ export default {
         },
         //更改页数
         changeInput(){
+            this.current = Math.ceil(this.current)
             if(this.current > this.currentArray.length){
                 this.current = this.currentArray.length
             }else if(this.current < 1){
                 this.current = 1
             }
             this.currentProduct = this.currentArray[this.current-1]
+        },
+        //修改数量
+        changNum(val,name){
+            //大于0
+            val[name] < 0 ? val[name] = 0 : val[name]
+            //取整
+            val[name] = Math.ceil(val[name])
         }
     },
     components: {
@@ -445,6 +456,9 @@ export default {
                     &:nth-child(2){
                         width: 60%;
                     }
+                }
+                .van-icon-play{
+                    transform: rotate(90deg);
                 }
             }
             .tiji{

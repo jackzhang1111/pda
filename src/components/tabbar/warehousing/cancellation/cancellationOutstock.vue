@@ -177,6 +177,7 @@ export default {
         },
         //更改页数
         changeInput(){
+            this.current = Math.ceil(this.current)
             if(this.current > this.listLength){
                 this.current = this.listLength
             }else if(this.current < 1){

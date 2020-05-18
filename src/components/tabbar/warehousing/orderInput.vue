@@ -11,6 +11,7 @@
 <script>
 import nosaomiaoHeader from '@/multiplexing/nosaomiaoHeader.vue'
 import {pdascanningordernoinApi,pdascanningordernooutApi} from '@/api/warehousing/warehousSupplied/index.js'
+import { Dialog ,Toast } from 'vant';
 export default {
     props: {
 
@@ -43,8 +44,10 @@ export default {
                     }else if(res.Data.type == 2){
                         this.$router.push({name:'allocationInstorage',query:{orderid:res.Data.orderId}})
                     }else if(res.Data.type == 3){
-                        this.$router.push({name:'warehouSalesPickUp',query:{orderid:res.Data.orderId}})
+                        this.$router.push({name:'warehouSalesPickUp',query:{backOrderId:res.Data.orderId}})
                     }
+                }else if(res.code == -1){
+                    Toast('订单不存在')
                 }
             })
         },
@@ -53,12 +56,14 @@ export default {
             pdascanningordernooutApi({orderSn}).then(res => {
                 if(res.code == 0){
                     if(res.Data.type == 1){
-                        this.$router.push({name:'soldOutstock',query:{orderid:res.Data.orderId}})
+                        this.$router.push({name:'soldRemove',query:{orderid:res.Data.orderId}})
                     }else if(res.Data.type == 2){
-                        this.$router.push({name:'allocationOutstock',query:{orderid:res.Data.orderId}})
+                        this.$router.push({name:'allocationRemove',query:{orderid:res.Data.orderId}})
                     }else if(res.Data.type == 3){
-                        this.$router.push({name:'cancellationOutstock',query:{orderid:res.Data.orderId}})
+                        this.$router.push({name:'cancellationRemove',query:{orderid:res.Data.orderId}})
                     }
+                }else if(res.code == -1){
+                    Toast('订单不存在')
                 }
             })
         },

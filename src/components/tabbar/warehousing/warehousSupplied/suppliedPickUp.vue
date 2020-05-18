@@ -32,7 +32,7 @@
                     <div class="detailed-item">
                         <span class="c-999">本次入库数量</span>&nbsp;&nbsp;&nbsp;
                         <div class="item-input">
-                            <input type="number" v-model="currentProduct.inDetailNum">
+                            <input type="number" v-model="currentProduct.inDetailNum" @change="changNum(currentProduct,'yes','inDetailNum')">
                         </div>
                     </div>
                     <div class="detailed-item">
@@ -42,7 +42,7 @@
                     <div class="detailed-item">
                         <span class="c-999">单位重量(kg)</span>&nbsp;&nbsp;&nbsp;
                         <div class="item-input">
-                            <input type="number" v-model="currentProduct.unitWeight">
+                            <input type="number" v-model="currentProduct.unitWeight"  @change="changNum(currentProduct,'no','unitWeight')">
                         </div>
                     </div>
                     <div class="detailed-item">
@@ -52,7 +52,7 @@
                     <div class="detailed-item">
                         <span class="c-999">装箱重量(kg)</span>&nbsp;&nbsp;&nbsp;
                         <div class="item-input">
-                            <input type="number" v-model="currentProduct.boxWeight">
+                            <input type="number" v-model="currentProduct.boxWeight"  @change="changNum(currentProduct,'no','boxWeight')">
                         </div>
                     </div>
                     <div class="tiji">
@@ -60,15 +60,15 @@
                             <span class="pl-30">单位体积 长×宽×高(cm)</span>
                             <div class="fl-right">
                                 <div class="kuang">
-                                    <input type="number" v-model="currentProduct.unitLength">
+                                    <input type="number" v-model="currentProduct.unitLength" @change="changNum(currentProduct,'no','unitLength')">
                                 </div>
                                 <span>X</span>
                                 <div class="kuang">
-                                    <input type="number" v-model="currentProduct.unitWidth">
+                                    <input type="number" v-model="currentProduct.unitWidth" @change="changNum(currentProduct,'no','unitWidth')">
                                 </div>
                                 <span>X</span>
                                 <div class="kuang">
-                                    <input type="number" v-model="currentProduct.unitHeight">
+                                    <input type="number" v-model="currentProduct.unitHeight" @change="changNum(currentProduct,'no','unitHeight')">
                                 </div>
                             </div>
                         </div>
@@ -83,15 +83,15 @@
                             <span class="pl-30">装箱体积 长×宽×高(cm)</span>
                             <div class="fl-right">
                                 <div class="kuang">
-                                    <input type="number" v-model="currentProduct.boxLength">
+                                    <input type="number" v-model="currentProduct.boxLength" @change="changNum(currentProduct,'no','boxLength')">
                                 </div>
                                 <span>X</span>
                                 <div class="kuang">
-                                    <input type="number" v-model="currentProduct.boxWidth">
+                                    <input type="number" v-model="currentProduct.boxWidth" @change="changNum(currentProduct,'no','boxWidth')">
                                 </div>
                                 <span>X</span>
                                 <div class="kuang">
-                                    <input type="number" v-model="currentProduct.boxHeight">
+                                    <input type="number" v-model="currentProduct.boxHeight" @change="changNum(currentProduct,'no','boxHeight')">
                                 </div>
                             </div>
                         </div>
@@ -318,12 +318,22 @@ export default {
         },
         //更改页数
         changeInput(){
+            this.current = Math.ceil(this.current)
             if(this.current > this.currentArray.length){
                 this.current = this.currentArray.length
             }else if(this.current < 1){
                 this.current = 1
             }
             this.currentProduct = this.currentArray[this.current-1]
+            console.log(this.current,'this.current');
+        },
+        //修改数量
+        changNum(val,type,name){
+            //大于0
+            val[name] < 0 ? val[name] = 0 : val[name]
+            if(type == 'no') return
+            //取整
+            val[name] = Math.ceil(val[name])
         }
     },
     components: {

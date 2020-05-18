@@ -82,7 +82,7 @@
                     <div class="item-number" v-for="(batchNolist,index) in warehouse.batchNoList" :key="index">
                         <div>{{batchNolist.inbatchNo}}(库存:{{batchNolist.canUseNum}})</div>
                         <div class="item-input">
-                            <input type="number" v-model="batchNolist.downItemNum">
+                            <input type="number" v-model="batchNolist.downItemNum" @change="changNum(batchNolist)">
                         </div>
                     </div>
                 </div>
@@ -93,7 +93,7 @@
             <div class="shelves-place"></div>
         </div>
         <div v-if="batchNoListStatus">
-            <batch-no-list @choiceStatus="choiceStatus" @batchDatas="batchDatas" :dataObj="dataObj"></batch-no-list>
+            <batch-no-list @choiceStatus="choiceStatus" @batchDatas="batchDatas" :dataObj="dataObj" :checkBatchNo="checkBatchNo"></batch-no-list>
         </div>
     </div>
 </template>
@@ -130,7 +130,11 @@ export default {
             removeData:{
                 productlist:[],
                 shelfDownOrderId:'',
-                sourceType:2
+                sourceType:2,
+                isUpdate:0,
+                logisticsOrderId:'',
+                outWarehouseId:'',
+                stockOutOrderId:''
             },
             productArray:[],
             batchNoListStatus:false,
@@ -140,7 +144,8 @@ export default {
             },
 
             activeNames:[],
-            dataList:[]
+            dataList:[],
+            checkBatchNo:''
         };
     },
     computed: {
@@ -199,6 +204,10 @@ export default {
                     this.productArray = res.Data.productList
                     
                     this.removeData.shelfDownOrderId = this.detailData.shelfDownOrderId
+                    this.removeData.logisticsOrderId = this.detailData.logisticsOrderId
+                    this.removeData.outWarehouseId = this.detailData.outWarehouseId
+                    this.removeData.stockOutOrderId = this.detailData.stockOutOrderId
+
                     this.dataObj.outWarehouseId = res.Data.outWarehouseId
                     this.setCurrentProduct()
                 }
@@ -220,43 +229,54 @@ export default {
         //全部下架
         allShelves(){
             let arr = []
+            let Obj = {}
             //循环商品
             this.productArray.forEach(ele => {
                 //将商品的批次号,转化成数组
                 let itemBatchNo = ele.batchNo.split(',')
                 //如果有多个批次号
                 if(itemBatchNo.length>1){
+                    
                     //批次号循环
                     itemBatchNo.forEach(itemBatch => {
                         let obj = {
                             skuId:ele.skuId,
                             stockOutOrderType:3,
                             proRegion:[],
-                            stockOutOrderDetailId:''
+                            stockOutOrderDetailId:'',
+                            logisticsOrderDetailId:ele.logisticsOrderDetailId
                         }
                         //库区循环
                         ele.warehouselist.forEach(warehouse => {
+                            
                             warehouse.batchNoList.forEach(item => {
+                                
                                 //如果库区里面是有值的
                                 if(Number(item.downItemNum)>0){
+                                    
                                     //批次号等于该库区的批次号
                                     if(item.inbatchNo == itemBatch){
+                                        // console.log(item.inbatchNo,'item.inbatchNo');
                                         obj.batchNo = itemBatch
                                         obj.stockOutOrderDetailId = item.stockOutOrderDetailId
                                         let proRegionObj = {
                                             downItemNum:Number(item.downItemNum),
                                             regionId:warehouse.regionId,
                                             stockOutOrderDetailId:item.stockOutOrderDetailId,
-                                            stockOutOrderType:3
+                                            stockOutOrderType:3,
+                                            inventoryBatchId:item.inventoryBatchId
                                         }
+                                        // console.log(proRegionObj,'proRegionObj');
                                         obj.proRegion.push(proRegionObj)
                                     }
                                 }
                             })
-                            if(obj.batchNo){
-                                arr.push(obj)
-                            }
+                            
                         })
+                        if(obj.batchNo){
+                            console.log(obj,'obj');
+                            arr.push(obj)
+                        }
                     })
                 }else{
                     let obj = {
@@ -264,7 +284,8 @@ export default {
                         skuId:ele.skuId,
                         stockOutOrderType:3,
                         stockOutOrderDetailId:'',
-                        proRegion:[]
+                        proRegion:[],
+                        logisticsOrderDetailId:ele.logisticsOrderDetailId
                     }
                     ele.warehouselist.forEach(warehouse => {
                         warehouse.batchNoList.forEach(item => {
@@ -274,7 +295,8 @@ export default {
                                     downItemNum:Number(item.downItemNum),
                                     regionId:warehouse.regionId,
                                     stockOutOrderDetailId:item.stockOutOrderDetailId,
-                                    stockOutOrderType:3
+                                    stockOutOrderType:3,
+                                    inventoryBatchId:item.inventoryBatchId
                                 }
                                 obj.proRegion.push(proRegionObj)
                             }
@@ -285,15 +307,22 @@ export default {
                     })
                     
                 }
-                this.removeData.productlist = arr
+                
             });
+            //去重
+            arr = arr.reduce((cur,next) => {
+                Obj[next.batchNo] ? "" : Obj[next.batchNo] = true && cur.push(next);
+                return cur;
+            },[]) //设置cur默认类型为数组，并且初始值为空的数组
+
+            this.removeData.productlist = arr
+            console.log(this.removeData.productlist,'this.removeData');
             Dialog.confirm({
                 title: '温馨提示',
                 message: '您确定要“确认全部下架”操作吗?'
             }).then(() => {
                 let productIndex, proRegionIndex,flag = true
                 if(this.productArray.length > this.removeData.productlist.length){
-                    console.log(this.productArray,'this.productArray',this.removeData);
                     flag = false
                 }
                 if(flag){
@@ -301,13 +330,14 @@ export default {
                     this.productArray.forEach(ele => {
                         num += ele.detailNum
                     })
+                    console.log(this.removeData,'this.removeData');
                     this.removeData.productlist.forEach(ele => {
                         ele.proRegion.forEach(item => {
                             num2 += item.downItemNum
                         })
                     })
                     if(num != num2){
-                        console.log(num,num2);
+                        console.log(num,num2,'num');
                         flag = false
                     }
                 }
@@ -332,6 +362,8 @@ export default {
                     },1500)
                 }else if(res.code == 1){
                     Toast('本次下架商品数量超过当前最大可下架商品数量（出库单出库商品数量-已创建下架单商品数量）')
+                }else if(res.code == 2){
+                    Toast('销售出库不能下架非正品区商品')
                 }else if(res.code == 3){
                     Toast('出库单出库仓库不一致')
                 }else if(res.code == 4){
@@ -350,6 +382,7 @@ export default {
             if(value != '批次号') return
             this.dataObj.skuId = this.currentProduct.skuId
             this.batchNoListStatus = true
+            this.checkBatchNo = this.currentProduct.batchNo
         },
         //点击回退
         choiceStatus(status){
@@ -357,7 +390,8 @@ export default {
         },
         //点击确定
         batchDatas(batchArr){
-            this.detailedGuigeList[2].value = batchArr.join(',')
+            this.removeData.isUpdate = 1
+            this.detailedGuigeList[2].value = batchArr.join(', ')
             this.currentProduct.batchNo = batchArr.join(',')
             let obj = {
                 outWarehouseId:this.dataObj.outWarehouseId,
@@ -406,12 +440,18 @@ export default {
         },
         //更改页数
         changeInput(){
+            this.current = Math.ceil(this.current)
             if(this.current > this.listLength){
                 this.current = this.listLength
             }else if(this.current < 1){
                 this.current = 1
             }
             this.currentProduct = this.detailData.productList[this.current-1]
+        },
+        //修改数量
+        changNum(val){
+            val.downItemNum < 0 ? val.downItemNum = 0 : val.downItemNum
+            val.downItemNum = Math.ceil(val.downItemNum)
         }
     },
     components: {

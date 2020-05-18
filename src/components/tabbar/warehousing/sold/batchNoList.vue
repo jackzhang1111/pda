@@ -22,11 +22,16 @@ export default {
             default: ()=>{
                 return {}
             }
+        },
+        checkBatchNo:{
+            type:String,
+            default:''
         }
     },
     data() {
         return {
-            noList:[]
+            noList:[],
+            checkBatchNoList:[]
         };
     },
     computed: {
@@ -36,10 +41,8 @@ export default {
 
     },
     mounted() {
+        this.checkBatchNoList = this.checkBatchNo.split(',')
         this.saleoutorderstockdowmprobatchNo(this.dataObj)
-    },
-    watch: {
-        
     },
     methods: {
         //销售下架获取所有商品入库批次列表信息
@@ -49,6 +52,12 @@ export default {
                     this.noList = res.Data
                     this.noList.forEach(item => {
                         item.checked = false
+                        this.checkBatchNoList.forEach(ele => {
+                            if(ele == item.inbatchNo){
+                                item.checked = true
+                            }
+                        })
+                        
                     })
                 }
             })

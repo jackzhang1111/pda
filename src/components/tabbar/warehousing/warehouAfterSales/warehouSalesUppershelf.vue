@@ -61,7 +61,7 @@
                     <div>{{warehouse.volume}}/{{warehouse.volume-warehouse.takeVolume}}m³</div>
                     <div>{{warehouse.upItemNum*currentProduct.unitSize ? accMul(warehouse.upItemNum,currentProduct.unitSize) : 0}}m³</div>
                     <div class="item-input">
-                        <input type="number" v-model="warehouse.upItemNum">
+                        <input type="number" v-model="warehouse.upItemNum" @change="changNum(warehouse,'upItemNum')">
                     </div>
                 </div>
             </div>
@@ -291,6 +291,7 @@ export default {
         },
         //更改页数
         changeInput(){
+            this.current = Math.ceil(this.current)
             if(this.current > this.listLength){
                 this.current = this.listLength
             }else if(this.current < 1){
@@ -308,6 +309,13 @@ export default {
                 this.currentProduct.columns.push(item)
             }).catch(() => {});
         },
+        //修改数量
+        changNum(val,name){
+            //大于0
+            val[name] < 0 ? val[name] = 0 : val[name]
+            //取整
+            val[name] = Math.ceil(val[name])
+        }
     },
     components: {
         saomiaoHeader

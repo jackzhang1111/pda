@@ -75,7 +75,7 @@
                     <div>{{warehouse.volume}}m³</div>
                     <div>{{warehouse.takeVolume}}m³</div>
                     <div class="item-input">
-                        <input type="number" v-model="warehouse.downItemNum">
+                        <input type="number" v-model="warehouse.downItemNum" @change="changNum(warehouse)">
                     </div>
                 </div>
             </div>
@@ -236,16 +236,16 @@ export default {
                 message: '您确定要“确认全部下架”操作吗?'
             }).then(() => {
                 let productIndex, proRegionIndex,flag = true
-                if(this.productArray.length != this.removeData.productlist.length){
-                    flag = false
-                }
+                // if(this.productArray.length != this.removeData.productlist.length){
+                //     flag = false
+                // }
                 if(flag){
                     for (productIndex = 0; productIndex < this.removeData.productlist.length; productIndex++) { 
                         let num = 0
                         for(proRegionIndex = 0; proRegionIndex < this.removeData.productlist[productIndex].proRegion.length; proRegionIndex++){
                             num += this.removeData.productlist[productIndex].proRegion[proRegionIndex].downItemNum
                         }
-                        if(this.productArray[productIndex].detailNum != num){
+                        if(this.productArray[productIndex].downDetailNum != num){
                             flag = false
                         }
                     }
@@ -271,6 +271,8 @@ export default {
                     },1500)
                 }else if(res.code == 1){
                     Toast('本次下架商品数量超过当前最大可下架商品数量（出库单出库商品数量-已创建下架单商品数量）')
+                }else if(res.code == 2){
+                    Toast('销售出库不能下架非正品区商品')
                 }else if(res.code == 3){
                     Toast('出库单出库仓库不一致')
                 }else if(res.code == 4){
@@ -316,12 +318,18 @@ export default {
         },
         //更改页数
         changeInput(){
+            this.current = Math.ceil(this.current)
             if(this.current > this.listLength){
                 this.current = this.listLength
             }else if(this.current < 1){
                 this.current = 1
             }
             this.currentProduct = this.detailData.productList[this.current-1]
+        },
+        //修改数量
+        changNum(val){
+            val.downItemNum < 0 ? val.downItemNum = 0 : val.downItemNum
+            val.downItemNum = Math.ceil(val.downItemNum)
         }
     },
     components: {

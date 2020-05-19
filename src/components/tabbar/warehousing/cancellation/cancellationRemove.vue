@@ -241,11 +241,22 @@ export default {
                 // }
                 if(flag){
                     for (productIndex = 0; productIndex < this.removeData.productlist.length; productIndex++) { 
-                        let num = 0
+                        let num = 0,num2 = 0,allNum=0
                         for(proRegionIndex = 0; proRegionIndex < this.removeData.productlist[productIndex].proRegion.length; proRegionIndex++){
                             num += this.removeData.productlist[productIndex].proRegion[proRegionIndex].downItemNum
                         }
+                        this.productArray.forEach(ele => {
+                            allNum += ele.downDetailNum
+                        })
+                        this.removeData.productlist.forEach(ele => {
+                            ele.proRegion.forEach(item => {
+                                num2 += item.downItemNum
+                            })
+                        })
                         if(this.productArray[productIndex].downDetailNum != num){
+                            flag = false
+                        }
+                        if(allNum != num2){
                             flag = false
                         }
                     }
@@ -258,7 +269,7 @@ export default {
                     Toast('请选择商品下架')
                     return
                 }
-               this.returngoodsstockdowmAll(this.removeData)
+                this.returngoodsstockdowmAll(this.removeData)
             }).catch(() => {});
         },
         //下架

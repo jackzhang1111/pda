@@ -452,6 +452,7 @@ export default {
         changNum(val){
             val.downItemNum < 0 ? val.downItemNum = 0 : val.downItemNum
             val.downItemNum = Math.ceil(val.downItemNum)
+            this.removeData.isUpdate = 1
         }
     },
     components: {

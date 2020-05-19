@@ -250,11 +250,22 @@ export default {
                 let productIndex, proRegionIndex,flag = true
                 if(flag){
                     for (productIndex = 0; productIndex < this.shelvesData.productlist.length; productIndex++) { 
-                        let num = 0,allNum = 0
+                        let num = 0,num2 = 0 ,allNum = 0
                         for(proRegionIndex = 0; proRegionIndex < this.shelvesData.productlist[productIndex].proRegion.length; proRegionIndex++){
                             num += this.shelvesData.productlist[productIndex].proRegion[proRegionIndex].upItemNum
                         }
+                        this.productArray.forEach(ele => {
+                            allNum += ele.hasInDetailNum
+                        })
+                        this.shelvesData.productlist.forEach(ele => {
+                            ele.proRegion.forEach(item => {
+                                num2 += item.upItemNum
+                            })
+                        })
                         if(this.productArray[productIndex].hasInDetailNum != num){
+                            flag = false
+                        }
+                        if(allNum != num2){
                             flag = false
                         }
                     }
@@ -295,6 +306,16 @@ export default {
                     },1500)
                 }else if(res.code == 1){
                     Toast('本次上架商品数量超过当前最大可上架商品数量（入库单入库商品数量-已创建上架单商品数量）')
+                }else if(res.code == 2){
+                    Toast('存在重复的入库单')
+                }else if(res.code == 3){
+                    Toast('入库单入库仓库不一致')
+                }else if(res.code == 4){
+                    Toast('存在状态不为待上架的入库单')
+                }else if(res.code == 5){
+                    Toast('存在本次上架数总数等于0的入库单')
+                }else if(res.code == 6){
+                    Toast('本次上架商品体积超过库区最大可上架体积（库区空闲体积-已创建上架单待上架商品体积）')
                 }
             })
         },

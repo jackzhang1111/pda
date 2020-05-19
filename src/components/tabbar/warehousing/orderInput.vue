@@ -40,11 +40,11 @@ export default {
             pdascanningordernoinApi({orderSn}).then(res => {
                 if(res.code == 0){
                     if(res.Data.type == 1){
-                        this.$router.push({name:'suppliedPickUp',query:{orderid:res.Data.orderId}})
+                        this.$router.replace({name:'suppliedPickUp',query:{orderid:res.Data.orderId}})
                     }else if(res.Data.type == 2){
-                        this.$router.push({name:'allocationInstorage',query:{orderid:res.Data.orderId}})
+                        this.$router.replace({name:'allocationInstorage',query:{orderid:res.Data.orderId}})
                     }else if(res.Data.type == 3){
-                        this.$router.push({name:'warehouSalesPickUp',query:{backOrderId:res.Data.orderId}})
+                        this.$router.replace({name:'warehouSalesPickUp',query:{backOrderId:res.Data.orderId}})
                     }
                 }else if(res.code == -1){
                     Toast('订单不存在')
@@ -56,11 +56,11 @@ export default {
             pdascanningordernooutApi({orderSn}).then(res => {
                 if(res.code == 0){
                     if(res.Data.type == 1){
-                        this.$router.push({name:'soldRemove',query:{orderid:res.Data.orderId}})
+                        this.$router.replace({name:'soldRemove',query:{orderid:res.Data.orderId}})
                     }else if(res.Data.type == 2){
-                        this.$router.push({name:'allocationRemove',query:{orderid:res.Data.orderId}})
+                        this.$router.replace({name:'allocationRemove',query:{orderid:res.Data.orderId}})
                     }else if(res.Data.type == 3){
-                        this.$router.push({name:'cancellationRemove',query:{orderid:res.Data.orderId}})
+                        this.$router.replace({name:'cancellationRemove',query:{orderid:res.Data.orderId}})
                     }
                 }else if(res.code == -1){
                     Toast('订单不存在')

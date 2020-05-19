@@ -15,7 +15,7 @@
                             </div>
                         </div>
                         <div class="order-con" @click="toDetail(data.orderId)">
-                            <img src="@/assets/img/wodezichan.png" class="touxiang fl-left">
+                            <img :src="$webUrl+data.headImg" class="touxiang fl-left">
                             <div class="fl-left xinxi">
                                 <div class="p1">
                                     <span>{{data.consignee}}</span>

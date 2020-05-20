@@ -292,9 +292,13 @@ export default {
             scanproductbarcodeApi(data).then(res => {
                 if(res.code == 0){
                     Toast('入库成功')
-                    setTimeout(()=>{
-                        this.$router.go(-1)
-                    },1500)
+                    if(this.$route.query.code == 'sweepCode'){
+                        this.$router.replace({name:'suppliedShelves',query:{paramId:this.$route.query.orderid,typeId:1}})
+                    }else{
+                        setTimeout(()=>{
+                            this.$router.go(-1)
+                        },1500)
+                    }
                 }else if(res.code == 1){
                     Toast('本次入库商品数量超过当前最大可入库商品数量（供货数量-已创建入库单商品数量）')
                 }else if(res.code == 2){

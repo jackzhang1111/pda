@@ -277,9 +277,13 @@ export default {
             returngoodsstockdowmAllApi(data).then(res => {
                 if(res.code == 0){
                     Toast('下架成功')
-                    setTimeout(()=>{
-                        this.$router.go(-1)
-                    },1500)
+                    if(this.$route.query.code == 'sweepCode'){
+                        this.$router.replace({name:'cancellationOutstock',query:{orderid:this.$route.query.orderid}})
+                    }else{
+                        setTimeout(()=>{
+                            this.$router.go(-1)
+                        },1500)
+                    }
                 }else if(res.code == 1){
                     Toast('本次下架商品数量超过当前最大可下架商品数量（出库单出库商品数量-已创建下架单商品数量）')
                 }else if(res.code == 2){

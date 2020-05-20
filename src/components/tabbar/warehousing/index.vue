@@ -24,7 +24,7 @@
         
         <div class="saomiao-btn" @click="saomiaoBtn">
             <img src="@/assets/img/saomiao.svg">
-            <span>扫描条码</span>
+            <span>扫描条码1</span>
         </div>
 
 

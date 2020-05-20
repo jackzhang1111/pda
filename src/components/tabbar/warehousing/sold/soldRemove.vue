@@ -277,7 +277,6 @@ export default {
                             
                         })
                         if(obj.batchNo){
-                            console.log(obj,'obj');
                             arr.push(obj)
                         }
                     })
@@ -319,7 +318,6 @@ export default {
             },[]) //设置cur默认类型为数组，并且初始值为空的数组
 
             this.removeData.productlist = arr
-            console.log(this.removeData.productlist,'this.removeData');
             Dialog.confirm({
                 title: '温馨提示',
                 message: '您确定要“确认全部下架”操作吗?'
@@ -333,14 +331,12 @@ export default {
                     this.productArray.forEach(ele => {
                         num += ele.detailNum
                     })
-                    console.log(this.removeData,'this.removeData');
                     this.removeData.productlist.forEach(ele => {
                         ele.proRegion.forEach(item => {
                             num2 += item.downItemNum
                         })
                     })
                     if(num != num2){
-                        console.log(num,num2,'num');
                         flag = false
                     }
                 }
@@ -360,9 +356,13 @@ export default {
             returngoodsstockdowmAllApi(data).then(res => {
                 if(res.code == 0){
                     Toast('下架成功')
-                    setTimeout(()=>{
-                        this.$router.go(-1)
-                    },1500)
+                    if(this.$route.query.code == 'sweepCode'){
+                        this.$router.replace({name:'soldOutstock',query:{orderid:this.$route.query.orderid}})
+                    }else{
+                        setTimeout(()=>{
+                            this.$router.go(-1)
+                        },1500)
+                    }
                 }else if(res.code == 1){
                     Toast('本次下架商品数量超过当前最大可下架商品数量（出库单出库商品数量-已创建下架单商品数量）')
                 }else if(res.code == 2){

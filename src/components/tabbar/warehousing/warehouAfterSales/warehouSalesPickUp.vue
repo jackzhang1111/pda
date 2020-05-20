@@ -105,7 +105,7 @@ export default {
             detailedGuigeList:[
                 {name:'规格属性',value:''},
                 {name:'供应商',value:''},
-                {name:'批次号',value:''},
+                {name:'批次号',value:'',sanjiao:true},
                 {name:'入库仓库',value:'',sanjiao:true},
                 {name:'FNSKU',value:''},
                 {name:'退货数量',value:''},

@@ -19,12 +19,12 @@
                                         <p>入库仓库：{{data.warehouseName}}</p>
                                         <p>供货数量：{{data.totalNum}}</p>
                                     </div>
-                                    <div class="order-footer" v-show="data.wmsOrderStatus != 1">
-                                        <div class="btn fl-right" v-if="data.wmsOrderStatus == 2">打印供货单</div>
+                                    <div class="order-footer" v-show="data.wmsOrderStatus == 2 || data.wmsOrderStatus == 3">
+                                        <!-- <div class="btn fl-right" v-if="data.wmsOrderStatus == 2">打印供货单</div> -->
                                         <div class="btn fl-right" v-if="data.wmsOrderStatus == 2" @click="toPickUp(data.orderId,data.wmsOrderStatus)">入库</div>
-                                        <div class="btn fl-right" v-if="data.wmsOrderStatus == 3">打印入库单</div>
+                                        <!-- <div class="btn fl-right" v-if="data.wmsOrderStatus == 3">打印入库单</div> -->
                                         <div class="btn fl-right" v-if="data.wmsOrderStatus == 3" @click="toshelves(data.orderId)">上架</div>
-                                        <div class="btn fl-right" v-if="data.wmsOrderStatus == 4">打印上架单</div>
+                                        <!-- <div class="btn fl-right" v-if="data.wmsOrderStatus == 4">打印上架单</div> -->
                                     </div>
                                 </div>
                          </div>

@@ -40,9 +40,12 @@
                     </div>
                 </div>
                 <div class="detailed">
-                    <div class="detailed-item" v-for="(detailedGuige,index) in detailedGuigeList" :key="index">
+                    <div class="detailed-item" v-for="(detailedGuige,index) in detailedGuigeList" :key="index" @click="replaceBatchNo(detailedGuige.name)">
                         <div class="c-999">{{detailedGuige.name}}</div>&nbsp;&nbsp;&nbsp;
-                        <div class="c-666" @click="replaceBatchNo(detailedGuige.name)">{{detailedGuige.value}}</div>
+                        <div class="c-666">
+                            <span>{{detailedGuige.value}}</span>
+                            <van-icon name="play" v-if="detailedGuige.sanjiao"/>
+                        </div>
                     </div>
                     <div class="tiji">
                         <div class="clearfix">
@@ -118,7 +121,7 @@ export default {
             detailedGuigeList:[
                 {name:'规格属性',value:''},
                 {name:'供应商',value:''},
-                {name:'批次号',value:''},
+                {name:'批次号',value:'',sanjiao:true},
                 {name:'出库仓库',value:''},
                 {name:'FNSKU',value:''},
                 {name:'出库数量',value:''},
@@ -374,6 +377,8 @@ export default {
                     Toast('该下架单不是待下架状态，不能修改')
                 }else if(res.code == 8){
                     Toast('存在已申请退款的销售出库单')
+                }else if(res.code == 9){
+                    Toast('该订单已下架，请勿重复下架')
                 }
             })
         },
@@ -567,6 +572,9 @@ export default {
                     &:nth-child(2){
                         width: 60%;
                     }
+                }
+                .van-icon-play{
+                    transform: rotate(90deg);
                 }
             }
             .tiji{

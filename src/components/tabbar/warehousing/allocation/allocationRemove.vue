@@ -311,6 +311,8 @@ export default {
                     Toast('该下架单不是待下架状态，不能修改')
                 }else if(res.code == 8){
                     Toast('存在已申请退款的销售出库单')
+                }else if(res.code == 9){
+                    Toast('该订单已下架，请勿重复下架')
                 }
             })
         },

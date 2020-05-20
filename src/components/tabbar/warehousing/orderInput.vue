@@ -48,6 +48,8 @@ export default {
                     }
                 }else if(res.code == -1){
                     Toast('订单不存在')
+                }else if(res.code == -2){
+                    Toast('商品已入库，无需重复操作')
                 }
             })
         },

@@ -29,9 +29,9 @@
                                 </div>
                                 <div class="order-footer" v-show="data.orderState == 2 || data.orderState == 3">
                                     <div class="btn fl-right"  v-if="data.orderState == 2" @click="toPickUp(data.backOrderId)">入库</div>
-                                    <div class="btn fl-right"  v-if="data.orderState == 2">打印退货单</div>
+                                    <!-- <div class="btn fl-right"  v-if="data.orderState == 2">打印退货单</div> -->
                                     <div class="btn fl-right"  v-if="data.orderState == 3" @click="toUppershelf(data.backOrderId)">上架</div>
-                                    <div class="btn fl-right"  v-if="data.orderState == 3">打印上架单</div>
+                                    <!-- <div class="btn fl-right"  v-if="data.orderState == 3">打印上架单</div> -->
                                 </div>
                             </div>
                         </div>

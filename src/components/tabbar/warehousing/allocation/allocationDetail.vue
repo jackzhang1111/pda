@@ -18,10 +18,6 @@
                     <div class="fl-right fs-22 c-666">{{detailData.inWarehouseName}}</div>
                 </div>
                 <div class="time-item">
-                    <span class="c-333">调出日期</span>
-                    <div class="fl-right fs-22 c-666">{{detailData.stockOutTime ? detailData.stockOutTime.slice(0,10) : ''}}</div>
-                </div>
-                <div class="time-item">
                     <span class="c-333">调拨来源</span>
                     <div class="fl-right fs-22 c-666">{{detailData.transferSourceTypeTxt}}</div>
                 </div>

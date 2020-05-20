@@ -159,7 +159,7 @@ export default {
                 }else if(res.code == 1){
                     Toast('该出库单不存在')
                 }else if(res.code == 2){
-                    Toast('该出库单不是待出库状态，不能进行出库')
+                    Toast('商品已出库，无需重复操作')
                 }
             })
         },

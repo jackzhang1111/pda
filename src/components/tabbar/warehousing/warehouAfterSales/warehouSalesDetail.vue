@@ -6,7 +6,7 @@
                 <div class="shxx-header">
                     <p class="p1">取件信息</p> 
                     <p>退货单号:{{detailData.backSn}}</p>
-                    <p>入库单号:{{detailData.backInSn}}</p>
+                    <p v-show="$route.query.type != 1">入库单号:{{detailData.backInSn}}</p>
                 </div>
                 <div class="shxx-con">
                     <img :src="$webUrl+detailData.headImg" class="touxiang fl-left">
@@ -57,7 +57,7 @@
                     <img :src="$webUrl+detail.skuImg" class="shangpin-img fl-left">
                     <div class="fl-left good-name">
                         <p class="p1 clamp-2 c-333">{{detail.skuName}}</p>
-                        <p class="p2 c-666">入库批次号:{{detail.batchNo}}</p>
+                        <p class="p2 c-666" v-show="$route.query.type != 1">入库批次号:{{detail.batchNo}}</p>
                         <p class="p2 c-666">TSIN：{{detail.tisnCode}}</p>
                         <p class="p3 c-666">
                             <span>{{detail.titleValues}}</span>

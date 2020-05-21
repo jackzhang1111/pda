@@ -255,6 +255,8 @@ export default {
                     Toast('该物流单不存在')
                 }else if(res.code == 22){
                     Toast('该物流单不是待接单状态，不能接单')
+                }else if(res.code == 23){
+                    Toast('该包裹已经申请退款，不能签收或拒签')
                 }else if(res.code == 31){
                     Toast('该物流单不属于当前配送人员，不能进行此操作')
                 }

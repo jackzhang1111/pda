@@ -126,9 +126,9 @@ export default {
                     }else if(res.Data.type == 3){
                         this.$router.replace({name:'warehouSalesPickUp',query:{backOrderId:res.Data.orderId,code:'sweepCode'}})
                     }
-                }else if(res.code == -1){
-                    Toast('订单不存在')
-                }else if(res.code == -2){
+                }else if(res.code == 1){
+                    Toast('出库单不存在，请重新扫描')
+                }else if(res.code == 2){
                     Toast('商品已入库，无需重复操作')
                 }
             })
@@ -144,8 +144,10 @@ export default {
                     }else if(res.Data.type == 3){
                         this.$router.replace({name:'cancellationRemove',query:{orderid:res.Data.orderId,code:'sweepCode'}})
                     }
-                }else if(res.code == -1){
-                    Toast('订单不存在')
+                }else if(res.code == 1){
+                    Toast('出库单不存在，请重新扫描')
+                }else if(res.code == 2){
+                    Toast('商品已出库，无需重复操作')
                 }
             })
         },

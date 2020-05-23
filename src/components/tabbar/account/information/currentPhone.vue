@@ -4,10 +4,10 @@
         <div class="container">
             <img src="@/assets/img/icon-06@2x.png">
             <p>当前手机号</p>
-            <p class="mobile">12664133411</p>
+            <p class="mobile">{{$route.query.mobile}}</p>
             <span>此手机号将显示在个人信息中，</span><br>
             <span>你也可以使用此手机号登录。</span>
-            <div class="btn" @click="$router.push({name:'replacementPhone'})">更换手机号</div>
+            <!-- <div class="btn" @click="$router.push({name:'replacementPhone'})">更换手机号</div> -->
         </div>
         
     </div>

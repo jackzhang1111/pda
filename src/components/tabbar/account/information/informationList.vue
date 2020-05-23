@@ -10,18 +10,19 @@
                 <span>性别</span>
                 <div class="fl-right">{{userinfoPda.sextxt}}</div>
             </div>
-            <div class="option-item" @click="$router.push({name:'currentPhone'})">
+            <div class="option-item" @click="$router.push({name:'currentPhone',query:{mobile:userinfoPda.mobile}})">
                 <span>手机</span>
                 <div class="fl-right">
                     <span>{{userinfoPda.mobile}}</span>
                     <van-icon name="arrow" size="15" class="arrow" color="#A3A3A3"/>
                 </div>
             </div>
-            <div class="option-item" @click="$router.push({name:'eMail'})">
+            <div class="option-item">
+                <!-- <div class="option-item" @click="$router.push({name:'eMail'})"> -->
                 <span>邮箱</span>
                 <div class="fl-right">
                     <span>{{userinfoPda.email}}</span>
-                    <van-icon name="arrow" size="15" class="arrow" color="#A3A3A3"/>
+                    <!-- <van-icon name="arrow" size="15" class="arrow" color="#A3A3A3"/> -->
                 </div>
             </div>
             <div class="option-item">

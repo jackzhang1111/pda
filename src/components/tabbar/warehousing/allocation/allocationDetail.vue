@@ -21,8 +21,8 @@
                     <span class="c-333">调拨来源</span>
                     <div class="fl-right fs-22 c-666">{{detailData.transferSourceTypeTxt}}</div>
                 </div>
-                <div class="time-item">
-                    <span class="c-333">来源供货单号</span>
+                <div class="time-item" v-if="detailData.transferSourceType != 5">
+                    <span class="c-333">来源单号</span>
                     <div class="fl-right fs-22 c-666">{{detailData.rlaOrderSn}}</div>
                 </div>
                 <div class="time-item">

@@ -47,9 +47,11 @@ export default {
                         this.$router.replace({name:'warehouSalesPickUp',query:{backOrderId:res.Data.orderId,code:'sweepCode'}})
                     }
                 }else if(res.code == 1){
-                    Toast('出库单不存在，请重新扫描')
+                    Toast('入库单不存在，请重新扫描待入库订单')
                 }else if(res.code == 2){
                     Toast('商品已入库，无需重复操作')
+                }else if(res.code == 3){
+                    Toast('商品已入库，请前往上架')
                 }
             })
         },
@@ -65,9 +67,11 @@ export default {
                         this.$router.replace({name:'cancellationRemove',query:{orderid:res.Data.orderId,code:'sweepCode'}})
                     }
                 }else if(res.code == 1){
-                    Toast('出库单不存在，请重新扫描')
+                    Toast('出库单不存在，请重新扫描待出库订单')
                 }else if(res.code == 2){
                     Toast('商品已出库，无需重复操作')
+                }else if(res.code == 3){
+                    Toast('商品已下架，请到对应单据完成出库')
                 }
             })
         },

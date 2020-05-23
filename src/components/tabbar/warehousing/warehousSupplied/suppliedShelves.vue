@@ -316,6 +316,14 @@ export default {
                     Toast('存在本次上架数总数等于0的入库单')
                 }else if(res.code == 6){
                     Toast('本次上架商品体积超过库区最大可上架体积（库区空闲体积-已创建上架单待上架商品体积）')
+                }else if(res.code == 7){
+                    Toast('该上架单不是待上架状态，不能修改')
+                }else if(res.code == 8){
+                    Toast('上架位置必须为无货架库区或者货位')
+                }else if(res.code == 9){
+                    Toast('商品不能上架到非站点仓库的正品库区')
+                }else if(res.code == 11){
+                    Toast('传入的源入库单明细不存在')
                 }
             })
         },

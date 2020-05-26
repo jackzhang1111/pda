@@ -57,7 +57,7 @@ export default {
                 {name:'待发货',type:1},
                 {name:'待入库',type:2},
                 {name:'待上架',type:3},
-                {name:'已上架',type:4},
+                {name:'已入库',type:4},
             ],
             active:0,
             recordGroup:[],

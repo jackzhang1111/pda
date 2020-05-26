@@ -434,7 +434,7 @@ export default {
                 }else if(res.code == 3){
                     Toast('入库单入库仓库不一致')
                 }else if(res.code == 4){
-                    Toast('存在状态不为待上架的入库单')
+                    Toast('该入库单已上架，无需重复操作')
                 }else if(res.code == 5){
                     Toast('存在本次上架数总数等于0的入库单')
                 }else if(res.code == 6){

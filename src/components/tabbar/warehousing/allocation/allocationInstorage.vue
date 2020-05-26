@@ -164,6 +164,10 @@ export default {
                             this.$router.go(-1)
                         },1500)
                     }
+                }else if(res.code == 1){
+                    Toast('该入库单状态不是待入库，不能进行入库操作')
+                }else if(res.code == 2){
+                    Toast('该入库单已入库，无需重复操作')
                 }
             })
         },

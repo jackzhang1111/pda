@@ -148,6 +148,8 @@ export default {
                     Toast('商品已出库，无需重复操作')
                 }else if(res.code == 3){
                     Toast('该出库单已申请出库，无需重复操作')
+                }else if(res.code == 5){
+                    Toast('该出库单已出库，无需重复操作')
                 }
             })
         },

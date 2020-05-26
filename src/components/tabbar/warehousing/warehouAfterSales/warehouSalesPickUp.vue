@@ -241,13 +241,17 @@ export default {
                 if(res.code == 0){
                     this.$router.push({name:'warehouSalesUppershelf',query:{paramId:this.$route.query.backOrderId,typeId:1}})
                 }else if(res.code == 1){
-                    Toast('本次上架商品数量超过当前最大可上架商品数量（入库单入库商品数量-已创建上架单商品数量）')
+                    let txt = ''
+                    JSON.parse(res.resdata).forEach(item => {
+                        txt+=`批次号：${item.batchNo}，最大可入库商品数量${item.maxCanStockInNum}.`
+                    })
+                    Toast(`本次入库数量不能大于最大可入库商品数量（销售出库数量-已创建入库单商品批次数量）${txt}`)
                 }else if(res.code == 2){
                     Toast('商品入库数量必须等于退货数量')
                 }else if(res.code == 6){
                     Toast('该入库单不是待入库状态，不能修改')
                 }else if(res.code == 7){
-                    Toast('退货单状态不为待入库，不能创建或修改入库单')
+                    Toast('该退货单已入库，无需重复操作')
                 }else if(res.code == 8){
                     Toast('该退货单已关联入库单，不能重复使用')
                 }

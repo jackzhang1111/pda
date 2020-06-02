@@ -12,6 +12,7 @@
                 <span class="ma-35 header-font">/</span>
                 <span class="header-font">{{listLength}}</span>
                 <van-icon name="play" class="play-right" :color="playRight ? '#DCDCDC':'#333'" @click="cliPlayRight"/>
+                <div class="printing-btn" @click="print">打印批次号</div>
             </div>
             <div class="order-product">
                 <img :src="$webUrl+currentProduct.skuImg">
@@ -93,9 +94,17 @@
 </template>
 
 <script>
+var device = null,
+    main = null,
+    BluetoothAdapter = null,
+    UUID=null,
+    uuid = null,
+    BAdapter = null,
+    bluetoothSocket = null
 import saomiaoHeader from '@/multiplexing/saomiaoHeader.vue'
 import { Dialog ,Toast } from 'vant';
 import {stockInToShelvesApi,stockInToShelvesAllApi} from '@/api/warehousing/warehousSupplied/index.js'
+import BTool from '@/static/js/BluetoothTool.js'
 export default {
     props: {
 
@@ -128,7 +137,10 @@ export default {
 
             value: '',
             showPicker: false,
-            columns: []
+            columns: [],
+            bluetoothState: {},
+            pairedDevices: [],
+            address:null,
         };
     },
     computed: {
@@ -139,8 +151,20 @@ export default {
             return  this.current == this.listLength
         }
     },
+    created() {
+        setTimeout(()=>{this.getBluetooth()},500)
+        
+    },
     mounted() {
         this.stockInToShelves(this.$route.query.paramId,this.$route.query.typeId)
+    },
+    beforeDestroy(){
+        try{
+            device = null //这里关键
+            bluetoothSocket.close();
+        }catch(err){
+            console.log(error,'beforeDestroy');
+        }
     },
     watch: {
         currentProduct:{
@@ -353,7 +377,105 @@ export default {
             val[name] < 0 ? val[name] = 0 : val[name]
             //取整
             val[name] = Math.ceil(val[name])
-        }
+        },
+        //初始化打印机参数
+        getReady(){
+            main = plus.android.runtimeMainActivity();
+            BluetoothAdapter = plus.android.importClass("android.bluetooth.BluetoothAdapter");
+            UUID = plus.android.importClass("java.util.UUID");
+            uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");//不需要更改
+            BAdapter = BluetoothAdapter.getDefaultAdapter();
+            BAdapter.cancelDiscovery(); //停止扫描
+            device = BAdapter.getRemoteDevice(this.address);//这里是蓝牙打印机的蓝牙地址
+            plus.android.importClass(device);
+            bluetoothSocket = device.createInsecureRfcommSocketToServiceRecord(uuid);
+            plus.android.importClass(bluetoothSocket);
+        },
+        //初始化寻找打印机参数
+        getBluetooth(){
+            var that = this;
+            var onPlusReady=function(){
+                that.bluetoothTool = BTool.BluetoothTool();
+                that.bluetoothState = that.bluetoothTool.state;
+                that.getPairedDevices()
+            }
+            if(typeof plus!="undefined"){
+                onPlusReady();
+            }
+        },
+        //获取蓝牙地址
+        getPairedDevices: function() {
+            try{
+                this.pairedDevices = this.bluetoothTool.getPairedDevices();
+                this.address = this.pairedDevices[0].address
+                this.getReady()
+            }catch(error){
+                Toast('请链接蓝牙')
+                console.log(error,'error');
+            }
+            
+        },
+        print() {
+            if(!bluetoothSocket.isConnected()) {
+                try{
+                    bluetoothSocket.connect();
+                }catch(error){
+                    Toast('打印机链接断开了，重新连接中');
+                    this.getReady()
+                }
+            }
+
+            if(bluetoothSocket.isConnected()) {
+                var outputStream = bluetoothSocket.getOutputStream();
+                plus.android.importClass(outputStream);
+                var s = plus.android.importClass('java.lang.String');
+                var bytes;
+
+                var size="SIZE 10mm,30mm\n";
+                bytes = plus.android.invoke(size, 'getBytes', 'gb18030');
+                outputStream.write(bytes);
+                outputStream.flush();
+                
+                var gap="GAP 0mm\n";
+                bytes = plus.android.invoke(gap, 'getBytes', 'gb18030');
+                outputStream.write(bytes);
+                outputStream.flush();
+                
+                var speed="SPEED 5\n";
+                bytes = plus.android.invoke(speed, 'getBytes', 'gb18030');
+                outputStream.write(bytes);
+                outputStream.flush();
+                
+                var density="DENSITY 8\n";
+                bytes = plus.android.invoke(density, 'getBytes', 'gb18030');
+                outputStream.write(bytes);
+                outputStream.flush();
+                
+                var cls="CLS \n";
+                bytes = plus.android.invoke(cls, 'getBytes', 'gb18030');
+                outputStream.write(bytes);
+                outputStream.flush();
+                
+                // var values1=`TEXT 10,10,\"TSS24.BF2\",0,1,1,\"${this.currentProduct.batchNo}\"\n`
+                // bytes = plus.android.invoke(values1, 'getBytes', 'gb18030');
+                // outputStream.write(bytes);
+                // outputStream.flush();
+                
+                var values2=`BARCODE 25,0,\"128\",50,1,0,1,1,\"${this.currentProduct.batchNo}\"\n`;
+                bytes = plus.android.invoke(values2, 'getBytes', 'gb18030');
+                outputStream.write(bytes);
+                outputStream.flush();
+                
+                
+                var string = "PRINT 1\n";//必须以创建字符串对象的形式创建对象，否则返回NULL
+                bytes = plus.android.invoke(string, 'getBytes', 'gb18030');
+                outputStream.write(bytes);
+                outputStream.flush();
+                    
+            }else {
+                Toast('蓝牙链接失败');
+            }
+        },
     },
     components: {
         saomiaoHeader
@@ -379,6 +501,7 @@ export default {
             line-height: 88px;
             text-align: center;
             border-bottom: 1px solid #F2F3F5;
+            position: relative;
             .play-left{
                 transform:rotate(180deg);
                 margin-right:30px;
@@ -407,6 +530,15 @@ export default {
             .header-font{
                 font-size: 34px;
                 color: #999;
+            }
+            .printing-btn{
+                position: absolute;
+                right:20px;
+                top:20px;
+                height: 50px;
+                border: 1px solid;
+                padding: 0 10px;
+                line-height: 50px;
             }
         }
         .order-product{

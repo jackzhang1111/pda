@@ -201,7 +201,7 @@ export default {
             device = null //这里关键
             bluetoothSocket.close();
         }catch(err){
-            console.log(error,'beforeDestroy');
+            console.log(err,'beforeDestroy');
         }
     },
     watch: {

@@ -29,6 +29,7 @@
             </div>
             <div class="login-btn" @click="denglu">登录</div>
         </div>
+        <div class="qiehuan" v-if="qiehuanStatus" @click="toen">切换</div>
     </div>
 </template>
 
@@ -49,6 +50,7 @@ export default {
             eyeName:'closed-eye',
             inputType:'password',
             iconStatus:false,
+            qiehuanStatus:false
         };
     },
     computed: {
@@ -59,6 +61,7 @@ export default {
     },
     mounted() {
         window.addEventListener("keyup",this.keyupEnter,false);
+        this.qiehuanStatus = (process.env.PDT_API == 'http://47.115.5.76:8083') 
     },
     beforeDestroy() {
         //生命周期 - 销毁之前
@@ -99,6 +102,10 @@ export default {
                 this.denglu()
             }
         },
+        //去英文版
+        toen(){
+            window.location.href = 'http://47.115.5.76:8091'
+        }
     },
     components: {
 
@@ -187,6 +194,16 @@ export default {
                 font-size: 30px;
             }
         }
+    }
+    .qiehuan{
+        width: 200px;
+        height: 50px;
+        background-color: #000;
+        color: #fff;
+        text-align: center;
+        line-height: 50px;
+        position: absolute;
+        bottom: 0;
     }
 }
 </style>

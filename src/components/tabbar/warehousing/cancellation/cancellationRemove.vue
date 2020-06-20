@@ -300,6 +300,12 @@ export default {
                     Toast('存在已申请退款的销售出库单')
                 }else if(res.code == 9){
                     Toast('该订单已下架，请勿重复下架')
+                }else if(res.code == 11){
+                    Toast('传入的源出库单明细不存在')
+                }else if(res.code == 12){
+                    Toast('下架数量不能小于0')
+                }else if(res.code == 13){
+                    Toast('目标位置的商品正在盘点中，不能进行此操作')
                 }
             })
         },

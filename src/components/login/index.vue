@@ -90,7 +90,11 @@ export default {
                if(res. code == 0){
                     localStorage.token = res.token
                     localStorage.userinfoPda = JSON.stringify(res.user) 
-                    this.$router.push({name:'logistics'})
+                    if(res.user.personnelId){
+                        this.$router.push({name:'logistics'})
+                    }else{
+                        this.$router.push({name:'warehousing'})
+                    }
                }
            })
         },

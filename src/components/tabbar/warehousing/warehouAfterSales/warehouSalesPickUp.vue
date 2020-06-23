@@ -23,6 +23,8 @@
                         <div class="product">
                             <p>{{currentProduct.skuName}}</p>
                             <p class="guige">TSIN：{{currentProduct.tsinCode}}</p>
+                            <p class="c-666">FNSKU：{{currentProduct.fnskuCode}}</p>
+                            <p class="c-666">卖家SKU：{{currentProduct.skuCode}}</p>
                         </div>
                     </div>
                     <div class="detailed">

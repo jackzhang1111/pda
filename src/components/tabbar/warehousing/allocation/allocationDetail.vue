@@ -71,7 +71,9 @@
                         <span>{{product.skuValuesTitle}}</span>
                         <span class="fl-right">x{{product.detailNum}}</span>
                     </p>
-                   <p class="p2 c-666">入库批次号:{{product.batchNo}}</p>
+                    <p class="p2 c-666">入库批次号:{{product.batchNo}}</p>
+                    <p class="p2 c-666">FNSKU：{{product.fnskuCode}}</p>
+                    <p class="p2 c-666">卖家SKU：{{product.skuCode}}</p>
                 </div>
             </div>
             <div class="spqd-footer">

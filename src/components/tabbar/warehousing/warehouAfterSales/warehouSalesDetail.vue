@@ -6,7 +6,7 @@
                 <div class="shxx-header">
                     <p class="p1">取件信息</p> 
                     <p>退货单号:{{detailData.backSn}}</p>
-                    <p v-show="$route.query.type != 1">入库单号:{{detailData.backInSn}}</p>
+                    <p v-show="$route.query.type != 1 && detailData.backInSn">入库单号:{{detailData.backInSn}}</p>
                 </div>
                 <div class="shxx-con">
                     <img :src="$webUrl+detailData.headImg" class="touxiang fl-left">
@@ -63,6 +63,8 @@
                             <span>{{detail.titleValues}}</span>
                             <span class="fl-right">x{{detail.totalNum}}</span>
                         </p>
+                        <p class="p2 c-666">FNSKU：{{detail.fnskuCode}}</p>
+                        <p class="p2 c-666">卖家SKU：{{detail.skuCode}}</p>
                     </div>
                 </div>
                 <div class="spqd-footer">
@@ -71,11 +73,11 @@
                 </div>
             </div>
             <div class="order-time">
-                <div class="time-item">
+                <div class="time-item" v-if="detailData.acceptTime">
                     <span class="c-333">接单时间</span>
                     <div class="fl-right fs-22 c-666">{{detailData.acceptTime}}</div>
                 </div>
-                <div class="time-item" v-if="$route.query.type != 1">
+                <div class="time-item" v-if="$route.query.type != 1 && detailData.pickupTime">
                     <span class="c-333">取件时间</span>
                     <div class="fl-right fs-22 c-666">{{detailData.pickupTime}}</div>
                 </div>

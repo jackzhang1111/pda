@@ -26,12 +26,12 @@
                         </div>
                         <div class="order-footer" v-if="data.orderStatus != 2">
                             <div v-if="activeOne == 0">
-                                <div class="btn fl-right" v-if="data.orderStatus == 0 || data.orderStatus == 1">打印出库单</div>
+                                <!-- <div class="btn fl-right" v-if="data.orderStatus == 0 || data.orderStatus == 1">打印出库单</div> -->
                                 <div class="btn fl-right" v-if="data.orderStatus == 0" @click="toRemove(data.orderId)">下架</div>
                                 <div class="btn fl-right" v-if="data.orderStatus == 1" @click="toOutstock(data.orderId)">出库</div>
                             </div>
                             <div v-else>
-                                <div class="btn fl-right" v-if="data.orderStatus == 0 || data.orderStatus == 1">打印出库单</div>
+                                <!-- <div class="btn fl-right" v-if="data.orderStatus == 0 || data.orderStatus == 1">打印出库单</div> -->
                                 <div class="btn fl-right" v-if="data.orderStatus == 0" @click="toInstorage(data.orderId)">入库</div>
                                 <div class="btn fl-right" v-if="data.orderStatus == 1" @click="toUppershelf(data.orderId)">上架</div>
                             </div>

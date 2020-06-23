@@ -108,6 +108,7 @@
                 <div class="btn-qbrk" @click="outStock">确认全部入库</div>
             </div>
         </div>
+        <div class="shelves-place"></div>
         <div v-if="!showPickUp">
             <sweep-code @search="search" @showSweepCode="showSweepCode"></sweep-code>
         </div>
@@ -501,6 +502,9 @@ export default {
 }
 .fs-22{
     font-size: 22px
+}
+.shelves-place{
+    height: 110px;
 }
 .pl-30{
     padding-left:30px;

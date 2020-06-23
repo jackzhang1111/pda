@@ -19,10 +19,10 @@
                                 <p>出库数量:&nbsp;{{data.totalNum}}</p>
                             </div>
                             <div class="order-footer">
-                                <div class="btn fl-right" v-if="data.orderStatus == 0">打印出库单</div>
+                                <!-- <div class="btn fl-right" v-if="data.orderStatus == 0">打印出库单</div> -->
                                 <div class="btn fl-right" v-if="data.orderStatus == 0" @click="toRemove(data.orderId)">下架</div>
                                 <div class="btn fl-right" v-if="data.orderStatus == 1" @click="toOutstock(data.orderId)">出库</div>
-                                <div class="btn fl-right" v-if="data.orderStatus == 2">打印下架单</div>
+                                <!-- <div class="btn fl-right" v-if="data.orderStatus == 2">打印下架单</div> -->
                             </div>
                         </div>
                     </div>

@@ -82,7 +82,7 @@ export default {
     },
     methods: {
         search(value){
-            this.formData.orderSn = this.$route.query.expressNo
+            this.formData.orderSn = value
             this.refreshOrder()
         },
         //售后列表

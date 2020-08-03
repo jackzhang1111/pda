@@ -88,3 +88,12 @@ export function pdascanningordernooutApi(params) {
         params
     })
 }
+
+//PDA一次性加载所有库位信息
+export function getwarehouseregionIDApi(params) {
+    return park({
+        url:`/storage/getwarehouseregionID`,
+        method: 'post',
+        data:params
+    })
+}

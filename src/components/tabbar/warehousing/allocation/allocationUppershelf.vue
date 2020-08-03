@@ -67,7 +67,7 @@
             <div class="set-shelves">
                 <span @click="showPicker = true">设置上架货位</span>
                 <van-popup v-model="showPicker" position="bottom">
-                    <van-picker show-toolbar :columns="currentProduct.columns" @cancel="showPicker = false" @confirm="onConfirm"/>
+                    <van-picker show-toolbar :columns="currentProduct.columns" @cancel="showPicker = false" @confirm="onConfirm" v-if="showPicker"/>
                 </van-popup>
                 <van-icon name="play"/>
             </div>
@@ -96,7 +96,7 @@
 import saomiaoHeader from '@/multiplexing/saomiaoHeader.vue'
 import { Dialog ,Toast } from 'vant';
 import {transferinstockdowmproshelvesApi} from '@/api/warehousing/allocation/index.js'
-import {stockInToShelvesAllApi} from '@/api/warehousing/warehousSupplied/index.js'
+import {stockInToShelvesAllApi,getwarehouseregionIDApi} from '@/api/warehousing/warehousSupplied/index.js'
 export default {
     props: {
 
@@ -136,9 +136,9 @@ export default {
                 paramId:''
             },
             productArray:[],
-            value: '',
             showPicker: false,
-            columns: []
+            columns: [],
+            goodsShelves:[],//接口货架货位
         };
     },
     computed: {
@@ -196,15 +196,9 @@ export default {
                     
                     this.removeData.shelfDownOrderId = this.detailData.shelfDownOrderId
                     this.shelvesData.shelvesOrderId = res.Data.shelvesOrderId
-                    this.detailData.warehouselist.forEach(element => {
-                        element.text = element.regionName
-                        this.columns.push(element)
-                    });
-                    this.productArray.forEach(ele => {
-                        ele.warehouselist = new Array()
-                        ele.columns = this.columns.map(o => Object.assign({}, o));
-                    })
+                    
                     this.setCurrentProduct()
+                    this.getwarehouseregionID({warehouseId:res.Data.warehouseId})
                 }
             })
         },
@@ -288,20 +282,14 @@ export default {
             try{m+=s2.split(".")[1].length}catch(e){}
             return Number(s1.replace(".",""))*Number(s2.replace(".",""))/Math.pow(10,m)
         },
-        onConfirm(value) {
+        onConfirm(value,valueIndexs) {
+            let threeShel = null
             if(this.currentProduct.columns.length == 0) return
             let currIndex = null
-            this.currentProduct.warehouselist.push(value)
-            this.value = value;
+            threeShel = this.currentProduct.columns[valueIndexs[0]].children[valueIndexs[1]].children[valueIndexs[2]]
+            console.log(threeShel,'threeShel',this.currentProduct);
+            this.currentProduct.warehouselist.push(this.$fn.copy(threeShel))  
             this.showPicker = false;
-            this.currentProduct.columns.forEach((item,index) => {
-                if(item.regionId == value.regionId){
-                    currIndex = index
-                }
-            })
-            if(currIndex != null){
-                this.currentProduct.columns.splice(currIndex,1)
-            }
         },
         //全部上架
         stockInToShelvesAll(data){
@@ -345,7 +333,6 @@ export default {
                 message: '您确定要删除该货位吗?'
             }).then(() => {
                 this.currentProduct.warehouselist.splice(index,1)
-                this.currentProduct.columns.push(item)
             }).catch(() => {});
         },
         //更改页数
@@ -364,6 +351,57 @@ export default {
             val[name] < 0 ? val[name] = 0 : val[name]
             //取整
             val[name] = Math.ceil(val[name])
+        },
+        //PDA获取所有库位信息接口
+        getwarehouseregionID(data){
+            getwarehouseregionIDApi(data).then(res => {
+                if(res.code == 0){
+                    res.Data.forEach((one,oneIndex) => {
+                        one.text = one.regionName
+                        //货区不可摆放
+                        if(one.canShelf == 0){
+                            if(one.children.length > 0){                            
+                                one.children.forEach((two,twoIndex) => {
+                                    two.text = two.regionName
+                                    if(two.children.length > 0){
+                                        two.children.forEach((three,threeIndex) => {
+                                            three.text = three.regionName
+                                        })
+                                        if(twoIndex == (one.children.length - 1)){
+                                            this.goodsShelves.push(one)
+                                        }
+                                    }
+                                })
+                            }
+                        }else{
+                            let obj = {
+                                canShelf: one.canShelf,
+                                children: null,
+                                isShelf: one.isShelf,
+                                parentRegionId: one.parentRegionId,
+                                regionId: one.regionId,
+                                regionName: one.regionName,
+                                regionNo: one.regionNo,
+                                regionType: one.regionType,
+                                text:one.regionName,
+                                takeVolume: one.takeVolume,
+                                upItemNum: one.upItemNum,
+                                useStatus: one.useStatus,
+                                volume: one.volume,
+                                warehouseId: one.warehouseId,
+                                warehouseNo: one.warehouseNo,
+                                warehouseType: one.warehouseType,
+                            }
+                            one.children.push({children:[obj],regionName:one.regionName,text:one.regionName})
+                            this.goodsShelves.push(one)
+                        }
+                    })
+                    this.productArray.forEach(ele => {
+                        ele.warehouselist = new Array()
+                        ele.columns = this.$fn.copy(this.goodsShelves) 
+                    })
+                }
+            })
         }
     },
     components: {

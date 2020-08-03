@@ -69,7 +69,7 @@
             <div class="set-shelves">
                 <span @click="showPicker = true">设置上架货位</span>
                 <van-popup v-model="showPicker" position="bottom">
-                    <van-picker show-toolbar :columns="currentProduct.columns" @cancel="showPicker = false" @confirm="onConfirm"/>
+                    <van-picker show-toolbar :columns="currentProduct.columns" @cancel="showPicker = false" @confirm="onConfirm" v-if="showPicker"/>
                 </van-popup>
                 <van-icon name="play"/>
             </div>
@@ -105,7 +105,7 @@ var device = null,
     bluetoothSocket = null
 import saomiaoHeader from '@/multiplexing/saomiaoHeader.vue'
 import { Dialog ,Toast } from 'vant';
-import {stockInToShelvesApi,stockInToShelvesAllApi} from '@/api/warehousing/warehousSupplied/index.js'
+import {stockInToShelvesApi,stockInToShelvesAllApi,getwarehouseregionIDApi} from '@/api/warehousing/warehousSupplied/index.js'
 import BTool from '@/static/js/BluetoothTool.js'
 export default {
     props: {
@@ -137,12 +137,12 @@ export default {
                 productlist:[]
             },
 
-            value: '',
             showPicker: false,
             columns: [],
             bluetoothState: {},
             pairedDevices: [],
             address:null,
+            goodsShelves:[],//接口货架货位
         };
     },
     computed: {
@@ -207,15 +207,8 @@ export default {
                     this.productArray = res.Data.productList
 
                     this.shelvesData.shelvesOrderId = res.Data.shelvesOrderId
-                    this.detailData.warehouselist.forEach(element => {
-                        element.text = element.regionName
-                        this.columns.push(element)
-                    });
-                    this.productArray.forEach(ele => {
-                        ele.warehouselist = new Array()
-                        ele.columns = this.columns.map(o => Object.assign({}, o));
-                    })
                     this.setCurrentProduct()
+                    this.getwarehouseregionID({warehouseId:res.Data.warehouseId})
                 }
             })
         },
@@ -307,19 +300,34 @@ export default {
                this.stockInToShelvesAll(this.shelvesData)
             }).catch(() => {});
         },
-        onConfirm(value) {
+        onConfirm(value,valueIndexs) {
+            let threeShel = null,  twoShel = null, currIndex = null, isOne = null
             if(this.currentProduct.columns.length == 0) return
-            let currIndex = null
-            this.currentProduct.warehouselist.push(value)
-            this.value = value;
+            twoShel = this.currentProduct.columns[valueIndexs[0]].children[valueIndexs[1]]
+            threeShel = this.currentProduct.columns[valueIndexs[0]].children[valueIndexs[1]].children[valueIndexs[2]]
+            this.currentProduct.warehouselist.push(this.$fn.copy(threeShel))  
             this.showPicker = false;
-            this.currentProduct.columns.forEach((item,index) => {
-                if(item.regionId == value.regionId){
-                    currIndex = index
-                }
+
+            this.currentProduct.columns.forEach((one,oneIndex) => {
+                let oneId = one.regionId
+                one.children.forEach((two,twoIndex) => {
+                    two.children.forEach((three,threeIndex) => {
+                        if(three.regionId == threeShel.regionId){
+                            currIndex = threeIndex
+                            if(three.regionId == oneId){
+                                //只有库区
+                                isOne = true
+                            }
+                        }
+                    })
+                })
             })
-            if(currIndex != null){
-                this.currentProduct.columns.splice(currIndex,1)
+            if(currIndex != null && !isOne){
+                //货架货区
+                twoShel.children.splice(valueIndexs[2],1)
+            }else{
+                //只有货区
+                this.currentProduct.columns.splice(valueIndexs[0],1)
             }
         },
         //全部上架
@@ -364,7 +372,27 @@ export default {
                 message: '您确定要删除该货位吗?'
             }).then(() => {
                 this.currentProduct.warehouselist.splice(index,1)
-                this.currentProduct.columns.push(item)
+                let onecolumnIndex = null,twocolumnIndex
+                if(item.parentRegionId){
+                    this.currentProduct.columns.forEach((column,columnIndex) => {
+                        column.children.forEach((two,twoIndex) => {
+                            if(two.regionId == item.parentRegionId){
+                                onecolumnIndex = columnIndex
+                                twocolumnIndex = twoIndex
+                                two.children.push(item)
+                            }
+                        })
+                    })
+                    this.currentProduct.columns[onecolumnIndex].children[twocolumnIndex].children.sort(this.$fn.compare('regionId'))
+                }else{
+                    let ele = null
+                    this.goodsShelves.forEach(good => {
+                        if(good.regionId == item.regionId){
+                            ele = good
+                        }
+                    })
+                    this.currentProduct.columns.push(ele)
+                }
             }).catch(() => {});
         },
         //更改页数
@@ -384,6 +412,59 @@ export default {
             //取整
             val[name] = Math.ceil(val[name])
         },
+        //PDA获取所有库位信息接口
+        getwarehouseregionID(data){
+            getwarehouseregionIDApi(data).then(res => {
+                if(res.code == 0){
+                    res.Data.forEach((one,oneIndex) => {
+                        one.text = one.regionName
+                        //货区不可摆放
+                        if(one.canShelf == 0){
+                            if(one.children.length > 0){                            
+                                one.children.forEach((two,twoIndex) => {
+                                    two.text = two.regionName
+                                    if(two.children.length > 0){
+                                        two.children.forEach((three,threeIndex) => {
+                                            three.text = three.regionName
+                                        })
+                                        if(twoIndex == (one.children.length - 1)){
+                                            this.goodsShelves.push(one)
+                                        }
+                                    }
+                                })
+                            }
+                        }else{
+                            let obj = {
+                                canShelf: one.canShelf,
+                                children: null,
+                                isShelf: one.isShelf,
+                                parentRegionId: one.parentRegionId,
+                                regionId: one.regionId,
+                                regionName: one.regionName,
+                                regionNo: one.regionNo,
+                                regionType: one.regionType,
+                                text:one.regionName,
+                                takeVolume: one.takeVolume,
+                                upItemNum: one.upItemNum,
+                                useStatus: one.useStatus,
+                                volume: one.volume,
+                                warehouseId: one.warehouseId,
+                                warehouseNo: one.warehouseNo,
+                                warehouseType: one.warehouseType,
+                            }
+                            one.children.push({children:[obj],regionName:one.regionName,text:one.regionName})
+                            this.goodsShelves.push(one)
+                        }
+                    })
+
+                    this.productArray.forEach(ele => {
+                        ele.warehouselist = new Array()
+                        ele.columns = this.$fn.copy(this.goodsShelves) 
+                    })
+                }
+            })
+        },
+        
         //初始化打印机参数
         getReady(){
             main = plus.android.runtimeMainActivity();
@@ -421,6 +502,7 @@ export default {
             }
             
         },
+        //打印
         print() {
             if(!bluetoothSocket.isConnected()) {
                 try{

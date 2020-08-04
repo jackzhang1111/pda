@@ -4,6 +4,7 @@
         <div v-show="!batchNoListStatus">
             <saomiao-header @search="search"></saomiao-header>
             <div class="pick-up-order" v-if="!$route.query.type">销售出库单号：{{detailData.shelfDownorderSn}}</div>
+            <div class="pick-up-order" v-if="!$route.query.type">销售单号：{{detailData.saleOrderSn}}</div>
 
             <van-collapse v-model="activeNames" class="collapse" v-if="$route.query.type == 'xiajia'">
                 <van-collapse-item>
@@ -505,6 +506,9 @@ export default {
         color: #333;
         background-color: #fff;
         margin-bottom: 20px;
+        &:nth-child(2){
+            margin:0
+        }
     }
     .order-detail{
         background-color: #fff;

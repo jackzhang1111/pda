@@ -379,6 +379,7 @@ export default {
                             if(two.regionId == item.parentRegionId){
                                 onecolumnIndex = columnIndex
                                 twocolumnIndex = twoIndex
+                                item.upItemNum = 0
                                 two.children.push(item)
                             }
                         })
@@ -389,6 +390,7 @@ export default {
                     this.goodsShelves.forEach(good => {
                         if(good.regionId == item.regionId){
                             ele = good
+                            ele.upItemNum = 0
                         }
                     })
                     this.currentProduct.columns.push(ele)

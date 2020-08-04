@@ -413,13 +413,34 @@ export default {
             }).catch(() => {});
         },
         onConfirm(value,valueIndexs) {
-            let threeShel = null
+            let threeShel = null,  twoShel = null, currIndex = null, isOne = null
             if(this.currentProduct.columns.length == 0) return
-            let currIndex = null
+            twoShel = this.currentProduct.columns[valueIndexs[0]].children[valueIndexs[1]]
             threeShel = this.currentProduct.columns[valueIndexs[0]].children[valueIndexs[1]].children[valueIndexs[2]]
-            console.log(threeShel,'threeShel',this.currentProduct);
             this.currentProduct.warehouselist.push(this.$fn.copy(threeShel))  
             this.showPicker = false;
+
+            this.currentProduct.columns.forEach((one,oneIndex) => {
+                let oneId = one.regionId
+                one.children.forEach((two,twoIndex) => {
+                    two.children.forEach((three,threeIndex) => {
+                        if(three.regionId == threeShel.regionId){
+                            currIndex = threeIndex
+                            if(three.regionId == oneId){
+                                //只有库区
+                                isOne = true
+                            }
+                        }
+                    })
+                })
+            })
+            if(currIndex != null && !isOne){
+                //货架货区
+                twoShel.children.splice(valueIndexs[2],1)
+            }else{
+                //只有货区
+                this.currentProduct.columns.splice(valueIndexs[0],1)
+            }
         },
         //全部上架
         stockInToShelvesAll(data){
@@ -495,6 +516,29 @@ export default {
                 message: '您确定要删除该货位吗?'
             }).then(() => {
                 this.currentProduct.warehouselist.splice(index,1)
+                let onecolumnIndex = null,twocolumnIndex
+                if(item.parentRegionId){
+                    this.currentProduct.columns.forEach((column,columnIndex) => {
+                        column.children.forEach((two,twoIndex) => {
+                            if(two.regionId == item.parentRegionId){
+                                onecolumnIndex = columnIndex
+                                twocolumnIndex = twoIndex
+                                item.upItemNum = 0
+                                two.children.push(item)
+                            }
+                        })
+                    })
+                    this.currentProduct.columns[onecolumnIndex].children[twocolumnIndex].children.sort(this.$fn.compare('regionId'))
+                }else{
+                    let ele = null
+                    this.goodsShelves.forEach(good => {
+                        if(good.regionId == item.regionId){
+                            ele = good
+                            ele.upItemNum = 0
+                        }
+                    })
+                    this.currentProduct.columns.push(ele)
+                }
             }).catch(() => {});
         },
         //更改页数

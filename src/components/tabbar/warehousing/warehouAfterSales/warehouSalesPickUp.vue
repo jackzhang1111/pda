@@ -284,7 +284,7 @@ export default {
                 this.detailData.produclist.forEach(ele => {
                     ele.inStockType = batchArr[0].warehouseName
                 });
-                this.currentArray.forEach(item => {
+                this.produclist.forEach(item => {
                     item.warehouseName = batchArr[0].warehouseName
                 })
                 this.outStockObj.inWarehouseId = batchArr[0].warehouseId

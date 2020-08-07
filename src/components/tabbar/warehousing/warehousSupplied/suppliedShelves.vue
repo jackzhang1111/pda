@@ -75,7 +75,7 @@
             </div>
             <div class="shelves-item" v-for="(warehouse,index) in currentProduct.warehouselist" :key="index">
                 <div class="item-title">
-                    <span>{{warehouse.regionName}}</span>
+                    <span>{{warehouse.fuseName ? warehouse.fuseName : warehouse.regionName}}</span>
                     <img src="@/assets/img/lajitong.svg" @click="detailWarehouse(index,warehouse)">
                 </div>
                 <div class="item-number">
@@ -428,6 +428,7 @@ export default {
                                     if(two.children.length > 0){
                                         two.children.forEach((three,threeIndex) => {
                                             three.text = three.regionName
+                                            three.fuseName = one.regionName + '/' + two.regionName + '/' + three.regionName
                                         })
                                         if(twoIndex == (one.children.length - 1)){
                                             this.goodsShelves.push(one)
@@ -458,7 +459,6 @@ export default {
                             this.goodsShelves.push(one)
                         }
                     })
-
                     this.productArray.forEach(ele => {
                         ele.warehouselist = new Array()
                         ele.columns = this.$fn.copy(this.goodsShelves) 

@@ -76,6 +76,8 @@ export default {
             })
         },
         submit(){
+             this.pdascanningordernoin(this.orderNum)
+             return
             if(this.code == 1){
                 this.pdascanningordernoin(this.orderNum)
             }else if(this.code == 2){

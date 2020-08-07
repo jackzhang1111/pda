@@ -46,6 +46,7 @@ export default {
         dataList:{
             handler:function(newVal){
                 this.noList = newVal
+                console.log(this.noList,'this.noList');
             }
         }
     },

@@ -428,7 +428,7 @@ export default {
                                     if(two.children.length > 0){
                                         two.children.forEach((three,threeIndex) => {
                                             three.text = three.regionName
-                                            three.fuseName = one.regionName + '/' + two.regionName + '/' + three.regionName
+                                            three.fuseName = one.regionName + '-' + two.regionName + '-' + three.regionName
                                         })
                                         if(twoIndex == (one.children.length - 1)){
                                             this.goodsShelves.push(one)

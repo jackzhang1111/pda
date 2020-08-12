@@ -9,6 +9,10 @@
                         <span>{{orderName}}</span>
                         <span class="fl-right fs-20">{{detailData.stockInOrderSn}}</span>
                     </div>
+                    <div v-if="typeVal == 3">
+                        <span>售后单号</span>
+                        <span class="fl-right fs-20">{{detailData.backOrderSn ? detailData.backOrderSn : '无'}}</span>
+                    </div>
                 </template>
                 <div @click="toPickUp(data)" v-for="(data,index) in dataList" :key="index" class="order-list">
                     <span>{{data.orderSn}}</span> 
@@ -180,7 +184,7 @@ export default {
             return  this.current == this.listLength
         },
         orderName(){
-            return this.typeVal == 1 ? '供货入库单号' : this.typeVal == 2 ? '调拨入库单号':'销售退货入库单号'
+            return this.typeVal == 1 ? '供货入库单号' : this.typeVal == 2 ? '调拨入库单号':'销售退货入库单'
         }
     },
     mounted() {
@@ -572,7 +576,7 @@ export default {
                                     if(two.children.length > 0){
                                         two.children.forEach((three,threeIndex) => {
                                             three.text = three.regionName
-                                            three.fuseName = one.regionName + '/' + two.regionName + '/' + three.regionName
+                                            three.fuseName = one.regionName + '-' + two.regionName + '-' + three.regionName
                                         })
                                         if(twoIndex == (one.children.length - 1)){
                                             this.goodsShelves.push(one)

@@ -198,7 +198,13 @@ export default {
                     this.shelvesData.shelvesOrderId = res.Data.shelvesOrderId
                     
                     this.setCurrentProduct()
-                    this.getwarehouseregionID({warehouseId:res.Data.warehouseId})
+
+                    if(!res.Data.shelvesOrderId && res.Data.shelvesOrderId==0){
+                        this.getwarehouseregionID({warehouseId:res.Data.warehouseId},true)
+                    }else{
+                        this.getwarehouseregionID({warehouseId:res.Data.warehouseId},false)
+                    }
+                    
                 }
             })
         },
@@ -397,7 +403,7 @@ export default {
             val[name] = Math.ceil(val[name])
         },
         //PDA获取所有库位信息接口
-        getwarehouseregionID(data){
+        getwarehouseregionID(data,flag){
             getwarehouseregionIDApi(data).then(res => {
                 if(res.code == 0){
                     res.Data.forEach((one,oneIndex) => {
@@ -442,7 +448,9 @@ export default {
                         }
                     })
                     this.productArray.forEach(ele => {
-                        ele.warehouselist = new Array()
+                        if(flag){
+                            ele.warehouselist = new Array()
+                        }
                         ele.columns = this.$fn.copy(this.goodsShelves) 
                     })
                 }

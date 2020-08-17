@@ -199,10 +199,15 @@ export default {
                     
                     this.setCurrentProduct()
 
-                    if(!res.Data.shelvesOrderId && res.Data.shelvesOrderId==0){
+                    if(!res.Data.shelvesOrderId){
                         this.getwarehouseregionID({warehouseId:res.Data.warehouseId},true)
                     }else{
                         this.getwarehouseregionID({warehouseId:res.Data.warehouseId},false)
+                        res.Data.productList.forEach(ele => {
+                            ele.warehouselist.forEach(item => {
+                                item.text = 'wms'
+                            })
+                        })
                     }
                     
                 }
@@ -368,6 +373,7 @@ export default {
                                 onecolumnIndex = columnIndex
                                 twocolumnIndex = twoIndex
                                 item.upItemNum = 0
+                                if(item.text == 'wms') return
                                 two.children.push(item)
                             }
                         })
@@ -381,6 +387,7 @@ export default {
                             ele.upItemNum = 0
                         }
                     })
+                    if(item.text == 'wms') return
                     this.currentProduct.columns.push(ele)
                 }
             }).catch(() => {});

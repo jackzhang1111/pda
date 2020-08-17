@@ -208,10 +208,16 @@ export default {
 
                     this.shelvesData.shelvesOrderId = res.Data.shelvesOrderId
                     this.setCurrentProduct()
-                    if(!res.Data.shelvesOrderId && res.Data.shelvesOrderId==0){
+                    if(!res.Data.shelvesOrderId){
                         this.getwarehouseregionID({warehouseId:res.Data.warehouseId},true)
+                        
                     }else{
                         this.getwarehouseregionID({warehouseId:res.Data.warehouseId},false)
+                        res.Data.productList.forEach(ele => {
+                            ele.warehouselist.forEach(item => {
+                                item.text = 'wms'
+                            })
+                        })
                     }
                 }
             })
@@ -384,6 +390,7 @@ export default {
                                 onecolumnIndex = columnIndex
                                 twocolumnIndex = twoIndex
                                 item.upItemNum = 0
+                                if(item.text == 'wms') return
                                 two.children.push(item)
                             }
                         })
@@ -397,6 +404,7 @@ export default {
                             ele.upItemNum = 0
                         }
                     })
+                    if(item.text == 'wms') return
                     this.currentProduct.columns.push(ele)
                 }
             }).catch(() => {});
@@ -419,7 +427,7 @@ export default {
             val[name] = Math.ceil(val[name])
         },
         //PDA获取所有库位信息接口
-        getwarehouseregionID(data){
+        getwarehouseregionID(data,flag){
             getwarehouseregionIDApi(data).then(res => {
                 if(res.code == 0){
                     res.Data.forEach((one,oneIndex) => {
@@ -464,7 +472,9 @@ export default {
                         }
                     })
                     this.productArray.forEach(ele => {
-                        ele.warehouselist = new Array()
+                        if(flag){
+                            ele.warehouselist = new Array()
+                        }
                         ele.columns = this.$fn.copy(this.goodsShelves) 
                     })
                 }

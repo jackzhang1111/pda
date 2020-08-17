@@ -257,10 +257,15 @@ export default {
                     this.shelvesData.shelvesOrderId = res.Data.shelvesOrderId
                    
                     this.setCurrentProduct()
-                    if(!res.Data.shelvesOrderId && res.Data.shelvesOrderId==0){
+                    if(!res.Data.shelvesOrderId){
                         this.getwarehouseregionID({warehouseId:res.Data.warehouseId},true)
                     }else{
                         this.getwarehouseregionID({warehouseId:res.Data.warehouseId},false)
+                        res.Data.productList.forEach(ele => {
+                            ele.warehouselist.forEach(item => {
+                                item.text = 'wms'
+                            })
+                        })
                     }
                 }
             })
@@ -277,10 +282,15 @@ export default {
                     this.shelvesData.shelvesOrderId = res.Data.shelvesOrderId
                    
                     this.setCurrentProduct()
-                    if(!res.Data.shelvesOrderId && res.Data.shelvesOrderId==0){
+                    if(!res.Data.shelvesOrderId){
                         this.getwarehouseregionID({warehouseId:res.Data.warehouseId},true)
                     }else{
                         this.getwarehouseregionID({warehouseId:res.Data.warehouseId},false)
+                        res.Data.productList.forEach(ele => {
+                            ele.warehouselist.forEach(item => {
+                                item.text = 'wms'
+                            })
+                        })
                     }
                 }
             })
@@ -297,10 +307,15 @@ export default {
                     this.shelvesData.shelvesOrderId = res.Data.shelvesOrderId
                     
                     this.setCurrentProduct()
-                    if(!res.Data.shelvesOrderId && res.Data.shelvesOrderId==0){
+                    if(!res.Data.shelvesOrderId){
                         this.getwarehouseregionID({warehouseId:res.Data.warehouseId},true)
                     }else{
                         this.getwarehouseregionID({warehouseId:res.Data.warehouseId},false)
+                        res.Data.productList.forEach(ele => {
+                            ele.warehouselist.forEach(item => {
+                                item.text = 'wms'
+                            })
+                        })
                     }
                 }
             })
@@ -540,6 +555,7 @@ export default {
                                 onecolumnIndex = columnIndex
                                 twocolumnIndex = twoIndex
                                 item.upItemNum = 0
+                                if(item.text == 'wms') return
                                 two.children.push(item)
                             }
                         })
@@ -553,6 +569,7 @@ export default {
                             ele.upItemNum = 0
                         }
                     })
+                    if(item.text == 'wms') return
                     this.currentProduct.columns.push(ele)
                 }
             }).catch(() => {});
@@ -575,7 +592,8 @@ export default {
             val[name] = Math.ceil(val[name])
         },
         //PDA获取所有库位信息接口
-        getwarehouseregionID(data){
+        getwarehouseregionID(data,flag){
+            let arr = []
             getwarehouseregionIDApi(data).then(res => {
                 if(res.code == 0){
                     res.Data.forEach((one,oneIndex) => {
@@ -591,7 +609,8 @@ export default {
                                             three.fuseName = one.regionName + '-' + two.regionName + '-' + three.regionName
                                         })
                                         if(twoIndex == (one.children.length - 1)){
-                                            this.goodsShelves.push(one)
+                                            arr.push(one)
+                                            // this.goodsShelves.push(one)
                                         }
                                     }
                                 })
@@ -616,11 +635,16 @@ export default {
                                 warehouseType: one.warehouseType,
                             }
                             one.children.push({children:[obj],regionName:one.regionName,text:one.regionName})
-                            this.goodsShelves.push(one)
+                            arr.push(one)
+                            //this.goodsShelves.push(one)
                         }
+                        this.goodsShelves = this.$fn.copy(arr) 
                     })
                     this.productArray.forEach(ele => {
-                        ele.warehouselist = new Array()
+                        if(flag){
+                            ele.warehouselist = new Array()
+                        }
+                        // ele.columns = this.$fn.copy(arr) 
                         ele.columns = this.$fn.copy(this.goodsShelves) 
                     })
                 }

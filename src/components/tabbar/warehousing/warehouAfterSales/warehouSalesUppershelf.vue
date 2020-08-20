@@ -4,6 +4,7 @@
         <saomiao-header @search="search"></saomiao-header>
         <div class="pick-up-order">销售退货入库单号：{{detailData.stockInOrderSn}}</div>
         <div class="pick-up-order">售后单号： {{detailData.backOrderSn ? detailData.backOrderSn : '无'}}</div>
+        <div class="pick-up-order">销售单号： {{detailData.saleOrderSn ? detailData.saleOrderSn : '无'}}</div>
         <div class="order-detail">
             <div class="detail-header">
                 <van-icon name="play" class="play-left" :color="playLeft ? '#DCDCDC':'#333'" @click="cliPlayLeft"/>
@@ -43,6 +44,11 @@
                         <span>体积:</span>
                         <span class="tijitotal">{{currentProduct.unitSize}}</span>
                         <span>m³</span>
+                    </div>
+                </div>
+                <div class="tiji">
+                    <div class="clearfix">
+                        <span class="pl-30">原位置 : {{currentProduct.outRegionName?currentProduct.outRegionName:'无'}}</span>
                     </div>
                 </div>
             </div>
@@ -453,7 +459,7 @@ export default {
         color: #333;
         background-color: #fff;
         margin-bottom: 20px;
-        &:nth-child(2){
+        &:nth-child(2),&:nth-child(3){
             margin:0
         }
     }

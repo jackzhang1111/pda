@@ -13,6 +13,9 @@
                         <span>售后单号</span>
                         <span class="fl-right fs-20">{{detailData.backOrderSn ? detailData.backOrderSn : '无'}}</span>
                     </div>
+                     <div>销售单号：
+                         <span  class="fl-right fs-20"> {{detailData.saleOrderSn ? detailData.saleOrderSn : '无'}}</span>
+                     </div>
                 </template>
                 <div @click="toPickUp(data)" v-for="(data,index) in dataList" :key="index" class="order-list">
                     <span>{{data.orderSn}}</span> 
@@ -79,6 +82,11 @@
                         <span>体积:</span>
                         <span class="tijitotal">{{currentProduct.boxSize}}</span>
                         <span>m³</span>
+                    </div>
+                </div>
+                <div class="tiji">
+                    <div class="clearfix">
+                        <span class="pl-30">原位置 : {{currentProduct.outRegionName?currentProduct.outRegionName:'无'}}</span>
                     </div>
                 </div>
             </div>

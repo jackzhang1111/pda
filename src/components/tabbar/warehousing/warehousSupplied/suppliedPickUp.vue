@@ -309,7 +309,7 @@ export default {
                 }else if(res.code == 3){
                     Toast('供货单入库仓库不一致')
                 }else if(res.code == 4){
-                    Toast('存在状态不为已发货待入库的供货单')
+                    Toast('已出库,无需重复操作')
                 }else if(res.code == 5){
                     Toast('存在本次入库数总数不大于0的供货单')
                 }else if(res.code == 6){

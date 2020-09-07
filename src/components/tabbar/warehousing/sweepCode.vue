@@ -152,6 +152,8 @@ export default {
                     Toast('商品已出库，无需重复操作')
                 }else if(res.code == 3){
                     Toast('商品已下架，请到对应单据完成出库')
+                }else if(res.code == 4){
+                    Toast('存在已申请退款的销售出库单')
                 }
             })
         },

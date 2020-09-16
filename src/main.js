@@ -9,10 +9,10 @@ import 'lib-flexible/flexible'
 import '@/assets/css/reset.css'
 import '@/assets/css/common.less'
 import '@/assets/css/animation.less'
-import {isDisabled,formValidate,strTrim,objTrim,priceReg,objDeepCopy,deepnull,compare} from '@/common/utils'
+import { isDisabled, formValidate, strTrim, objTrim, priceReg, objDeepCopy, deepnull, compare, deepCopy } from '@/common/utils'
 import store from './store/index'
 import * as mycomponents from '@/common/mycomponents.js'
-import {gethttpimgurlApi} from '@/api/login/index'
+import { gethttpimgurlApi } from '@/api/login/index'
 
 Vue.config.productionTip = false
 
@@ -24,7 +24,7 @@ Vue.prototype.jn = '₵'
 Vue.prototype.$webUrl = ''
 
 gethttpimgurlApi().then(res => {
-  if(res.code == 0){
+  if (res.code == 0) {
     Vue.prototype.jn = res.currency
     Vue.prototype.$webUrl = res.webUrl
   }
@@ -32,7 +32,8 @@ gethttpimgurlApi().then(res => {
 
 
 Vue.prototype.$fn = {
-  copy:objDeepCopy,
+  copy: objDeepCopy,
+  deepCopy: deepCopy,
   isDisabled,
   formValidate,
   strTrim,
@@ -48,7 +49,7 @@ Object.keys(mycomponents).forEach(key => {
   Vue.component(key, mycomponents[key])
 })
 
-router.afterEach((to,from,next) => {
+router.afterEach((to, from, next) => {
   window.scroll(0, 0);
 });
 

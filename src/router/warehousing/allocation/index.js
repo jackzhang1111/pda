@@ -6,6 +6,10 @@ import allocationRemove from '@/components/tabbar/warehousing/allocation/allocat
 import allocationInstorage from '@/components/tabbar/warehousing/allocation/allocationInstorage'
 import allocationUppershelf from '@/components/tabbar/warehousing/allocation/allocationUppershelf'
 import allocationSearch from '@/components/tabbar/warehousing/allocation/allocationSearch'
+import allInstorage from '@/components/tabbar/warehousing/allocation/allInstorage'
+import allUppershelf from '@/components/tabbar/warehousing/allocation/allUppershelf'
+import noOrder from '@/components/tabbar/warehousing/allocation/itemComponents/noOrder'
+import orderList from '@/components/tabbar/warehousing/allocation/itemComponents/orderList'
 let routes = [
     {
         path: 'allocationList',
@@ -41,6 +45,26 @@ let routes = [
         path: 'allocationList/allocationSearch',
         name: 'allocationSearch',
         component: allocationSearch,
+    },
+    {
+        path: 'allocationList/allInstorage',
+        name: 'allInstorage',
+        component: allInstorage,
+    },
+    {
+        path: 'allocationList/allUppershelf',
+        name: 'allUppershelf',
+        component: allUppershelf,
+    },
+    {
+        path: 'allocationList/noOrder',
+        name: 'noOrder',
+        component: noOrder,
+    },
+    {
+        path: 'allocationList/orderList',
+        name: 'orderList',
+        component: orderList,
     }
 ];
 

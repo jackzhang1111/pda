@@ -14,7 +14,7 @@ const mainAxios = axios.create({
 const parkAxios = axios.create({
     timeout: 30000,
     headers: {
-        'Content-Type':'application/json;charset=utf-8'
+        'Content-Type': 'application/json;charset=utf-8'
     },
     withCredentials: true,
 });
@@ -27,12 +27,12 @@ mainAxios.interceptors.request.use(function (config) {
         message: 'loading',
         forbidClick: true,
         loadingType: 'spinner',
-        duration:180000
-      });
-    
+        duration: 180000
+    });
+
     return config;
 
-    }, function (error) {
+}, function (error) {
     // 对请求错误做些什么
     return Promise.reject(error);
 });
@@ -40,17 +40,17 @@ mainAxios.interceptors.request.use(function (config) {
 
 // 添加请求拦截器
 parkAxios.interceptors.request.use(function (config) {
-    if(localStorage.token){
-        config.headers.token = localStorage.token; 
+    if (localStorage.token) {
+        config.headers.token = localStorage.token;
     }
-    
+
     // 在发送请求之前做些什么
     Toast.loading({
         message: 'loading',
         forbidClick: true,
         loadingType: 'spinner',
-        duration:30000
-      });
+        duration: 30000
+    });
     config.transformRequest = [function (data) {
         // 在请求之前对data传参进行格式转换
         data = JSON.stringify(data)
@@ -58,7 +58,7 @@ parkAxios.interceptors.request.use(function (config) {
     }];
     return config;
 
-    }, function (error) {
+}, function (error) {
     // 对请求错误做些什么
     return Promise.reject(error);
 });
@@ -66,42 +66,42 @@ parkAxios.interceptors.request.use(function (config) {
 
 // 添加响应拦截器
 mainAxios.interceptors.response.use(function (response) {
-    let { noError = true } =  response.config
+    let { noError = true } = response.config
 
     if (noError) {
         let data = response.data
-        if(data.code < 0){
-            if(data.code == -1){
+        if (data.code < 0) {
+            if (data.code == -1) {
                 data.msg = "token不能为空"
-                setTimeout(()=>{main.$router.replace({name: 'login'})},1000)
+                setTimeout(() => { main.$router.replace({ name: 'login' }) }, 1000)
 
-            }else if(data.code == -2){
+            } else if (data.code == -2) {
                 data.msg = "用户信息不存在"
-                setTimeout(()=>{main.$router.replace({name: 'login'})},1000)
+                setTimeout(() => { main.$router.replace({ name: 'login' }) }, 1000)
 
-            }else if(data.code == -3){
+            } else if (data.code == -3) {
                 data.msg = "用户登录信息已失效"
-                setTimeout(()=>{main.$router.replace({name: 'login'})},1000)
+                setTimeout(() => { main.$router.replace({ name: 'login' }) }, 1000)
 
-            }else if(data.code == -4){
+            } else if (data.code == -4) {
                 data.msg = "账户不存在或者密码错误"
             }
-        }else{
+        } else {
             if (data.code == 500) {
                 data.msg = "网络繁忙，请稍后再试！"
                 Toast(data.msg);
-            }else if(data.code == 0){
+            } else if (data.code == 0) {
                 Toast.clear();
             }
         }
-        
+
     }
     return response.data;
 }, function (error) {
     // 对响应错误做点什么
     if (error.response) {
         console.log(error.response);
-        if (error.response.status == 401 ) {
+        if (error.response.status == 401) {
             console.log(401);
             // redirect()
         } else if (error.response.status == 402) {
@@ -116,35 +116,35 @@ mainAxios.interceptors.response.use(function (response) {
 
 // 添加响应拦截器
 parkAxios.interceptors.response.use(function (response) {
-    let { noError = true } =  response.config
+    let { noError = true } = response.config
     if (noError) {
         let data = response.data
-        if(data.code < 0){
-            if(data.code == -1){
+        if (data.code < 0) {
+            if (data.code == -1) {
                 data.msg = "token不能为空"
-                setTimeout(()=>{main.$router.replace({name: 'login'})},1000)
-            }else if(data.code == -2){
+                setTimeout(() => { main.$router.replace({ name: 'login' }) }, 1000)
+            } else if (data.code == -2) {
                 data.msg = "用户信息不存在,请重新登录"
-                setTimeout(()=>{main.$router.replace({name: 'login'})},1000)
-                
-            }else if(data.code == -3){
+                setTimeout(() => { main.$router.replace({ name: 'login' }) }, 1000)
+
+            } else if (data.code == -3) {
                 data.msg = "用户登录信息已失效,请重新登录"
-                setTimeout(()=>{main.$router.replace({name: 'login'})},1000)
-            }else if(data.code == -4){
+                setTimeout(() => { main.$router.replace({ name: 'login' }) }, 1000)
+            } else if (data.code == -4) {
                 data.msg = "账户不存在或者密码错误"
             }
             Toast(data.msg);
-        }else{
+        } else {
             if (data.code == 500) {
                 data.msg = "网络繁忙，请稍后再试！"
                 Toast(data.msg);
-            }else if(data.code == 0){
+            } else if (data.code == 0) {
                 Toast.clear();
-            }else{
+            } else {
                 Toast('error');
             }
         }
-        
+
     }
     return response.data;
 }, function (error) {
@@ -152,7 +152,7 @@ parkAxios.interceptors.response.use(function (response) {
     Toast('error');
     if (error.response) {
         console.log(error.response);
-        if (error.response.status == 401 ) {
+        if (error.response.status == 401) {
             console.log(401);
             // redirect()
         } else if (error.response.status == 402) {
@@ -165,8 +165,8 @@ parkAxios.interceptors.response.use(function (response) {
     return Promise.reject(error);
 });
 
-function redirect(){}
+function redirect() { }
 
 
 
-export {mainAxios,parkAxios}
+export { mainAxios, parkAxios }

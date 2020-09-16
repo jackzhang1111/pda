@@ -2,7 +2,7 @@
   <!-- 上架 -->
   <div class="pick-up">
     <saomiao-header @search="search"></saomiao-header>
-    <div class="pick-up-order">调拨入库单号：{{detailData.stockInOrderSn}}</div>
+    <div class="pick-up-order">入库单号：{{detailData.transferStockInOrderSn}}</div>
     <div class="order-detail">
       <div class="detail-header">
         <van-icon
@@ -119,7 +119,12 @@
 <script>
 import saomiaoHeader from "@/multiplexing/saomiaoHeader.vue";
 import { Dialog, Toast } from "vant";
-import { transferinstockdowmproshelvesApi } from "@/api/warehousing/allocation/index.js";
+import {
+  transferinstockdowmproshelvesApi,
+  getshelfuporderconfirminfoApi,
+  getcanupregionlistApi,
+  confirmtransfershelfuporderApi,
+} from "@/api/warehousing/allocation/index.js";
 import {
   stockInToShelvesAllApi,
   getwarehouseregionIDApi,
@@ -134,32 +139,24 @@ export default {
       currentProduct: {},
       detailedGuigeList: [
         { name: "规格属性", value: "" },
-        { name: "供应商", value: "" },
-        { name: "批次号", value: "" },
         { name: "调拨入库数量", value: "" },
-        { name: "FNSKU", value: "" },
+        { name: "卖家", value: "" },
         { name: "装箱数量", value: "" },
-        { name: "国际码", value: "" },
+        { name: "批次号", value: "" },
         { name: "上架数量", value: "" },
+        { name: "FNSKU", value: "" },
+        { name: "已上架数量", value: "" },
         { name: "入库类型", value: "" },
         { name: "单位重量(kg)", value: "" },
         { name: "入库仓库", value: "" },
         { name: "装箱重量(kg)", value: "" },
       ],
-      removeData: {
-        productlist: [],
-        shelfDownOrderId: "",
-        sourceType: 2,
-      },
-      shelvesData: {
-        shelvesOrderId: 0,
-        sourceType: 2,
-        productlist: [],
-      },
-      paraObj: {
-        typeId: 1,
-        paramId: "",
-      },
+      productList: [
+        { type: 1, name: "供货入库" },
+        { type: 2, name: "调拨入库" },
+        { type: 3, name: "销售退货入库" },
+      ],
+      shelvesData: {},
       productArray: [],
       showPicker: false,
       columns: [],
@@ -176,8 +173,7 @@ export default {
   },
   created() {},
   mounted() {
-    this.paraObj.paramId = this.$route.query.orderid;
-    this.transferinstockdowmproshelves(this.paraObj);
+    this.getshelfuporderconfirminfo({ orderSn: this.$route.query.orderid });
   },
   watch: {
     currentProduct: {
@@ -192,7 +188,7 @@ export default {
       this.productArray.forEach((item, index) => {
         if (item.fnskuCode == val) {
           this.current = index + 1;
-          this.currentProduct = this.detailData.productList[index];
+          this.currentProduct = this.detailData.batchList[index];
         }
       });
     },
@@ -200,133 +196,87 @@ export default {
     cliPlayLeft() {
       if (this.current <= 1) return;
       this.current--;
-      this.currentProduct = this.detailData.productList[this.current - 1];
+      this.currentProduct = this.detailData.batchList[this.current - 1];
     },
     //下一个
     cliPlayRight() {
       if (this.current >= this.listLength) return;
       this.current++;
-      this.currentProduct = this.detailData.productList[this.current - 1];
+      this.currentProduct = this.detailData.batchList[this.current - 1];
     },
     //上架详情
-    transferinstockdowmproshelves(data) {
-      transferinstockdowmproshelvesApi(data).then((res) => {
+    getshelfuporderconfirminfo(data) {
+      getshelfuporderconfirminfoApi(data).then((res) => {
         if (res.code == 0) {
-          this.detailData = res.Data;
-          this.currentProduct = res.Data.productList[this.current - 1];
-          this.listLength = res.Data.productList.length;
-          this.productArray = res.Data.productList;
-
-          this.removeData.shelfDownOrderId = this.detailData.shelfDownOrderId;
-          this.shelvesData.shelvesOrderId = res.Data.shelvesOrderId;
-
+          this.detailData = res.orderModel;
+          this.detailData.batchList.forEach((item) => {
+            item.regionList = [];
+          });
+          this.currentProduct = res.orderModel.batchList[this.current - 1];
+          this.listLength = res.orderModel.batchList.length;
+          this.productArray = res.orderModel.batchList;
           this.setCurrentProduct();
-
-          if (!res.Data.shelvesOrderId) {
-            this.getwarehouseregionID(
-              { warehouseId: res.Data.warehouseId },
-              true
-            );
-          } else {
-            this.getwarehouseregionID(
-              { warehouseId: res.Data.warehouseId },
-              false
-            );
-            res.Data.productList.forEach((ele) => {
-              ele.warehouselist.forEach((item) => {
-                item.text = "wms";
-              });
-            });
-          }
+          this.getcanupregionlist({
+            warehouseId: this.detailData.inWarehouseId,
+          });
+        } else if (res.code == 3) {
+          this.$router.replace({ name: "noOrder", query: { type: 3 } });
+        } else if (res.code == 4) {
+          this.$router.replace({ name: "noOrder", query: { type: 5 } });
+        } else if (res.code == 6) {
+          this.$router.replace({ name: "noOrder", query: { type: 4 } });
+        } else {
+          Toast(res.msg);
         }
       });
     },
     //当前商品基本属性
     setCurrentProduct() {
       this.detailedGuigeList[0].value = this.currentProduct.skuValuesTitle;
-      this.detailedGuigeList[1].value = this.currentProduct.businessName;
-      this.detailedGuigeList[2].value = this.currentProduct.batchNo;
-      this.detailedGuigeList[3].value = this.currentProduct.detailNum;
-      this.detailedGuigeList[4].value = this.currentProduct.fnskuCode;
-      this.detailedGuigeList[5].value = this.currentProduct.goodnumPerBox;
-      this.detailedGuigeList[6].value = this.currentProduct.intCode;
-      this.detailedGuigeList[7].value = this.currentProduct.hasInDetailNum;
-      this.detailedGuigeList[8].value = this.currentProduct.stockIntype;
+      this.detailedGuigeList[1].value = this.currentProduct.inDetailNum;
+      this.detailedGuigeList[2].value = this.currentProduct.businessName;
+      this.detailedGuigeList[3].value = this.currentProduct.goodnumPerBox;
+      this.detailedGuigeList[4].value = this.currentProduct.batchNo;
+      this.detailedGuigeList[5].value = this.currentProduct.upDetailNum;
+      this.detailedGuigeList[6].value = this.currentProduct.fnskuCode;
+      this.detailedGuigeList[7].value = this.currentProduct.hasUpDetailNum;
+      this.detailedGuigeList[8].value = this.orderStatus(
+        this.currentProduct.stockInOrderType,
+        "productList"
+      );
       this.detailedGuigeList[9].value = this.currentProduct.unitWeight;
-      this.detailedGuigeList[10].value = this.currentProduct.stockInWarehouse;
-      this.detailedGuigeList[11].value = this.currentProduct.boxWeight;
+      this.detailedGuigeList[10].value = this.currentProduct.inWarehouseName;
+      this.detailedGuigeList[11].value = this.currentProduct.goodnumPerBox;
+    },
+    //编译状态
+    orderStatus(type, list) {
+      let name = "";
+      this[list].forEach((statu) => {
+        if (statu.type == type) {
+          name = statu.name;
+        }
+      });
+      return name;
     },
     //全部上架
     finishPicking() {
       let arr = [];
-      this.productArray.forEach((ele) => {
-        let obj = {
-          batchNo: ele.batchNo,
-          skuId: ele.skuId,
-          stockInOrderType: 2,
-          orderDetailId: ele.orderDetailId,
-          unitSize: ele.unitSize,
-          proRegion: [],
-        };
+      this.shelvesData = this.$fn.deepCopy(this.detailData);
+      this.shelvesData.batchList.forEach((ele) => {
         ele.warehouselist.forEach((item) => {
-          if (Number(item.upItemNum) > 0) {
-            let proRegionObj = {
-              regionId: item.regionId,
-              orderDetailId: ele.orderDetailId,
-              stockInOrderType: 2,
-              upItemNum: Number(item.upItemNum),
-            };
-            obj.proRegion.push(proRegionObj);
-          }
+          let obj = {
+            regionId: item.regionId,
+            upItemNum: item.upItemNum,
+          };
+          ele.regionList.push(obj);
         });
-        if (obj.proRegion.length > 0) {
-          arr.push(obj);
-        }
-        this.shelvesData.productlist = arr;
       });
       Dialog.confirm({
         title: "温馨提示",
         message: "您确定要“确认全部上架”操作吗?",
       })
         .then(() => {
-          let productIndex,
-            proRegionIndex,
-            flag = true;
-          if (this.productArray.length != this.shelvesData.productlist.length) {
-            flag = false;
-          }
-          if (flag) {
-            for (
-              productIndex = 0;
-              productIndex < this.shelvesData.productlist.length;
-              productIndex++
-            ) {
-              let num = 0,
-                allNum = 0;
-              for (
-                proRegionIndex = 0;
-                proRegionIndex <
-                this.shelvesData.productlist[productIndex].proRegion.length;
-                proRegionIndex++
-              ) {
-                num += this.shelvesData.productlist[productIndex].proRegion[
-                  proRegionIndex
-                ].upItemNum;
-              }
-              if (this.productArray[productIndex].hasInDetailNum != num) {
-                flag = false;
-              }
-            }
-          }
-          if (!flag) {
-            Toast("全部上架数量不正确");
-            return;
-          }
-          if (this.shelvesData.productlist.length == 0) {
-            Toast("请选择库区上架");
-            return;
-          }
-          this.stockInToShelvesAll(this.shelvesData);
+          this.confirmtransfershelfuporder(this.shelvesData);
         })
         .catch(() => {});
     },
@@ -346,6 +296,7 @@ export default {
         Math.pow(10, m)
       );
     },
+    //库区货位选择
     onConfirm(value, valueIndexs) {
       let threeShel = null,
         twoShel = null,
@@ -359,9 +310,7 @@ export default {
         valueIndexs[1]
       ].children[valueIndexs[2]];
       this.currentProduct.warehouselist.push(this.$fn.copy(threeShel));
-
       this.showPicker = false;
-
       this.currentProduct.columns.forEach((one, oneIndex) => {
         let oneId = one.regionId;
         one.children.forEach((two, twoIndex) => {
@@ -384,45 +333,6 @@ export default {
         this.currentProduct.columns.splice(valueIndexs[0], 1);
       }
     },
-    //全部上架
-    stockInToShelvesAll(data) {
-      stockInToShelvesAllApi(data).then((res) => {
-        if (res.code == 0) {
-          Toast("上架成功");
-          setTimeout(() => {
-            this.$router.go(-1);
-          }, 1500);
-        } else if (res.code == 1) {
-          Toast(
-            "本次上架商品数量超过当前最大可上架商品数量（入库单入库商品数量-已创建上架单商品数量）"
-          );
-        } else if (res.code == 2) {
-          Toast("存在重复的入库单");
-        } else if (res.code == 3) {
-          Toast("入库单入库仓库不一致");
-        } else if (res.code == 4) {
-          Toast("该入库单已上架，无需重复操作");
-        } else if (res.code == 5) {
-          Toast("存在本次上架数总数等于0的入库单");
-        } else if (res.code == 6) {
-          Toast(
-            "本次上架商品体积超过库区最大可上架体积（库区空闲体积-已创建上架单待上架商品体积）"
-          );
-        } else if (res.code == 7) {
-          Toast("该上架单不是待上架状态，不能修改");
-        } else if (res.code == 8) {
-          Toast("上架位置必须为无货架库区或者货位");
-        } else if (res.code == 9) {
-          Toast("商品不能上架到非站点仓库的正品库区");
-        } else if (res.code == 11) {
-          Toast("传入的源入库单明细不存在");
-        } else if (res.code == 12) {
-          Toast("上架数量不能小于0");
-        } else if (res.code == 13) {
-          Toast("目标位置的商品正在盘点中，不能进行此操作 ");
-        }
-      });
-    },
     //垃圾桶
     detailWarehouse(index, item) {
       Dialog.confirm({
@@ -440,7 +350,6 @@ export default {
                   onecolumnIndex = columnIndex;
                   twocolumnIndex = twoIndex;
                   item.upItemNum = 0;
-                  if (item.text == "wms") return;
                   two.children.push(item);
                 }
               });
@@ -456,9 +365,9 @@ export default {
                 ele.upItemNum = 0;
               }
             });
-            if (item.text == "wms") return;
             this.currentProduct.columns.push(ele);
           }
+          this.$forceUpdate();
         })
         .catch(() => {});
     },
@@ -470,7 +379,7 @@ export default {
       } else if (this.current < 1) {
         this.current = 1;
       }
-      this.currentProduct = this.detailData.productList[this.current - 1];
+      this.currentProduct = this.detailData.batchList[this.current - 1];
     },
     //修改数量
     changNum(val, name) {
@@ -479,9 +388,9 @@ export default {
       //取整
       val[name] = Math.ceil(val[name]);
     },
-    //PDA获取所有库位信息接口
-    getwarehouseregionID(data, flag) {
-      getwarehouseregionIDApi(data).then((res) => {
+    //通过入库仓库Id获取可上架的位置
+    getcanupregionlist(data) {
+      getcanupregionlistApi(data).then((res) => {
         if (res.code == 0) {
           res.Data.forEach((one, oneIndex) => {
             one.text = one.regionName;
@@ -534,11 +443,22 @@ export default {
             }
           });
           this.productArray.forEach((ele) => {
-            if (flag) {
-              ele.warehouselist = new Array();
-            }
+            ele.warehouselist = new Array();
             ele.columns = this.$fn.copy(this.goodsShelves);
           });
+        }
+      });
+    },
+    //调拨入库确认上架（支持部分上架）
+    confirmtransfershelfuporder(data) {
+      confirmtransfershelfuporderApi(data).then((res) => {
+        if (res.code == 0) {
+          Toast("上架成功");
+          setTimeout(() => {
+            this.$router.go(-1);
+          }, 1500);
+        } else {
+          Toast(res.msg);
         }
       });
     },

@@ -4,7 +4,7 @@
     <div class="pick-up" v-show="showPickUp">
       <saomiao-header @search="search"></saomiao-header>
       <div class="pick-up-order">
-        <span>供货单号：{{detailData.orderSn}}</span>
+        <span>调拨出库单号:{{detailData.transferStockOutOrderSn}}</span>
         <span class="fl-right">{{listLength}}</span>
       </div>
       <div class="order-detail" v-if="currentArray.length > 0">
@@ -51,8 +51,10 @@
               type="number"
               v-model="currentProduct.inDetailNum"
               style="width:50px"
+              @input="changeInDetailNum(currentProduct.inDetailNum,currentProduct.batchList)"
             />
           </div>
+          <div class="detailed-item"></div>
         </div>
       </div>
       <div class="goods-shelves">
@@ -173,6 +175,7 @@ export default {
         { name: "入库类型", value: "" },
         { name: "调拨已入库数量", value: "" },
         { name: "入库仓库", value: "" },
+        { name: "剩余待入库数量", value: "" },
       ],
       productList: [
         { type: 1, name: "供货入库" },
@@ -278,6 +281,7 @@ export default {
         );
         this.detailedGuigeList[5].value = this.currentProduct.hasInDetailNum;
         this.detailedGuigeList[6].value = this.currentProduct.inWarehouseName;
+        this.detailedGuigeList[7].value = this.currentProduct.maxCanStockInNum;
       } catch (err) {
         console.log(err);
       }
@@ -333,10 +337,9 @@ export default {
       this.currentProduct = this.currentArray[this.current - 1];
     },
     //修改数量
-    changNum(val, type, name) {
+    changNum(val, name) {
       //大于0
       val[name] < 0 ? (val[name] = 0) : val[name];
-      if (type == "no") return;
       //取整
       val[name] = Math.ceil(val[name]);
     },
@@ -477,6 +480,14 @@ export default {
         outputStream.flush();
       } else {
         Toast("蓝牙链接失败");
+      }
+    },
+    //当前入库数量修改
+    changeInDetailNum(value, list) {
+      value = value.replace(/[^\d]/g, "");
+      this.currentProduct.inDetailNum = value;
+      if (list.length === 1) {
+        list[0].inDetailNum = value;
       }
     },
   },

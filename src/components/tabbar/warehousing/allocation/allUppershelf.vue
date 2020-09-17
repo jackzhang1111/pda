@@ -150,6 +150,8 @@ export default {
         { name: "单位重量(kg)", value: "" },
         { name: "入库仓库", value: "" },
         { name: "装箱重量(kg)", value: "" },
+        { name: "商品分类", value: "" },
+        { name: "剩余待上架数量", value: "" },
       ],
       productList: [
         { type: 1, name: "供货入库" },
@@ -247,6 +249,8 @@ export default {
       this.detailedGuigeList[9].value = this.currentProduct.unitWeight;
       this.detailedGuigeList[10].value = this.currentProduct.inWarehouseName;
       this.detailedGuigeList[11].value = this.currentProduct.goodnumPerBox;
+      this.detailedGuigeList[12].value = this.currentProduct.categoryNamesReal;
+      this.detailedGuigeList[13].value = this.currentProduct.maxCanShelfUpNum;
     },
     //编译状态
     orderStatus(type, list) {
@@ -457,6 +461,8 @@ export default {
           setTimeout(() => {
             this.$router.go(-1);
           }, 1500);
+        } else if (res.code == 99 || res.code == 999) {
+          Toast("系统繁忙");
         } else {
           Toast(res.msg);
         }

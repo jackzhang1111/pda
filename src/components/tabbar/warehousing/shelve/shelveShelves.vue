@@ -7,7 +7,8 @@
         <template #title>
           <div>
             <span>{{orderName}}</span>
-            <span class="fl-right fs-20">{{detailData.stockInOrderSn}}</span>
+            <span class="fl-right fs-20" v-if="typeVal == 2">{{detailData.transferStockInOrderSn}}</span>
+            <span class="fl-right fs-20" v-else>{{detailData.stockInOrderSn}}</span>
           </div>
           <div v-if="typeVal == 3">
             <span>售后单号</span>
@@ -297,26 +298,31 @@ export default {
     cliPlayLeft() {
       if (this.current <= 1) return;
       this.current--;
-      this.currentProduct = this.detailData.productList[this.current - 1];
+      if (this.typeVal == 2) {
+        this.currentProduct = this.detailData.batchList[this.current - 1];
+      } else {
+        this.currentProduct = this.detailData.productList[this.current - 1];
+      }
     },
     //下一个
     cliPlayRight() {
       if (this.current >= this.listLength) return;
       this.current++;
-      this.currentProduct = this.detailData.productList[this.current - 1];
+      if (this.typeVal == 2) {
+        this.currentProduct = this.detailData.batchList[this.current - 1];
+      } else {
+        this.currentProduct = this.detailData.productList[this.current - 1];
+      }
     },
     //供货入库上架信息
     stockInToShelves(data) {
       stockInToShelvesApi(data).then((res) => {
         if (res.code == 0) {
           this.detailData = res.Data;
-          this.currentProduct = res.Data.productList[this.current - 1];
+          this.currentProduct = res.Data.productList[0];
           this.listLength = res.Data.productList.length;
           this.productArray = res.Data.productList;
-
           this.shelvesData.shelvesOrderId = res.Data.shelvesOrderId;
-
-          this.setCurrentProduct();
           if (!res.Data.shelvesOrderId) {
             this.getwarehouseregionID(
               { warehouseId: res.Data.warehouseId },
@@ -341,13 +347,11 @@ export default {
       customerservicebackordershelvesApi(data).then((res) => {
         if (res.code == 0) {
           this.detailData = res.Data;
-          this.currentProduct = res.Data.productList[this.current - 1];
+          this.currentProduct = res.Data.productList[0];
           this.listLength = res.Data.productList.length;
           this.productArray = res.Data.productList;
           this.removeData.shelfDownOrderId = this.detailData.shelfDownOrderId;
           this.shelvesData.shelvesOrderId = res.Data.shelvesOrderId;
-
-          this.setCurrentProduct();
           if (!res.Data.shelvesOrderId) {
             this.getwarehouseregionID(
               { warehouseId: res.Data.warehouseId },
@@ -375,10 +379,9 @@ export default {
           this.detailData.batchList.forEach((item) => {
             item.regionList = [];
           });
-          this.currentProduct = res.orderModel.batchList[this.current - 1];
+          this.currentProduct = res.orderModel.batchList[0];
           this.listLength = res.orderModel.batchList.length;
           this.productArray = res.orderModel.batchList;
-          this.setCurrentProduct();
           this.getcanupregionlist({
             warehouseId: this.detailData.inWarehouseId,
           });
@@ -434,6 +437,7 @@ export default {
           { name: "入库仓库", value: "" },
           { name: "装箱重量(kg)", value: "" },
         ];
+        console.log(this.currentProduct, "this.currentProduct");
         this.detailedGuigeList[0].value = this.currentProduct.skuValuesTitle;
         this.detailedGuigeList[1].value = this.currentProduct.inDetailNum;
         this.detailedGuigeList[2].value = this.currentProduct.businessName;
@@ -613,6 +617,8 @@ export default {
           setTimeout(() => {
             this.$router.go(-1);
           }, 1500);
+        } else if (res.code == 99 || res.code == 999) {
+          Toast("系统繁忙");
         } else {
           Toast(res.msg);
         }
@@ -709,6 +715,7 @@ export default {
     },
     //选择单号
     toPickUp(orderData) {
+      this.current = 1;
       if (this.paraObj.paramId == orderData.orderId) return;
       this.dataList.forEach((item) => {
         item.checked = false;

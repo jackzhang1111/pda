@@ -2,7 +2,7 @@
   <!-- 上架 -->
   <div class="pick-up">
     <saomiao-header @search="search"></saomiao-header>
-    <van-collapse v-model="activeNames" class="collapse">
+    <van-collapse v-model="activeNames" class="collapse" accordion name="1">
       <van-collapse-item>
         <template #title>
           <div>
@@ -219,7 +219,7 @@ export default {
       },
       typeVal: 0,
       dataList: [],
-      activeNames: [],
+      activeNames: 1,
       bluetoothState: {},
       pairedDevices: [],
       address: null,
@@ -436,8 +436,9 @@ export default {
           { name: "单位重量(kg)", value: "" },
           { name: "入库仓库", value: "" },
           { name: "装箱重量(kg)", value: "" },
+          { name: "商品分类", value: "" },
+          { name: "剩余待上架数量", value: "" },
         ];
-        console.log(this.currentProduct, "this.currentProduct");
         this.detailedGuigeList[0].value = this.currentProduct.skuValuesTitle;
         this.detailedGuigeList[1].value = this.currentProduct.inDetailNum;
         this.detailedGuigeList[2].value = this.currentProduct.businessName;
@@ -453,6 +454,8 @@ export default {
         this.detailedGuigeList[9].value = this.currentProduct.unitWeight;
         this.detailedGuigeList[10].value = this.currentProduct.inWarehouseName;
         this.detailedGuigeList[11].value = this.currentProduct.goodnumPerBox;
+        this.detailedGuigeList[12].value = this.currentProduct.categoryNamesReal;
+        this.detailedGuigeList[13].value = this.currentProduct.maxCanShelfUpNum;
       } else {
         //供货入库单,调拨入库单
         this.detailedGuigeList = [
@@ -716,6 +719,7 @@ export default {
     //选择单号
     toPickUp(orderData) {
       this.current = 1;
+      this.activeNames = 2;
       if (this.paraObj.paramId == orderData.orderId) return;
       this.dataList.forEach((item) => {
         item.checked = false;

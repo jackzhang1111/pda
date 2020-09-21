@@ -67,9 +67,12 @@
           </div>
           <div class="item-number">
             <div>
-              <span>{{batch.batchNo}}</span>
-              <span @click="see(batch)">查看</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-              <span @click="print(batch.batchNo)">打印</span>
+              <span>{{batch.batchNo}}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <span @click="see(batch)" style="color:#3983FF">查看</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <span
+                @click="print(batch.batchNo)"
+                style="color:#3983FF"
+              >打印</span>
             </div>
             <div class="item-input">
               <input type="number" v-model="batch.inDetailNum" />

@@ -54,7 +54,6 @@
               @input="changeInDetailNum(currentProduct.inDetailNum,currentProduct.batchList)"
             />
           </div>
-          <div class="detailed-item"></div>
         </div>
       </div>
       <div class="goods-shelves">
@@ -171,6 +170,7 @@ export default {
       detailData: {},
       currentProduct: {},
       detailedGuigeList: [
+        { name: "批次号", value: "" },
         { name: "规格属性", value: "" },
         { name: "卖家", value: "" },
         { name: "国际码", value: "" },
@@ -242,12 +242,14 @@ export default {
   methods: {
     //搜索框
     search(val) {
+      let flag = true;
       this.productlist.forEach((item, index) => {
         if (item.fnskuCode == val && item.isShow == 0) {
           item.isShow = 1;
           this.currentArray.push(item);
           this.currentProduct = this.currentArray[this.currentArray.length - 1];
           this.current = this.currentArray.length;
+          flag = false;
         } else if (item.fnskuCode == val && item.isShow == 1) {
           this.currentArray.forEach((ele, eleIndex) => {
             if (ele.fnskuCode == item.fnskuCode) {
@@ -256,8 +258,10 @@ export default {
               this.currentProduct.inDetailNum++;
             }
           });
+          flag = false;
         }
       });
+      if (flag) Toast("此订单没有该商品,请重新扫描");
     },
     //上一个
     cliPlayLeft() {
@@ -274,17 +278,18 @@ export default {
     //当前商品基本属性
     setCurrentProduct() {
       try {
-        this.detailedGuigeList[0].value = this.currentProduct.skuValuesTitle;
-        this.detailedGuigeList[1].value = this.currentProduct.businessName;
-        this.detailedGuigeList[2].value = this.currentProduct.intCode;
-        this.detailedGuigeList[3].value = this.currentProduct.outDetailNum;
-        this.detailedGuigeList[4].value = this.orderStatus(
+        this.detailedGuigeList[0].value = this.currentProduct.allBatchNos;
+        this.detailedGuigeList[1].value = this.currentProduct.skuValuesTitle;
+        this.detailedGuigeList[2].value = this.currentProduct.businessName;
+        this.detailedGuigeList[3].value = this.currentProduct.intCode;
+        this.detailedGuigeList[4].value = this.currentProduct.outDetailNum;
+        this.detailedGuigeList[5].value = this.orderStatus(
           this.currentProduct.stockInOrderType,
           "productList"
         );
-        this.detailedGuigeList[5].value = this.currentProduct.hasInDetailNum;
-        this.detailedGuigeList[6].value = this.currentProduct.inWarehouseName;
-        this.detailedGuigeList[7].value = this.currentProduct.maxCanStockInNum;
+        this.detailedGuigeList[6].value = this.currentProduct.hasInDetailNum;
+        this.detailedGuigeList[7].value = this.currentProduct.inWarehouseName;
+        this.detailedGuigeList[8].value = this.currentProduct.maxCanStockInNum;
       } catch (err) {
         console.log(err);
       }
@@ -372,7 +377,13 @@ export default {
           Toast("入库成功,打印入库单号");
           this.print(JSON.parse(res.resdata).orderAidSn);
           setTimeout(() => {
-            this.$router.go(-1);
+            Dialog.alert({
+              message: `${
+                JSON.parse(res.resdata).orderAidId
+              },请将该入库单标识写在箱子上`,
+            }).then(() => {
+              this.$router.go(-1);
+            });
           }, 1500);
         } else {
           Toast(res.msg);

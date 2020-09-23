@@ -781,6 +781,7 @@ export default {
             if (item.text == "wms") return;
             this.currentProduct.columns.push(ele);
           }
+          this.$forceUpdate();
         })
         .catch(() => {});
     },

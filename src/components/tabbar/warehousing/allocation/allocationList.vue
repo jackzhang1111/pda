@@ -163,6 +163,14 @@ export default {
     }
     this.refreshOrder();
   },
+  beforeDestroy() {
+    try {
+      device = null; //这里关键
+      bluetoothSocket.close();
+    } catch (err) {
+      console.log(err, "beforeDestroy");
+    }
+  },
   watch: {
     activeOne: {
       handler: function (newVal) {

@@ -362,7 +362,6 @@ export default {
         this.getReady();
       } catch (error) {
         Toast("请链接蓝牙");
-        console.log(error, "error");
       }
     },
     print(data) {
@@ -381,49 +380,49 @@ export default {
         var s = plus.android.importClass("java.lang.String");
         var bytes;
 
-        var size = "SIZE 10mm,30mm\n";
+        var size = `! 0 200 200 210 1\r\nBARCODE-TEXT 7 2 5\r\nBARCODE 128 1 1 50 100 80 ${data}\r\nFORM\r\nPRINT\r\n`;
         bytes = plus.android.invoke(size, "getBytes", "gb18030");
         outputStream.write(bytes);
         outputStream.flush();
 
-        var gap = "GAP 0mm\n";
-        bytes = plus.android.invoke(gap, "getBytes", "gb18030");
-        outputStream.write(bytes);
-        outputStream.flush();
-
-        var speed = "SPEED 5\n";
-        bytes = plus.android.invoke(speed, "getBytes", "gb18030");
-        outputStream.write(bytes);
-        outputStream.flush();
-
-        var density = "DENSITY 8\n";
-        bytes = plus.android.invoke(density, "getBytes", "gb18030");
-        outputStream.write(bytes);
-        outputStream.flush();
-
-        var cls = "CLS \n";
-        bytes = plus.android.invoke(cls, "getBytes", "gb18030");
-        outputStream.write(bytes);
-        outputStream.flush();
-
-        // var values1=`TEXT 10,10,\"TSS24.BF2\",0,1,1,\"${this.currentProduct.batchNo}\"\n`
-        // bytes = plus.android.invoke(values1, 'getBytes', 'gb18030');
-        // outputStream.write(bytes);
-        // outputStream.flush();
-        // var reference = "REFERENCE 0,16dot \n";
-        // bytes = plus.android.invoke(reference, "getBytes", "gb18030");
+        // var gap = "GAP 0mm\n";
+        // bytes = plus.android.invoke(gap, "getBytes", "gb18030");
         // outputStream.write(bytes);
         // outputStream.flush();
 
-        var values2 = `BARCODE 25,10,\"128\",50,1,0,1,1,\"${data}\"\n`;
-        bytes = plus.android.invoke(values2, "getBytes", "gb18030");
-        outputStream.write(bytes);
-        outputStream.flush();
+        // var speed = "SPEED 5\n";
+        // bytes = plus.android.invoke(speed, "getBytes", "gb18030");
+        // outputStream.write(bytes);
+        // outputStream.flush();
 
-        var string = "PRINT 1\n"; //必须以创建字符串对象的形式创建对象，否则返回NULL
-        bytes = plus.android.invoke(string, "getBytes", "gb18030");
-        outputStream.write(bytes);
-        outputStream.flush();
+        // var density = "DENSITY 8\n";
+        // bytes = plus.android.invoke(density, "getBytes", "gb18030");
+        // outputStream.write(bytes);
+        // outputStream.flush();
+
+        // var cls = "CLS \n";
+        // bytes = plus.android.invoke(cls, "getBytes", "gb18030");
+        // outputStream.write(bytes);
+        // outputStream.flush();
+
+        // // var values1=`TEXT 10,10,\"TSS24.BF2\",0,1,1,\"${this.currentProduct.batchNo}\"\n`
+        // // bytes = plus.android.invoke(values1, 'getBytes', 'gb18030');
+        // // outputStream.write(bytes);
+        // // outputStream.flush();
+        // // var reference = "REFERENCE 0,16dot \n";
+        // // bytes = plus.android.invoke(reference, "getBytes", "gb18030");
+        // // outputStream.write(bytes);
+        // // outputStream.flush();
+
+        // var values2 = `BARCODE 25,10,\"128\",50,1,0,1,1,\"${data}\"\n`;
+        // bytes = plus.android.invoke(values2, "getBytes", "gb18030");
+        // outputStream.write(bytes);
+        // outputStream.flush();
+
+        // var string = "PRINT 1\n"; //必须以创建字符串对象的形式创建对象，否则返回NULL
+        // bytes = plus.android.invoke(string, "getBytes", "gb18030");
+        // outputStream.write(bytes);
+        // outputStream.flush();
       } else {
         Toast("蓝牙链接失败");
       }
